@@ -1,0 +1,192 @@
+# Déploiement complet de Butterfly.
+#
+# docker compose up -d --build (services applicatifs)
+# docker compose --profile tools up -d (y compris SonarQube)
+#
+# Les valeurs sensibles proviennent d'un fichier .env placé à côté de ce fichier,
+# jamais écrites ici : docker-compose.yml est versionné, .env ne l'est pas.
+#
+# Backend et frontend vivent dans des dépôts distincts. Ce fichier réside dans un
+# troisième dépôt de déploiement et désigne les deux autres par des chemins relatifs
+# configurables (BACKEND_PATH et FRONTEND_PATH dans .env).
+#
+# Arborescence attendue selon les chemins relatifs par défaut,
+# les trois dépôts clonés côte à côte :
+# workspace/
+#   butterfly/            dépôt backend, contient son propre Dockerfile
+#   butterfly-front/      dépôt frontend, contient son Dockerfile et nginx.conf
+#   butterfly-deploy/     ce dépôt
+#     docker-compose.yml
+#     .env
+
+services:
+
+  # ---------------------------------------------------------------------------
+  # Base de données
+  # ---------------------------------------------------------------------------
+  mysql:
+    image: mysql:8.4
+    container_name: butterfly-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME:-butterfly}
+      MYSQL_USER: ${DB_USERNAME}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+    # Port exposé sur l'hôte pour permettre l'inspection depuis un client SQL. À retirer
+    # sur un serveur réellement exposé : le backend n'en a pas besoin, il joint la base par
+    # le réseau interne.
+    ports:
+      - "${DB_EXPOSED_PORT:-3306}:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      # Le conteneur MySQL accepte des connexions bien avant d'être prêt à répondre.
+      # Sans ce contrôle, le backend démarrerait trop tôt et échouerait sur la connexion.
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-p${DB_ROOT_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    networks:
+      - butterfly
+
+  # ---------------------------------------------------------------------------
+  # Serveur de messagerie de développement
+  # ---------------------------------------------------------------------------
+  mailpit:
+    image: axllent/mailpit:latest
+    container_name: butterfly-mailpit
+    restart: unless-stopped
+    ports:
+      - "${MAILPIT_SMTP_PORT:-1025}:1025"
+      - "${MAILPIT_UI_PORT:-8025}:8025"
+    environment:
+      MP_MAX_MESSAGES: 500
+      MP_SMTP_AUTH_ACCEPT_ANY: "true"
+      MP_SMTP_AUTH_ALLOW_INSECURE: "true"
+    networks:
+      - butterfly
+
+  # ---------------------------------------------------------------------------
+  # API Spring Boot
+  # ---------------------------------------------------------------------------
+  backend:
+    build:
+      # Chemin vers le dépôt du backend, relatif à ce fichier. Les deux projets vivant
+      # dans des dépôts distincts, le chemin est paramétrable plutôt qu'écrit en dur :
+      # chacun peut les cloner où il le souhaite sans modifier ce fichier.
+      context: ${BACKEND_PATH:-../butterfly}
+      dockerfile: Dockerfile
+    container_name: butterfly-backend
+    restart: unless-stopped
+    depends_on:
+      mysql:
+        # Attente de la bonne santé du service et non de son simple démarrage :
+        # c'est la différence entre "le conteneur tourne" et "la base répond".
+        condition: service_healthy
+      mailpit:
+        condition: service_started
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_NAME: ${DB_NAME:-butterfly}
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRATION: ${JWT_EXPIRATION:-900000}
+      JWT_REFRESH_EXPIRATION: ${JWT_REFRESH_EXPIRATION:-604800000}
+
+      ADMIN_FIRST_NAME: ${ADMIN_FIRST_NAME:-Admin}
+      ADMIN_LAST_NAME: ${ADMIN_LAST_NAME:-Butterfly}
+      ADMIN_EMAIL: ${ADMIN_EMAIL}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD}
+
+      # L'interface est servie par nginx sur le port 80 du service frontend :
+      # c'est cette origine que le navigateur présente au backend.
+      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-http://localhost}
+
+      MAIL_HOST: mailpit
+      MAIL_PORT: 1025
+      MAIL_SMTP_AUTH: "false"
+      MAIL_SMTP_STARTTLS: "false"
+      MAIL_ENABLED: "true"
+      MAIL_FROM: ${MAIL_FROM:-no-reply@butterfly.local}
+      MAIL_FROM_NAME: ${MAIL_FROM_NAME:-Butterfly}
+      # Adresse vue depuis le navigateur de l'utilisateur et non depuis le réseau Docker :
+      # les liens des e-mails sont ouverts hors des conteneurs.
+      MAIL_FRONT_BASE_URL: ${MAIL_FRONT_BASE_URL:-http://localhost}
+
+      STORAGE_LOCATION: /app/uploads/exercise-submissions
+      MEDIA_IMAGE_LOCATION: /app/uploads/media/images
+      MEDIA_VIDEO_LOCATION: /app/uploads/media/videos
+      LOG_FILE_PATH: /app/logs/butterfly.log
+    volumes:
+      # Volumes nommés : les fichiers téléversés et les journaux survivent à la
+      # reconstruction de l'image, contrairement à tout ce qui reste dans le conteneur.
+      - backend_uploads:/app/uploads
+      - backend_logs:/app/logs
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:8080/actuator/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      # Délai avant le premier contrôle : le démarrage d'une application Spring Boot prend
+      # plusieurs dizaines de secondes, les échecs constatés avant ce délai sont ignorés.
+      start_period: 90s
+    networks:
+      - butterfly
+
+  # ---------------------------------------------------------------------------
+  # Interface Vue servie par nginx
+  # ---------------------------------------------------------------------------
+  frontend:
+    build:
+      context: ${FRONTEND_PATH:-../butterfly-front}
+      dockerfile: Dockerfile
+    container_name: butterfly-frontend
+    restart: unless-stopped
+    depends_on:
+      backend:
+        condition: service_healthy
+    ports:
+      - "${FRONTEND_PORT:-80}:80"
+    networks:
+      - butterfly
+
+  # ---------------------------------------------------------------------------
+  # Analyse de qualité, hors des services applicatifs
+  # ---------------------------------------------------------------------------
+  sonarqube:
+    image: sonarqube:community
+    container_name: butterfly-sonarqube
+    restart: unless-stopped
+    # Profil dédié : cet outil n'a rien à faire dans un démarrage courant
+    # et il réclame à lui seul environ deux gigaoctets de mémoire.
+    profiles:
+      - tools
+    ports:
+      - "${SONARQUBE_PORT:-9000}:9000"
+    volumes:
+      # Sans ces volumes, le projet, le jeton d'analyse et tout l'historique disparaissent
+      # à la suppression du conteneur.
+      - sonarqube_data:/opt/sonarqube/data
+      - sonarqube_extensions:/opt/sonarqube/extensions
+      - sonarqube_logs:/opt/sonarqube/logs
+    networks:
+      - butterfly
+
+volumes:
+  mysql_data:
+  backend_uploads:
+  backend_logs:
+  sonarqube_data:
+  sonarqube_extensions:
+  sonarqube_logs:
+
+networks:
+  butterfly:
+    driver: bridge
