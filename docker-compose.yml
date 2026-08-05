@@ -43,7 +43,10 @@ services:
     healthcheck:
       # Le conteneur MySQL accepte des connexions bien avant d'être prêt à répondre.
       # Sans ce contrôle, le backend démarrerait trop tôt et échouerait sur la connexion.
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-p${DB_ROOT_PASSWORD}"]
+      # Aucun mot de passe : mysqladmin ping renvoie 0 dès que le serveur est vivant même
+      # sans authentification. Le passer inscrirait le secret dans la configuration du
+      # conteneur lisible par un simple docker inspect.
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       interval: 10s
       timeout: 5s
       retries: 10
