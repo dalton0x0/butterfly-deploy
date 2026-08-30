@@ -111,7 +111,9 @@ toucher au `docker-compose.yml`.
 Les volumes nommés font survivre les données à la reconstruction des images :
 
 - `mysql_data` : la base de données
-- `backend_uploads` : fichiers téléversés (soumissions d'exercices, images, vidéos)
+- `backend_uploads` : fichiers téléversés (soumissions d'exercices, fichiers joints aux énoncés,
+  images, vidéos). Le montage porte sur `/app/uploads` en entier, tout nouveau sous-répertoire de
+  stockage est donc couvert sans modifier le `docker-compose.yml`
 - `backend_logs` : journaux applicatifs
 - `sonarqube_data`, `sonarqube_extensions`, `sonarqube_logs` : projet, jetons et historique
   d'analyse
@@ -153,6 +155,11 @@ Cette orchestration vise la démonstration et l'intégration, pas la production 
 
 ## Historique des versions
 
+- v1.0.2 : suivi des évolutions applicatives 1.4.0. Répertoire dédié aux fichiers joints aux
+  énoncés d'exercices (`EXERCISE_ATTACHMENT_LOCATION`) volontairement séparé des soumissions pour
+  qu'une purge de celles-ci n'emporte pas les consignes et documentation des réglages optionnels
+  du parcours (délai de grâce des tentatives de quiz, limites des pièces jointes). Aucun volume
+  supplémentaire : `backend_uploads` monte `/app/uploads` en entier.
 - v1.0.1 : durcissement et documentation. Mot de passe root retiré du contrôle de santé MySQL (il
   était inscrit dans la configuration du conteneur lisible par `docker inspect` et inutile au
   ping), configuration mail entièrement surchargeable depuis le `.env` (Mailpit par défaut, Brevo
