@@ -128,12 +128,18 @@ services:
       MAIL_FRONT_BASE_URL: ${MAIL_FRONT_BASE_URL:-http://localhost}
 
       STORAGE_LOCATION: /app/uploads/exercise-submissions
+      # Répertoire distinct des soumissions : les consignes du formateur et les rendus des
+      # apprenants n'ont ni les mêmes auteurs ni la même durée de vie. Une purge des rendus
+      # ne doit pas emporter les énoncés.
+      EXERCISE_ATTACHMENT_LOCATION: /app/uploads/exercise-attachments
       MEDIA_IMAGE_LOCATION: /app/uploads/media/images
       MEDIA_VIDEO_LOCATION: /app/uploads/media/videos
       LOG_FILE_PATH: /app/logs/butterfly.log
     volumes:
       # Volumes nommés : les fichiers téléversés et les journaux survivent à la
       # reconstruction de l'image, contrairement à tout ce qui reste dans le conteneur.
+      # Le montage porte sur /app/uploads en entier : tout nouveau sous-répertoire de
+      # stockage est couvert sans modifier ce fichier.
       - backend_uploads:/app/uploads
       - backend_logs:/app/logs
     healthcheck:
