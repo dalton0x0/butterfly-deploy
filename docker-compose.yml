@@ -110,6 +110,8 @@ services:
 
       # L'interface est servie par nginx sur le port 80 du service frontend :
       # c'est cette origine que le navigateur présente au backend.
+      # Attention, ces deux valeurs sont liées à FRONTEND_PORT. Le port changé sans
+      # elles, les liens des e-mails pointent vers une adresse qui ne répond plus.
       CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-http://localhost}
 
       # Messagerie : Mailpit par défaut, chaque valeur restant surchargeable depuis le
@@ -135,6 +137,17 @@ services:
       MEDIA_IMAGE_LOCATION: /app/uploads/media/images
       MEDIA_VIDEO_LOCATION: /app/uploads/media/videos
       LOG_FILE_PATH: /app/logs/butterfly.log
+
+      # Réglages applicatifs facultatifs. Ils doivent figurer ici pour atteindre le
+      # conteneur : Compose lit le .env pour remplacer les ${...} de ce fichier, il
+      # n'injecte pas ces variables dans les services. Sans ces lignes, les décommenter
+      # dans .env resterait sans effet.
+      LEARNING_QUIZ_ABANDON_GRACE_SECONDS: ${LEARNING_QUIZ_ABANDON_GRACE_SECONDS:-30}
+      EXERCISE_ATTACHMENT_MAX_FILE_SIZE_BYTES: ${EXERCISE_ATTACHMENT_MAX_FILE_SIZE_BYTES:-10485760}
+      EXERCISE_ATTACHMENT_MAX_FILES: ${EXERCISE_ATTACHMENT_MAX_FILES:-10}
+      # Plafond de la taille de page acceptée. Au delà, Spring rabaisse la valeur en
+      # silence : à remonter en même temps que les tailles demandées par le frontend.
+      PAGE_MAX_SIZE: ${PAGE_MAX_SIZE:-100}
     volumes:
       # Volumes nommés : les fichiers téléversés et les journaux survivent à la
       # reconstruction de l'image, contrairement à tout ce qui reste dans le conteneur.
@@ -174,6 +187,8 @@ services:
       # Le conteneur écoute sur 8080 : l'image nginx non privilégiée tourne sans root
       # et ne peut pas se lier au port 80. L'utilisateur, lui, entre toujours par le
       # port défini ici côté hôte.
+      # Changer ce port impose de changer aussi CORS_ALLOWED_ORIGINS et
+      # MAIL_FRONT_BASE_URL, qui décrivent la même adresse vue du navigateur.
       - "${FRONTEND_PORT:-80}:8080"
     networks:
       - butterfly
