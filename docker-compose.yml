@@ -190,6 +190,14 @@ services:
       # Changer ce port impose de changer aussi CORS_ALLOWED_ORIGINS et
       # MAIL_FRONT_BASE_URL, qui décrivent la même adresse vue du navigateur.
       - "${FRONTEND_PORT:-80}:8080"
+    healthcheck:
+      # wget vient de BusyBox présent dans l'image alpine : rien à installer.
+      # --spider demande l'en-tête seulement sans télécharger la page.
+      test: ["CMD-SHELL", "wget -q --spider http://localhost:8080/ || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
     networks:
       - butterfly
 
