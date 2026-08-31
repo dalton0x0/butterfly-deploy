@@ -87,6 +87,8 @@ plusieurs dizaines de secondes à démarrer.
   `docker inspect`.
 - Backend : appel de `/actuator/health` avec une période de grâce de 90 secondes couvrant le
   démarrage de Spring Boot.
+- Frontend : `wget --spider` sur la racine servie par nginx. La commande vient de BusyBox déjà
+  présent dans l'image alpine et ne demande que l'en-tête sans télécharger la page.
 
 ## Configuration
 
@@ -94,13 +96,18 @@ Toutes les valeurs proviennent du fichier `.env`, jamais du `docker-compose.yml`
 fichier `.env.example` documente chaque variable. Les obligatoires sont les mots de passe de la
 base, la clé `JWT_SECRET` et le compte administrateur.
 
-Deux variables méritent une attention particulière :
+Trois points méritent une attention particulière :
 
-- `CORS_ALLOWED_ORIGINS` et `MAIL_FRONT_BASE_URL` désignent l'adresse telle que vue depuis le
-  navigateur de l'utilisateur, jamais un nom de service Docker. À ajuster ensemble si
-  `FRONTEND_PORT` change.
+- `FRONTEND_PORT`, `CORS_ALLOWED_ORIGINS` et `MAIL_FRONT_BASE_URL` décrivent la même adresse,
+  celle que l'utilisateur tape dans son navigateur, jamais un nom de service Docker. Elles se
+  modifient ensemble. Rien ne signale l'oubli au démarrage : les e-mails partent simplement avec
+  des liens qui ne mènent nulle part.
 - `APP_NAME` et `APP_TAGLINE` sont figées dans les fichiers du frontend à la construction de
   l'image : les changer impose un `docker compose up -d --build frontend`.
+- Une variable du `.env` n'atteint un conteneur que si elle est listée dans le bloc
+  `environment` du service concerné. Compose lit le `.env` pour remplacer les `${...}` de ce
+  fichier, il ne transmet rien de lui-même. Ajouter un réglage au `.env.example` sans l'ajouter
+  au `docker-compose.yml` donne une variable qui semble configurable et qui ne fait rien.
 
 La messagerie vise Mailpit par défaut mais chaque variable `MAIL_*` est surchargeable depuis le
 `.env` : décommenter le bloc Brevo de `.env.example` suffit à basculer sur un envoi réel, sans
@@ -155,6 +162,14 @@ Cette orchestration vise la démonstration et l'intégration, pas la production 
 
 ## Historique des versions
 
+- v1.0.3 : correctifs d'orchestration. Les réglages optionnels du parcours documentés dans le
+  `.env` atteignent enfin le conteneur. Compose lit ce fichier pour remplacer les `${...}` du
+  `docker-compose.yml`, il ne transmet rien aux services de lui-même si bien que les décommenter
+  restait sans effet (`LEARNING_QUIZ_ABANDON_GRACE_SECONDS`, limites des pièces jointes).
+  Ajout du plafond de taille de page (`PAGE_MAX_SIZE`). Contrôle de santé sur le frontend, le
+  seul service applicatif qui n'en avait pas. Version de Mailpit épinglée sur sa release mineure
+  au lieu de `latest`. Couplage de `FRONTEND_PORT`, `CORS_ALLOWED_ORIGINS` et `MAIL_FRONT_BASE_URL`
+  signalé aux deux endroits, faute de quoi un changement de port casse silencieusement les liens des e-mails.
 - v1.0.2 : suivi des évolutions applicatives 1.4.0. Répertoire dédié aux fichiers joints aux
   énoncés d'exercices (`EXERCISE_ATTACHMENT_LOCATION`) volontairement séparé des soumissions pour
   qu'une purge de celles-ci n'emporte pas les consignes et documentation des réglages optionnels
