@@ -58,7 +58,10 @@ services:
   # Serveur de messagerie de développement
   # ---------------------------------------------------------------------------
   mailpit:
-    image: axllent/mailpit:latest
+    # Version épinglée sur la release mineure, comme MySQL et à la différence de latest.
+    # Le tag mineur reçoit les correctifs de sécurité sans changer de fonctionnalités :
+    # deux machines qui construisent à un mois d'écart obtiennent le même comportement.
+    image: axllent/mailpit:${MAILPIT_VERSION:-v1.31}
     container_name: butterfly-mailpit
     restart: unless-stopped
     ports:
