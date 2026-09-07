@@ -32,6 +32,7 @@ workspace/
   butterfly-deploy/     ce dépôt
     docker-compose.yml
     .env
+    swagger.htpasswd    identifiants d'accès à la documentation de l'API
 ```
 
 ## Prérequis
@@ -45,14 +46,22 @@ workspace/
 cp .env.example .env
 openssl rand -base64 48        # à coller dans JWT_SECRET
 # renseigner les mots de passe marqués obligatoires dans .env
+
+# Obligatoire avant le premier démarrage. Docker crée un répertoire quand la source
+# d'un montage de fichier n'existe pas et la documentation renvoie alors une erreur 500.
+printf 'admin:' > swagger.htpasswd
+openssl passwd -apr1 >> swagger.htpasswd
+
 docker compose up -d --build
 ```
 
 Une fois les contrôles de santé passés (le backend met une à deux minutes à démarrer) :
 
 - interface : `http://localhost` (ou le port défini par `FRONTEND_PORT`)
-- documentation de l'API : `http://localhost/swagger-ui.html`, réacheminée par nginx vers le
-  backend dont le profil `docker` active Swagger
+- documentation de l'API : `http://localhost/swagger-ui.html`, protégée par authentification
+  basique nginx avec les identifiants de `swagger.htpasswd`, puis réacheminée vers le backend dont
+  le profil `docker` active Swagger. Le mot de passe n'est pas récupérable, le fichier ne contenant
+  qu'une empreinte : en cas d'oubli, régénérer le fichier puis `docker compose restart frontend`
 - boîte aux lettres Mailpit : `http://localhost:8025`
 
 En dehors de ces chemins, l'API n'est joignable qu'à travers nginx sous `/api`. Le backend
@@ -158,10 +167,20 @@ Cette orchestration vise la démonstration et l'intégration, pas la production 
   passerait par le profil `prod` et un outil de migration de schéma (voir la feuille de route du
   backend),
 - les ports de MySQL et de Mailpit sont ouverts sur l'hôte pour faciliter l'inspection,
-- l'interface est servie en HTTP simple, sans terminaison TLS.
+- l'interface est servie en HTTP simple sans terminaison TLS. L'authentification basique qui
+  protège la documentation de l'API circule donc en clair : elle écarte un visiteur de passage,
+  pas quelqu'un capable d'écouter le réseau.
 
 ## Historique des versions
 
+- v1.1.0 : durcissement de la façade. Le nginx du frontend réécrit `X-Forwarded-For` avec
+  `$remote_addr` au lieu de le compléter avec `$proxy_add_x_forwarded_for`. La seconde variante
+  conservait la valeur envoyée par le client, or le backend retient la première entrée pour sa
+  limitation de débit : n'importe quel appelant disposait d'un compteur neuf à chaque requête et la
+  protection du formulaire de connexion ne servait à rien. Documentation de l'API désormais
+  protégée par authentification basique, ce qui introduit une étape d'installation obligatoire : le
+  fichier `swagger.htpasswd` doit exister avant le premier démarrage, Docker créant un répertoire à
+  sa place dans le cas contraire.
 - v1.0.3 : correctifs d'orchestration. Les réglages optionnels du parcours documentés dans le
   `.env` atteignent enfin le conteneur. Compose lit ce fichier pour remplacer les `${...}` du
   `docker-compose.yml`, il ne transmet rien aux services de lui-même si bien que les décommenter
