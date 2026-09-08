@@ -40,6 +40,9 @@ services:
       - "${DB_EXPOSED_PORT:-3306}:3306"
     volumes:
       - mysql_data:/var/lib/mysql
+    # Plafond mémoire : sans lui, un pic d'un service peut faire tuer un voisin par le
+    # noyau et le conteneur sacrifié n'est pas forcément celui qui a dérivé.
+    mem_limit: ${MYSQL_MEM_LIMIT:-768m}
     healthcheck:
       # Le conteneur MySQL accepte des connexions bien avant d'être prêt à répondre.
       # Sans ce contrôle, le backend démarrerait trop tôt et échouerait sur la connexion.
@@ -158,6 +161,7 @@ services:
       # stockage est couvert sans modifier ce fichier.
       - backend_uploads:/app/uploads
       - backend_logs:/app/logs
+    mem_limit: ${BACKEND_MEM_LIMIT:-1g}
     healthcheck:
       test: ["CMD-SHELL", "curl -fsS http://localhost:8080/actuator/health || exit 1"]
       interval: 15s
@@ -185,7 +189,12 @@ services:
     restart: unless-stopped
     depends_on:
       backend:
-        condition: service_healthy
+        # service_started et non service_healthy : attendre la bonne santé du backend
+        # rendrait l'interface totalement injoignable s'il ne démarre pas, l'utilisateur
+        # ne verrait qu'une connexion refusée. Servie tout de suite, elle affiche au
+        # moins sa page de connexion et le message d'erreur du premier appel, ce qui
+        # indique où chercher.
+        condition: service_started
     ports:
       # Le conteneur écoute sur 8080 : l'image nginx non privilégiée tourne sans root
       # et ne peut pas se lier au port 80. L'utilisateur, lui, entre toujours par le
@@ -214,9 +223,18 @@ services:
   # Analyse de qualité, hors des services applicatifs
   # ---------------------------------------------------------------------------
   sonarqube:
-    image: sonarqube:community
+    # Version épinglée comme les autres images. Le tag community seul suit la dernière
+    # version majeure : une montée change les règles d'analyse et fait apparaître des
+    # dizaines de signalements du jour au lendemain sans que le code ait bougé.
+    image: sonarqube:${SONARQUBE_VERSION:-25-community}
     container_name: butterfly-sonarqube
-    restart: unless-stopped
+    # restart "no" et non "unless-stopped", contrairement aux services applicatifs.
+    #
+    # Le profil empêche la création du conteneur lors d'un démarrage courant, mais une
+    # fois créé par un premier --profile tools, une politique de redémarrage le
+    # relancerait à chaque démarrage du démon Docker. Deux gigaoctets consommés en
+    # arrière-plan sur une machine où l'on ne travaille plus sur le projet.
+    restart: "no"
     # Profil dédié : cet outil n'a rien à faire dans un démarrage courant
     # et il réclame à lui seul environ deux gigaoctets de mémoire.
     profiles:
@@ -229,6 +247,7 @@ services:
       - sonarqube_data:/opt/sonarqube/data
       - sonarqube_extensions:/opt/sonarqube/extensions
       - sonarqube_logs:/opt/sonarqube/logs
+    mem_limit: ${SONARQUBE_MEM_LIMIT:-3g}
     networks:
       - butterfly
 

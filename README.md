@@ -158,6 +158,25 @@ docker compose down                        # arrêter en conservant les données
 docker compose down -v                     # arrêter et tout effacer
 ```
 
+## Sauvegarde des données
+
+Les volumes nommés survivent à `docker compose down` et à la reconstruction des images,
+mais pas à `docker compose down -v` qui les supprime définitivement. Deux volumes portent
+des données irremplaçables : `mysql_data` et `backend_uploads`.
+
+```bash
+# Base de données
+docker compose exec mysql mysqldump -u root -p"$DB_ROOT_PASSWORD" --databases butterfly \
+  > sauvegarde-butterfly-$(date +%F).sql
+
+# Fichiers téléversés (rendus, pièces jointes, médias)
+docker run --rm -v butterfly-deploy_backend_uploads:/data -v "$PWD":/sauvegarde alpine \
+  tar czf /sauvegarde/uploads-$(date +%F).tar.gz -C /data .
+```
+
+Le préfixe des volumes correspond au nom du répertoire contenant le `docker-compose.yml`.
+`docker volume ls` donne les noms exacts.
+
 ## Limites assumées
 
 Cette orchestration vise la démonstration et l'intégration, pas la production exposée :
@@ -169,7 +188,10 @@ Cette orchestration vise la démonstration et l'intégration, pas la production 
 - les ports de MySQL et de Mailpit sont ouverts sur l'hôte pour faciliter l'inspection,
 - l'interface est servie en HTTP simple sans terminaison TLS. L'authentification basique qui
   protège la documentation de l'API circule donc en clair : elle écarte un visiteur de passage,
-  pas quelqu'un capable d'écouter le réseau.
+  pas quelqu'un capable d'écouter le réseau,
+- les plafonds mémoire sont dimensionnés pour un poste de développement. Un serveur avec
+  plusieurs utilisateurs simultanés demanderait de les relever et de mesurer plutôt que
+  de deviner.
 
 ## Historique des versions
 
