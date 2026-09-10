@@ -195,6 +195,15 @@ Cette orchestration vise la démonstration et l'intégration, pas la production 
 
 ## Historique des versions
 
+- v1.2.0 : durcissement des réglages par défaut. SonarQube ne redémarre plus tout seul une fois
+  créé par le profil `tools` : sa politique de redémarrage le relançait à chaque démarrage du
+  démon Docker, deux gigaoctets consommés en arrière-plan sur une machine où l'on ne travaille
+  plus sur le projet. Son image est épinglée comme les autres, une montée de version majeure
+  changeant les règles d'analyse. Plafonds mémoire sur MySQL, le backend et SonarQube pour
+  qu'un service qui dérive ne fasse pas tuer ses voisins par le noyau. Le frontend n'attend plus
+  la bonne santé du backend : servie tout de suite, l'interface affiche au moins sa page de
+  connexion et le message d'erreur du premier appel là où l'attente donnait une connexion
+  refusée sans aucune indication. Procédure de sauvegarde des volumes documentée.
 - v1.1.0 : durcissement de la façade. Le nginx du frontend réécrit `X-Forwarded-For` avec
   `$remote_addr` au lieu de le compléter avec `$proxy_add_x_forwarded_for`. La seconde variante
   conservait la valeur envoyée par le client, or le backend retient la première entrée pour sa
