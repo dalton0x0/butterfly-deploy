@@ -17,6 +17,7 @@ applicatif : le backend et le frontend vivent dans leurs propres dépôts et y p
 - [SonarQube](#sonarqube)
 - [Commandes utiles](#commandes-utiles)
 - [Limites assumées](#limites-assumées)
+- [Conventions](#conventions)
 - [Historique des versions](#historique-des-versions)
 
 ## Arborescence attendue
@@ -193,44 +194,33 @@ Cette orchestration vise la démonstration et l'intégration, pas la production 
   plusieurs utilisateurs simultanés demanderait de les relever et de mesurer plutôt que
   de deviner.
 
+## Conventions
+
+Ce dépôt suit les mêmes conventions que le backend et le frontend.
+
+### Tags Git
+
+Un tag annoté par version publiée, nommé `vMAJEUR.MINEUR.CORRECTIF`.
+
+Le message suit toujours la même forme en anglais comme les commits :
+
+```text
+Titre court sans point final
+
+- premier changement notable
+- deuxième changement notable
+- troisième changement notable
+```
+
+Trois à cinq puces sans point final. Le tag doit se lire en trois secondes depuis
+`git tag -n99` : le détail vit dans [CHANGELOG.md](CHANGELOG.md) qui reste la référence.
+
+Toujours créer le tag avec `-a` et `-m`. Sans `-m`, Git reprend le message du commit
+désigné, ce qui produit un tag annonçant `chore(release): bump version` au lieu du
+contenu de la version.
+
 ## Historique des versions
 
-- v1.2.0 : durcissement des réglages par défaut. SonarQube ne redémarre plus tout seul une fois
-  créé par le profil `tools` : sa politique de redémarrage le relançait à chaque démarrage du
-  démon Docker, deux gigaoctets consommés en arrière-plan sur une machine où l'on ne travaille
-  plus sur le projet. Son image est épinglée comme les autres, une montée de version majeure
-  changeant les règles d'analyse. Plafonds mémoire sur MySQL, le backend et SonarQube pour
-  qu'un service qui dérive ne fasse pas tuer ses voisins par le noyau. Le frontend n'attend plus
-  la bonne santé du backend : servie tout de suite, l'interface affiche au moins sa page de
-  connexion et le message d'erreur du premier appel là où l'attente donnait une connexion
-  refusée sans aucune indication. Procédure de sauvegarde des volumes documentée.
-- v1.1.0 : durcissement de la façade. Le nginx du frontend réécrit `X-Forwarded-For` avec
-  `$remote_addr` au lieu de le compléter avec `$proxy_add_x_forwarded_for`. La seconde variante
-  conservait la valeur envoyée par le client, or le backend retient la première entrée pour sa
-  limitation de débit : n'importe quel appelant disposait d'un compteur neuf à chaque requête et la
-  protection du formulaire de connexion ne servait à rien. Documentation de l'API désormais
-  protégée par authentification basique, ce qui introduit une étape d'installation obligatoire : le
-  fichier `swagger.htpasswd` doit exister avant le premier démarrage, Docker créant un répertoire à
-  sa place dans le cas contraire.
-- v1.0.3 : correctifs d'orchestration. Les réglages optionnels du parcours documentés dans le
-  `.env` atteignent enfin le conteneur. Compose lit ce fichier pour remplacer les `${...}` du
-  `docker-compose.yml`, il ne transmet rien aux services de lui-même si bien que les décommenter
-  restait sans effet (`LEARNING_QUIZ_ABANDON_GRACE_SECONDS`, limites des pièces jointes).
-  Ajout du plafond de taille de page (`PAGE_MAX_SIZE`). Contrôle de santé sur le frontend, le
-  seul service applicatif qui n'en avait pas. Version de Mailpit épinglée sur sa release mineure
-  au lieu de `latest`. Couplage de `FRONTEND_PORT`, `CORS_ALLOWED_ORIGINS` et `MAIL_FRONT_BASE_URL`
-  signalé aux deux endroits, faute de quoi un changement de port casse silencieusement les liens des e-mails.
-- v1.0.2 : suivi des évolutions applicatives 1.4.0. Répertoire dédié aux fichiers joints aux
-  énoncés d'exercices (`EXERCISE_ATTACHMENT_LOCATION`) volontairement séparé des soumissions pour
-  qu'une purge de celles-ci n'emporte pas les consignes et documentation des réglages optionnels
-  du parcours (délai de grâce des tentatives de quiz, limites des pièces jointes). Aucun volume
-  supplémentaire : `backend_uploads` monte `/app/uploads` en entier.
-- v1.0.1 : durcissement et documentation. Mot de passe root retiré du contrôle de santé MySQL (il
-  était inscrit dans la configuration du conteneur lisible par `docker inspect` et inutile au
-  ping), configuration mail entièrement surchargeable depuis le `.env` (Mailpit par défaut, Brevo
-  en décommentant un bloc), correspondance de port adaptée au nginx non privilégié du frontend
-  (8080 interne), nom et slogan de l'interface transmis au build du frontend (`APP_NAME`,
-  `APP_TAGLINE`), `.gitignore` réduit à l'essentiel, rédaction de ce README.
-- v1.0.0 : première version. Orchestration complète (MySQL, Mailpit, backend, frontend) avec
-  contrôles de santé en cascade, volumes nommés, SonarQube dans un profil dédié et configuration
-  entièrement portée par le fichier `.env`.
+Version courante : **v1.2.0**.
+
+L'historique complet des versions avec le détail de chaque livraison est dans [CHANGELOG.md](CHANGELOG.md).
