@@ -1,0 +1,35 @@
+# Vérification du fichier compose à chaque poussée et à chaque pull request.
+#
+# Ce dépôt ne contient aucun code applicatif : il n'y a donc ni test ni
+# construction. La seule erreur qu'on peut attraper automatiquement ici est une
+# faute de syntaxe ou une référence cassée dans le docker-compose.yml.
+#
+# La commande config résout les variables, valide la structure et n'exécute rien.
+
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+
+jobs:
+  compose:
+    name: Validation du fichier compose
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Récupération des sources
+        uses: actions/checkout@v7
+
+      - name: Validation de la syntaxe
+        # BACKEND_PATH et FRONTEND_PATH pointent vers le répertoire courant :
+        # les deux autres dépôts ne sont pas clonés ici et compose refuse un
+        # contexte de construction inexistant. Rien n'étant construit, le
+        # contenu du répertoire visé n'a aucune importance.
+        #
+        # --env-file .env.example : le vrai .env n'est pas versionné. Le fichier
+        # d'exemple porte les mêmes clés, ce qui suffit à résoudre les ${...}.
+        run: |
+          BACKEND_PATH=. FRONTEND_PATH=. \
+            docker compose --env-file .env.example config --quiet
