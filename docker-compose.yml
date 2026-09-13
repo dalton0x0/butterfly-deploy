@@ -99,6 +99,18 @@ services:
     environment:
       SPRING_PROFILES_ACTIVE: docker
 
+      # Fuseau horaire du conteneur.
+      #
+      # Sans cette variable, l'image tourne en UTC. Les dates que l'application
+      # écrit sont des LocalDateTime donc sans fuseau : elles partent en JSON
+      # sous la forme 2026-09-13T22:30:00 que le navigateur de l'utilisateur
+      # interprète comme de l'heure locale. Un compte créé à 00h30 à Paris
+      # s'affichait ainsi daté de la veille.
+      #
+      # Aligner le conteneur sur le fuseau des utilisateurs supprime l'écart.
+      # Les journaux applicatifs passent également à l'heure locale.
+      TZ: ${TZ:-Europe/Paris}
+
       DB_HOST: mysql
       DB_PORT: 3306
       DB_NAME: ${DB_NAME:-butterfly}
