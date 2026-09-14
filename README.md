@@ -153,11 +153,14 @@ Les volumes nommés font survivre les données à la reconstruction des images :
 - `backend_uploads` : fichiers téléversés (soumissions d'exercices, fichiers joints aux énoncés,
   images, vidéos). Le montage porte sur `/app/uploads` en entier, tout nouveau sous-répertoire de
   stockage est donc couvert sans modifier le `docker-compose.yml`
-- `backend_logs` : journaux applicatifs
 - `sonarqube_data`, `sonarqube_extensions`, `sonarqube_logs` : projet, jetons et historique
   d'analyse
 
 `docker compose down` les conserve, `docker compose down -v` les supprime définitivement.
+
+Les journaux du backend ne suivent pas cette règle. Ils ne sont pas écrits dans un volume :
+la sortie standard du conteneur est collectée par Docker et se consulte avec
+`docker compose logs backend`. Un `docker compose down` les emporte, sans `-v`.
 
 ## SonarQube
 
