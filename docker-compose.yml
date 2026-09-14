@@ -172,7 +172,6 @@ services:
       # Le montage porte sur /app/uploads en entier : tout nouveau sous-répertoire de
       # stockage est couvert sans modifier ce fichier.
       - backend_uploads:/app/uploads
-      - backend_logs:/app/logs
     mem_limit: ${BACKEND_MEM_LIMIT:-1g}
     healthcheck:
       test: ["CMD-SHELL", "curl -fsS http://localhost:8080/actuator/health || exit 1"]
@@ -266,7 +265,6 @@ services:
 volumes:
   mysql_data:
   backend_uploads:
-  backend_logs:
   sonarqube_data:
   sonarqube_extensions:
   sonarqube_logs:
