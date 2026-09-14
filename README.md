@@ -35,6 +35,27 @@ workspace/
     .env
     swagger.htpasswd    identifiants d'accès à la documentation de l'API
 ```
+## Versions compatibles
+
+Les trois dépôts sont versionnés séparément mais forment un ensemble : ce fichier
+compose fournit au backend et au frontend des variables que leurs versions doivent
+connaître.
+
+| Version de ce dépôt | Backend | Frontend |
+|---|---|---|
+| 1.3.0 | 1.9.0 | 1.8.0 |
+| 1.2.0 | 1.8.0 | 1.7.0 |
+
+Rien ne vérifie cet accord au démarrage. Un dépôt de déploiement récent associé à un
+backend plus ancien fournit des variables d'environnement que celui-ci ignore sans
+message d'erreur : la valeur par défaut du backend s'applique en silence.
+
+Le cas le plus visible est `TZ`, introduit en 1.3.0. Un backend antérieur ne le lit
+pas et continue de tourner en UTC, ce qui décale les dates affichées.
+
+En cas de doute, comparer le `CHANGELOG.md` des trois dépôts et vérifier que les
+variables citées par le fichier compose existent bien dans le
+`application-docker.yml` du backend.
 
 ## Prérequis
 
