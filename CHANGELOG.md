@@ -11,6 +11,21 @@ commits qu'elle apporte. La toute première version renvoie vers son tag n'ayant
 
 ---
 
+## [v1.3.0](https://github.com/dalton0x0/butterfly-deploy/compare/v1.2.0...v1.3.0) - 2026-09-14
+
+Fuseau horaire et journalisation. Le conteneur backend tournait en UTC alors que ses
+horodatages partent en JSON sans fuseau : le navigateur les interprétait comme de l'heure locale
+et un compte créé peu après minuit à Paris s'affichait daté de la veille. La variable `TZ` aligne
+le conteneur sur le fuseau des utilisateurs, ce qui supprime l'écart sans toucher au code et
+passe les journaux applicatifs à l'heure locale. Les lignes déjà écrites gardent leur valeur en
+UTC, une base de développement mérite donc d'être recréée. Le volume `backend_logs` disparaît :
+dans un conteneur, la sortie standard est déjà collectée par Docker et le fichier n'en était
+qu'une seconde copie que personne ne lisait dans un volume à sauvegarder. Contrepartie
+désormais écrite dans le README, un `docker compose down` emporte ces journaux là où les volumes
+survivent. Les versions compatibles des trois dépôts sont documentées, rien ne vérifiant leur
+accord au démarrage : un fichier compose récent associé à un backend plus ancien lui fournit des
+variables qu'il ignore en silence.
+
 ## [v1.2.0](https://github.com/dalton0x0/butterfly-deploy/compare/v1.1.0...v1.2.0) - 2026-09-10
 
 Durcissement des réglages par défaut. SonarQube ne redémarre plus tout seul une fois
