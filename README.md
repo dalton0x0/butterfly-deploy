@@ -8,6 +8,7 @@ applicatif : le backend et le frontend vivent dans leurs propres dépôts et y p
 ## Sommaire
 
 - [Arborescence attendue](#arborescence-attendue)
+- [Versions compatibles](#versions-compatibles)
 - [Prérequis](#prérequis)
 - [Démarrage rapide](#démarrage-rapide)
 - [Services](#services)
