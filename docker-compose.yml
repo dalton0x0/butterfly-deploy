@@ -33,11 +33,12 @@ services:
       MYSQL_DATABASE: ${DB_NAME:-butterfly}
       MYSQL_USER: ${DB_USERNAME}
       MYSQL_PASSWORD: ${DB_PASSWORD}
-    # Port exposé sur l'hôte pour permettre l'inspection depuis un client SQL. À retirer
-    # sur un serveur réellement exposé : le backend n'en a pas besoin, il joint la base par
-    # le réseau interne.
-    ports:
-      - "${DB_EXPOSED_PORT:-3306}:3306"
+    # Aucun port publié par défaut : le backend joint la base par le réseau interne de
+    # Compose, personne d'autre n'en a besoin. Décommenter pour inspecter la base depuis
+    # un client SQL sur la machine hôte et recommenter ensuite. Un défaut fermé vaut
+    # mieux qu'un défaut ouvert accompagné d'un commentaire qui demande de le refermer.
+    # ports:
+    #   - "${DB_EXPOSED_PORT:-3306}:3306"
     volumes:
       - mysql_data:/var/lib/mysql
     # Plafond mémoire : sans lui, un pic d'un service peut faire tuer un voisin par le
@@ -154,7 +155,6 @@ services:
       EXERCISE_ATTACHMENT_LOCATION: /app/uploads/exercise-attachments
       MEDIA_IMAGE_LOCATION: /app/uploads/media/images
       MEDIA_VIDEO_LOCATION: /app/uploads/media/videos
-      LOG_FILE_PATH: /app/logs/butterfly.log
 
       # Réglages applicatifs facultatifs. Ils doivent figurer ici pour atteindre le
       # conteneur : Compose lit le .env pour remplacer les ${...} de ce fichier, il
