@@ -96,8 +96,9 @@ démarrage du backend.
 
 ## Services
 
-- **mysql** (`mysql:8.4`) : base de données. Le port 3306 est exposé sur l'hôte pour inspection
-  depuis un client SQL, à retirer sur un serveur réellement exposé.
+- **mysql** (`mysql:8.4`) : base de données. Aucun port n'est publié sur l'hôte : le backend la
+  joint par le réseau interne. Pour l'inspecter depuis un client SQL, décommenter la publication
+  du port dans `docker-compose.yml` puis la recommenter.
 - **mailpit** : serveur SMTP de développement. Il capture tous les messages émis par le backend
   (vérification d'adresse, réinitialisation de mot de passe) et les présente dans une interface
   web sans qu'aucun ne quitte la machine.
@@ -247,6 +248,6 @@ contenu de la version.
 
 ## Historique des versions
 
-Version courante : **v1.3.0**.
+Version courante : **v1.3.1**.
 
 L'historique complet des versions avec le détail de chaque livraison est dans [CHANGELOG.md](CHANGELOG.md).

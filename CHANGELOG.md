@@ -11,6 +11,18 @@ commits qu'elle apporte. La toute première version renvoie vers son tag n'ayant
 
 ---
 
+## [v1.3.1](https://github.com/dalton0x0/butterfly-deploy/compare/v1.3.0...v1.3.1) - 2026-09-23
+
+Le port de la base n'est plus publié sur l'hôte par défaut. Il l'était accompagné d'un commentaire
+demandant de le retirer en production, ce qui revenait à livrer un défaut ouvert en comptant sur
+la vigilance de celui qui déploie. Le backend joint la base par le réseau interne de Compose,
+personne d'autre n'en a besoin : la publication reste disponible en décommentant deux lignes pour
+inspecter la base depuis un client SQL. La variable `LOG_FILE_PATH` est retirée, le profil `docker`
+n'activant pas la journalisation en fichier : elle laissait croire que les journaux étaient
+conservés alors qu'aucun volume ne couvrait ce chemin.
+
+---
+
 ## [v1.3.0](https://github.com/dalton0x0/butterfly-deploy/compare/v1.2.0...v1.3.0) - 2026-09-14
 
 Fuseau horaire et journalisation. Le conteneur backend tournait en UTC alors que ses
