@@ -11,6 +11,18 @@ commits qu'elle apporte. La toute première version renvoie vers son tag n'ayant
 
 ---
 
+## [v1.3.2](https://github.com/dalton0x0/butterfly-deploy/compare/v1.3.1...v1.3.2) - 2026-09-25
+
+Les ports de Mailpit et de SonarQube ne sont plus publiés que sur l'interface locale de l'hôte.
+L'interface web de Mailpit affiche chaque message capturé, liens de réinitialisation de mot de passe
+compris : lancée sur une machine joignable, la pile permettait à n'importe qui de prendre la main sur
+un compte, administrateur compris. SonarQube démarre pour sa part avec le compte `admin/admin`. La
+variable `LEARNING_QUIZ_ABANDON_GRACE_SECONDS` est retirée, le délai de grâce ayant disparu du
+backend en v2.0.0 : la conserver laissait croire à un réglage qui n'agit plus. Les limites du README
+décrivent enfin le schéma produit par Flyway et la base non publiée.
+
+---
+
 ## [v1.3.1](https://github.com/dalton0x0/butterfly-deploy/compare/v1.3.0...v1.3.1) - 2026-09-23
 
 Le port de la base n'est plus publié sur l'hôte par défaut. Il l'était accompagné d'un commentaire

@@ -209,11 +209,11 @@ Le préfixe des volumes correspond au nom du répertoire contenant le `docker-co
 
 Cette orchestration vise la démonstration et l'intégration, pas la production exposée :
 
-- le backend tourne avec le profil Spring `docker` : schéma créé par Hibernate et connexion à la
-  base sans TLS, les conteneurs communiquant sur un réseau privé. Un déploiement réellement exposé
-  passerait par le profil `prod` et un outil de migration de schéma (voir la feuille de route du
-  backend),
-- les ports de MySQL et de Mailpit sont ouverts sur l'hôte pour faciliter l'inspection,
+- le backend tourne avec le profil Spring `docker` : schéma créé par les migrations Flyway et
+  connexion à la base sans TLS, les conteneurs communiquant sur un réseau privé. Un déploiement
+  réellement exposé passerait par le profil `prod`, qui exige TLS vers la base,
+- Mailpit et SonarQube ne sont joignables que depuis la machine hôte (`127.0.0.1`). Pour les
+  consulter depuis un autre poste, passer par un tunnel SSH plutôt que d'ouvrir leurs ports,
 - l'interface est servie en HTTP simple sans terminaison TLS. L'authentification basique qui
   protège la documentation de l'API circule donc en clair : elle écarte un visiteur de passage,
   pas quelqu'un capable d'écouter le réseau,
@@ -248,6 +248,6 @@ contenu de la version.
 
 ## Historique des versions
 
-Version courante : **v1.3.1**.
+Version courante : **v1.3.2**.
 
 L'historique complet des versions avec le détail de chaque livraison est dans [CHANGELOG.md](CHANGELOG.md).
