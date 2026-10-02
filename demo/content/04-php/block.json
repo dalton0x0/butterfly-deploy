@@ -1,0 +1,115 @@
+{
+  "name": "PHP",
+  "description": "Le langage PHP moderne : syntaxe et typage, programmation orientée objet, Composer, accès aux données avec PDO et sécurité des applications web. Le socle indispensable avant d'aborder Laravel.",
+  "prerequisites": [],
+  "modules": [
+    {
+      "name": "Les bases de PHP",
+      "description": "Exécuter un script PHP, manipuler les variables, les types, les tableaux et écrire des fonctions typées.",
+      "content": [
+        {
+          "type": "course",
+          "name": "Syntaxe, variables et types",
+          "description": "Premier script, variables, types scalaires, typage strict et structures de contrôle.",
+          "file": "01-bases/01-syntaxe-types.md"
+        },
+        {
+          "type": "course",
+          "name": "Tableaux et fonctions",
+          "description": "Tableaux indexés et associatifs, fonctions typées et fonctions de tableaux.",
+          "file": "01-bases/02-tableaux-fonctions.md"
+        },
+        {
+          "type": "exercise",
+          "name": "Gérer un panier d'achat",
+          "file": "01-bases/03-exercice-panier.md"
+        }
+      ],
+      "quiz": {
+        "name": "Quiz : les bases de PHP",
+        "instructions": "Huit questions sur la syntaxe, les types, les tableaux et les fonctions. Il faut au moins 70 % des points pour valider le module.",
+        "file": "01-bases/quiz.json",
+        "shuffleQuestions": true,
+        "shuffleOptions": true,
+        "feedbackMode": "SCORE_AND_MISSED",
+        "showCorrectionOnPass": true
+      }
+    },
+    {
+      "name": "PHP orienté objet",
+      "description": "Concevoir des classes modernes : propriétés typées, promotion de constructeur, héritage, interfaces, traits, énumérations, namespaces et Composer.",
+      "content": [
+        {
+          "type": "course",
+          "name": "Classes et objets en PHP moderne",
+          "description": "Propriétés typées, promotion de constructeur, readonly et énumérations.",
+          "file": "02-objet/01-classes-objets.md"
+        },
+        {
+          "type": "course",
+          "name": "Héritage, interfaces et traits",
+          "description": "Réutiliser et spécialiser un comportement, définir des contrats et partager du code.",
+          "file": "02-objet/02-heritage-interfaces-traits.md"
+        },
+        {
+          "type": "exercise",
+          "name": "Modéliser une billetterie d'événements",
+          "file": "02-objet/03-exercice-billetterie.md"
+        },
+        {
+          "type": "course",
+          "name": "Namespaces, autoload et Composer",
+          "description": "Organiser son code et gérer ses dépendances comme dans un vrai projet.",
+          "file": "02-objet/04-namespaces-composer.md"
+        }
+      ],
+      "quiz": {
+        "name": "Quiz : PHP orienté objet",
+        "instructions": "Huit questions sur les classes, l'héritage, les interfaces, les traits et Composer. Certaines questions acceptent plusieurs bonnes réponses.",
+        "file": "02-objet/quiz.json",
+        "shuffleQuestions": true,
+        "shuffleOptions": true,
+        "feedbackMode": "SCORE_AND_MISSED",
+        "showCorrectionOnPass": true
+      }
+    },
+    {
+      "name": "PHP et le web",
+      "description": "Traiter des formulaires, accéder à une base de données avec PDO et protéger une application contre les attaques les plus courantes.",
+      "content": [
+        {
+          "type": "course",
+          "name": "Formulaires et requêtes HTTP",
+          "description": "Le cycle requête et réponse, les superglobales et la validation des saisies.",
+          "file": "03-web/01-formulaires-http.md"
+        },
+        {
+          "type": "course",
+          "name": "Accéder aux données avec PDO",
+          "description": "Se connecter à MySQL, exécuter des requêtes préparées et gérer les erreurs.",
+          "file": "03-web/02-pdo.md"
+        },
+        {
+          "type": "course",
+          "name": "Sécuriser une application PHP",
+          "description": "Injection SQL, XSS, CSRF et stockage des mots de passe.",
+          "file": "03-web/03-securite.md"
+        },
+        {
+          "type": "exercise",
+          "name": "Livre d'or sécurisé",
+          "file": "03-web/04-exercice-livre-or.md"
+        }
+      ],
+      "quiz": {
+        "name": "Quiz : PHP et le web",
+        "instructions": "Huit questions sur les formulaires, PDO et la sécurité. La correction complète est affichée après une réussite.",
+        "file": "03-web/quiz.json",
+        "shuffleQuestions": true,
+        "shuffleOptions": true,
+        "feedbackMode": "SCORE_AND_MISSED",
+        "showCorrectionOnPass": true
+      }
+    }
+  ]
+}

@@ -1,0 +1,101 @@
+{
+  "questions": [
+    {
+      "statement": "Quel outil transforme un fichier .java en bytecode ?",
+      "type": "SINGLE_CHOICE",
+      "points": 1,
+      "timeLimitSeconds": 30,
+      "options": [
+        {"text": "javac", "correct": true},
+        {"text": "java", "correct": false},
+        {"text": "la JVM", "correct": false},
+        {"text": "jar", "correct": false}
+      ]
+    },
+    {
+      "statement": "Quelle est la signature du point d'entrée classique d'un programme Java ?",
+      "type": "SINGLE_CHOICE",
+      "points": 1,
+      "timeLimitSeconds": 30,
+      "options": [
+        {"text": "public static void main(String[] args)", "correct": true},
+        {"text": "public void main()", "correct": false},
+        {"text": "static int main(String args)", "correct": false},
+        {"text": "public static String main(String[] args)", "correct": false}
+      ]
+    },
+    {
+      "statement": "Que vaut l'expression 17 / 5 lorsque les deux opérandes sont des int ?",
+      "type": "SINGLE_CHOICE",
+      "points": 1,
+      "timeLimitSeconds": 30,
+      "options": [
+        {"text": "3", "correct": true},
+        {"text": "3.4", "correct": false},
+        {"text": "2", "correct": false},
+        {"text": "4", "correct": false}
+      ]
+    },
+    {
+      "statement": "Comment comparer correctement le contenu de deux chaînes a et b ?",
+      "type": "SINGLE_CHOICE",
+      "points": 1,
+      "timeLimitSeconds": 30,
+      "options": [
+        {"text": "a.equals(b)", "correct": true},
+        {"text": "a == b", "correct": false},
+        {"text": "a = b", "correct": false},
+        {"text": "a.compare(b) == true", "correct": false}
+      ]
+    },
+    {
+      "statement": "Parmi ces types, lesquels sont des types primitifs ?",
+      "type": "MULTIPLE_CHOICE",
+      "points": 2,
+      "timeLimitSeconds": 45,
+      "options": [
+        {"text": "int", "correct": true},
+        {"text": "boolean", "correct": true},
+        {"text": "double", "correct": true},
+        {"text": "String", "correct": false},
+        {"text": "Integer", "correct": false}
+      ]
+    },
+    {
+      "statement": "Quelle boucle exécute son corps au moins une fois, même si la condition est fausse dès le départ ?",
+      "type": "SINGLE_CHOICE",
+      "points": 1,
+      "timeLimitSeconds": 30,
+      "options": [
+        {"text": "do-while", "correct": true},
+        {"text": "while", "correct": false},
+        {"text": "for", "correct": false},
+        {"text": "for-each", "correct": false}
+      ]
+    },
+    {
+      "statement": "Que se passe-t-il à la compilation de : var ville = \"Paris\"; ville = 42; ?",
+      "type": "SINGLE_CHOICE",
+      "points": 1,
+      "timeLimitSeconds": 40,
+      "options": [
+        {"text": "Une erreur de compilation : ville est de type String", "correct": true},
+        {"text": "ville devient un int", "correct": false},
+        {"text": "ville vaut \"42\"", "correct": false},
+        {"text": "Une erreur seulement à l'exécution", "correct": false}
+      ]
+    },
+    {
+      "statement": "Quelles affirmations sur le switch avec flèche (case X ->) sont vraies ?",
+      "type": "MULTIPLE_CHOICE",
+      "points": 2,
+      "timeLimitSeconds": 45,
+      "options": [
+        {"text": "Il peut être utilisé comme une expression qui renvoie une valeur", "correct": true},
+        {"text": "Il n'a pas besoin de break pour éviter de passer au cas suivant", "correct": true},
+        {"text": "Un même case peut regrouper plusieurs valeurs séparées par des virgules", "correct": true},
+        {"text": "Il ne fonctionne qu'avec des nombres entiers", "correct": false}
+      ]
+    }
+  ]
+}

@@ -1,0 +1,100 @@
+{
+  "questions": [
+    {
+      "statement": "Par quel caractère commence le nom d'une variable en PHP ?",
+      "type": "SINGLE_CHOICE",
+      "points": 1,
+      "timeLimitSeconds": 20,
+      "options": [
+        {"text": "$", "correct": true},
+        {"text": "@", "correct": false},
+        {"text": "#", "correct": false},
+        {"text": "&", "correct": false}
+      ]
+    },
+    {
+      "statement": "Que vaut var_dump(0 === '0') ?",
+      "type": "SINGLE_CHOICE",
+      "points": 1,
+      "timeLimitSeconds": 30,
+      "options": [
+        {"text": "false, les types sont différents", "correct": true},
+        {"text": "true, les valeurs sont égales", "correct": false},
+        {"text": "Une erreur de syntaxe", "correct": false},
+        {"text": "null", "correct": false}
+      ]
+    },
+    {
+      "statement": "Quel est l'effet de declare(strict_types=1) en tête de fichier ?",
+      "type": "SINGLE_CHOICE",
+      "points": 1,
+      "timeLimitSeconds": 40,
+      "options": [
+        {"text": "Un argument du mauvais type provoque une TypeError au lieu d'être converti silencieusement", "correct": true},
+        {"text": "Toutes les variables doivent être déclarées avant usage", "correct": false},
+        {"text": "Le script s'exécute plus rapidement", "correct": false},
+        {"text": "Les tableaux associatifs deviennent interdits", "correct": false}
+      ]
+    },
+    {
+      "statement": "Qu'affiche le code : $nom = 'Lucas'; echo 'Bonjour $nom'; ?",
+      "type": "SINGLE_CHOICE",
+      "points": 1,
+      "timeLimitSeconds": 30,
+      "options": [
+        {"text": "Bonjour $nom", "correct": true},
+        {"text": "Bonjour Lucas", "correct": false},
+        {"text": "Bonjour", "correct": false},
+        {"text": "Une erreur", "correct": false}
+      ]
+    },
+    {
+      "statement": "Quelles affirmations sur l'expression match sont vraies ?",
+      "type": "MULTIPLE_CHOICE",
+      "points": 2,
+      "timeLimitSeconds": 45,
+      "options": [
+        {"text": "Elle renvoie une valeur", "correct": true},
+        {"text": "Elle compare de façon stricte, comme ===", "correct": true},
+        {"text": "Elle lève une erreur si aucun cas ne correspond et qu'il n'y a pas de default", "correct": true},
+        {"text": "Elle nécessite un break à la fin de chaque cas", "correct": false}
+      ]
+    },
+    {
+      "statement": "Que renvoie $_GET['page'] ?? 1 si le paramètre page est absent de l'URL ?",
+      "type": "SINGLE_CHOICE",
+      "points": 1,
+      "timeLimitSeconds": 30,
+      "options": [
+        {"text": "1", "correct": true},
+        {"text": "null", "correct": false},
+        {"text": "Une erreur de clé inexistante", "correct": false},
+        {"text": "Une chaîne vide", "correct": false}
+      ]
+    },
+    {
+      "statement": "Que renvoie array_map(fn ($n) => $n * 2, [1, 2, 3]) ?",
+      "type": "SINGLE_CHOICE",
+      "points": 1,
+      "timeLimitSeconds": 30,
+      "options": [
+        {"text": "[2, 4, 6]", "correct": true},
+        {"text": "[1, 2, 3]", "correct": false},
+        {"text": "12", "correct": false},
+        {"text": "[2]", "correct": false}
+      ]
+    },
+    {
+      "statement": "Quelles affirmations sur les fonctions de tableaux sont vraies ?",
+      "type": "MULTIPLE_CHOICE",
+      "points": 2,
+      "timeLimitSeconds": 50,
+      "options": [
+        {"text": "array_filter conserve les clés d'origine des éléments gardés", "correct": true},
+        {"text": "array_values réindexe un tableau à partir de 0", "correct": true},
+        {"text": "sort renvoie un nouveau tableau trié sans modifier l'original", "correct": false},
+        {"text": "count renvoie la somme des valeurs", "correct": false}
+      ]
+    }
+  ]
+}

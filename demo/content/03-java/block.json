@@ -1,0 +1,136 @@
+{
+  "name": "Java",
+  "description": "Les fondamentaux du langage Java : syntaxe, programmation orientée objet, collections, exceptions et Stream API. Le socle indispensable avant d'aborder Spring Boot.",
+  "prerequisites": [],
+  "modules": [
+    {
+      "name": "Les bases du langage Java",
+      "description": "Écrire, compiler et exécuter un premier programme. Manipuler les variables, les types, les opérateurs, les conditions et les boucles.",
+      "content": [
+        {
+          "type": "course",
+          "name": "Premier programme et JVM",
+          "description": "Comprendre le chemin du code source à l'exécution : compilateur, bytecode et machine virtuelle.",
+          "file": "01-bases/01-premier-programme.md"
+        },
+        {
+          "type": "course",
+          "name": "Variables, types et opérateurs",
+          "description": "Types primitifs, types références, conversions et opérateurs usuels.",
+          "file": "01-bases/02-variables-types.md"
+        },
+        {
+          "type": "exercise",
+          "name": "Calculer une moyenne de notes",
+          "file": "01-bases/03-exercice-moyenne.md"
+        },
+        {
+          "type": "course",
+          "name": "Conditions et boucles",
+          "description": "Contrôler le déroulement d'un programme avec if, switch, for et while.",
+          "file": "01-bases/04-conditions-boucles.md"
+        },
+        {
+          "type": "exercise",
+          "name": "Le jeu du nombre mystère",
+          "file": "01-bases/05-exercice-nombre-mystere.md"
+        }
+      ],
+      "quiz": {
+        "name": "Quiz : les bases de Java",
+        "instructions": "Huit questions pour valider les bases du langage. Chaque question est chronométrée. Il faut au moins 70 % des points pour valider le module.",
+        "file": "01-bases/quiz.json",
+        "shuffleQuestions": true,
+        "shuffleOptions": true,
+        "feedbackMode": "SCORE_AND_MISSED",
+        "showCorrectionOnPass": true
+      }
+    },
+    {
+      "name": "Programmation orientée objet",
+      "description": "Modéliser un problème avec des classes et des objets. Encapsulation, héritage, polymorphisme, interfaces et classes abstraites.",
+      "content": [
+        {
+          "type": "course",
+          "name": "Classes, objets et encapsulation",
+          "description": "Définir une classe, créer des objets et protéger leur état.",
+          "file": "02-poo/01-classes-objets.md"
+        },
+        {
+          "type": "exercise",
+          "name": "Modéliser un compte bancaire",
+          "file": "02-poo/02-exercice-compte-bancaire.md"
+        },
+        {
+          "type": "course",
+          "name": "Héritage et polymorphisme",
+          "description": "Réutiliser et spécialiser un comportement, puis manipuler des objets par leur type parent.",
+          "file": "02-poo/03-heritage-polymorphisme.md"
+        },
+        {
+          "type": "course",
+          "name": "Interfaces et classes abstraites",
+          "description": "Définir des contrats et choisir entre interface et classe abstraite.",
+          "file": "02-poo/04-interfaces-abstraites.md"
+        },
+        {
+          "type": "exercise",
+          "name": "Gérer un parc de véhicules",
+          "file": "02-poo/05-exercice-parc-vehicules.md"
+        }
+      ],
+      "quiz": {
+        "name": "Quiz : programmation orientée objet",
+        "instructions": "Huit questions sur les classes, l'encapsulation, l'héritage et les interfaces. Certaines questions acceptent plusieurs bonnes réponses.",
+        "file": "02-poo/quiz.json",
+        "shuffleQuestions": true,
+        "shuffleOptions": true,
+        "feedbackMode": "SCORE_AND_MISSED",
+        "showCorrectionOnPass": true
+      }
+    },
+    {
+      "name": "Collections, exceptions et streams",
+      "description": "Stocker et parcourir des données avec les collections, gérer les erreurs proprement et transformer des données avec la Stream API.",
+      "content": [
+        {
+          "type": "course",
+          "name": "Les collections",
+          "description": "List, Set et Map : choisir la bonne structure et la parcourir.",
+          "file": "03-collections/01-collections.md"
+        },
+        {
+          "type": "course",
+          "name": "Gérer les exceptions",
+          "description": "Exceptions vérifiées et non vérifiées, try-catch, try-with-resources et exceptions métier.",
+          "file": "03-collections/02-exceptions.md"
+        },
+        {
+          "type": "exercise",
+          "name": "Carnet de contacts",
+          "file": "03-collections/03-exercice-carnet-contacts.md"
+        },
+        {
+          "type": "course",
+          "name": "Lambdas et Stream API",
+          "description": "Écrire des traitements déclaratifs : filtrer, transformer, trier et agréger.",
+          "file": "03-collections/04-lambdas-streams.md"
+        },
+        {
+          "type": "exercise",
+          "name": "Analyser un relevé de notes",
+          "file": "03-collections/05-exercice-releve-notes.md"
+        }
+      ],
+      "quiz": {
+        "name": "Quiz : collections, exceptions et streams",
+        "instructions": "Huit questions pour valider le module. La correction complète est affichée après une réussite.",
+        "file": "03-collections/quiz.json",
+        "shuffleQuestions": true,
+        "shuffleOptions": true,
+        "feedbackMode": "SCORE_AND_MISSED",
+        "showCorrectionOnPass": true
+      }
+    }
+  ]
+}

@@ -1,0 +1,101 @@
+{
+  "questions": [
+    {
+      "statement": "Quelle collection choisir pour stocker des éléments sans doublon ?",
+      "type": "SINGLE_CHOICE",
+      "points": 1,
+      "timeLimitSeconds": 30,
+      "options": [
+        {"text": "Set", "correct": true},
+        {"text": "List", "correct": false},
+        {"text": "Un tableau", "correct": false},
+        {"text": "Queue", "correct": false}
+      ]
+    },
+    {
+      "statement": "Que se passe-t-il lors d'un appel à add sur une liste créée avec List.of(...) ?",
+      "type": "SINGLE_CHOICE",
+      "points": 1,
+      "timeLimitSeconds": 40,
+      "options": [
+        {"text": "Une UnsupportedOperationException est levée", "correct": true},
+        {"text": "L'élément est ajouté en fin de liste", "correct": false},
+        {"text": "L'élément est ignoré sans erreur", "correct": false},
+        {"text": "Le code ne compile pas", "correct": false}
+      ]
+    },
+    {
+      "statement": "Que renvoie map.put(\"Emma\", 150) si la clé \"Emma\" existe déjà avec la valeur 120 ?",
+      "type": "SINGLE_CHOICE",
+      "points": 1,
+      "timeLimitSeconds": 45,
+      "options": [
+        {"text": "120, et la valeur associée devient 150", "correct": true},
+        {"text": "150, et la map contient deux entrées Emma", "correct": false},
+        {"text": "null, la valeur n'est pas modifiée", "correct": false},
+        {"text": "Une exception pour clé en double", "correct": false}
+      ]
+    },
+    {
+      "statement": "Parmi ces exceptions, lesquelles sont non vérifiées (elles héritent de RuntimeException) ?",
+      "type": "MULTIPLE_CHOICE",
+      "points": 2,
+      "timeLimitSeconds": 50,
+      "options": [
+        {"text": "NullPointerException", "correct": true},
+        {"text": "IllegalArgumentException", "correct": true},
+        {"text": "IOException", "correct": false},
+        {"text": "SQLException", "correct": false}
+      ]
+    },
+    {
+      "statement": "Quel est l'intérêt principal de try-with-resources ?",
+      "type": "SINGLE_CHOICE",
+      "points": 1,
+      "timeLimitSeconds": 40,
+      "options": [
+        {"text": "Fermer automatiquement les ressources, même en cas d'exception", "correct": true},
+        {"text": "Ignorer les exceptions levées dans le bloc", "correct": false},
+        {"text": "Relancer automatiquement l'opération en cas d'échec", "correct": false},
+        {"text": "Rendre les exceptions vérifiées non vérifiées", "correct": false}
+      ]
+    },
+    {
+      "statement": "Parmi ces opérations de stream, lesquelles sont terminales ?",
+      "type": "MULTIPLE_CHOICE",
+      "points": 2,
+      "timeLimitSeconds": 50,
+      "options": [
+        {"text": "toList()", "correct": true},
+        {"text": "count()", "correct": true},
+        {"text": "filter()", "correct": false},
+        {"text": "map()", "correct": false},
+        {"text": "sorted()", "correct": false}
+      ]
+    },
+    {
+      "statement": "Que produit ce code : Stream.of(3, 8, 12, 5).filter(n -> n > 4).map(n -> n * 2).toList() ?",
+      "type": "SINGLE_CHOICE",
+      "points": 1,
+      "timeLimitSeconds": 60,
+      "options": [
+        {"text": "[16, 24, 10]", "correct": true},
+        {"text": "[6, 16, 24, 10]", "correct": false},
+        {"text": "[8, 12, 5]", "correct": false},
+        {"text": "[10, 16, 24]", "correct": false}
+      ]
+    },
+    {
+      "statement": "Pourquoi findFirst() renvoie-t-il un Optional plutôt que directement l'élément ?",
+      "type": "SINGLE_CHOICE",
+      "points": 1,
+      "timeLimitSeconds": 45,
+      "options": [
+        {"text": "Parce que le stream peut ne contenir aucun élément", "correct": true},
+        {"text": "Parce que l'élément est copié", "correct": false},
+        {"text": "Pour rendre le stream réutilisable", "correct": false},
+        {"text": "Parce que findFirst trie le stream", "correct": false}
+      ]
+    }
+  ]
+}

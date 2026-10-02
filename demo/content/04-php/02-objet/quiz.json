@@ -1,0 +1,99 @@
+{
+  "questions": [
+    {
+      "statement": "Que permet la promotion de propriétés dans un constructeur PHP 8 ?",
+      "type": "SINGLE_CHOICE",
+      "points": 1,
+      "timeLimitSeconds": 40,
+      "options": [
+        {"text": "Déclarer et affecter une propriété directement dans les paramètres du constructeur", "correct": true},
+        {"text": "Rendre toutes les propriétés publiques", "correct": false},
+        {"text": "Hériter de plusieurs classes", "correct": false},
+        {"text": "Créer automatiquement des setters", "correct": false}
+      ]
+    },
+    {
+      "statement": "Que se passe-t-il si l'on modifie une propriété readonly déjà initialisée ?",
+      "type": "SINGLE_CHOICE",
+      "points": 1,
+      "timeLimitSeconds": 30,
+      "options": [
+        {"text": "PHP lève une erreur", "correct": true},
+        {"text": "La nouvelle valeur remplace l'ancienne", "correct": false},
+        {"text": "La modification est ignorée sans erreur", "correct": false},
+        {"text": "La propriété devient null", "correct": false}
+      ]
+    },
+    {
+      "statement": "Combien de classes parentes une classe PHP peut-elle étendre ?",
+      "type": "SINGLE_CHOICE",
+      "points": 1,
+      "timeLimitSeconds": 30,
+      "options": [
+        {"text": "Une seule", "correct": true},
+        {"text": "Deux", "correct": false},
+        {"text": "Autant que nécessaire", "correct": false},
+        {"text": "Aucune, PHP ne gère pas l'héritage", "correct": false}
+      ]
+    },
+    {
+      "statement": "Quel mécanisme permet de réutiliser des méthodes dans plusieurs classes sans lien d'héritage ?",
+      "type": "SINGLE_CHOICE",
+      "points": 1,
+      "timeLimitSeconds": 30,
+      "options": [
+        {"text": "Un trait", "correct": true},
+        {"text": "Une énumération", "correct": false},
+        {"text": "Un namespace", "correct": false},
+        {"text": "Une constante de classe", "correct": false}
+      ]
+    },
+    {
+      "statement": "Quelles affirmations sur les énumérations PHP sont vraies ?",
+      "type": "MULTIPLE_CHOICE",
+      "points": 2,
+      "timeLimitSeconds": 50,
+      "options": [
+        {"text": "Une énumération adossée peut associer une valeur string ou int à chaque cas", "correct": true},
+        {"text": "Role::tryFrom renvoie null pour une valeur inconnue", "correct": true},
+        {"text": "Une énumération peut définir des méthodes", "correct": true},
+        {"text": "On peut créer un nouveau cas avec new Role()", "correct": false}
+      ]
+    },
+    {
+      "statement": "Quels fichiers d'un projet Composer doivent être versionnés dans Git pour une application ?",
+      "type": "MULTIPLE_CHOICE",
+      "points": 2,
+      "timeLimitSeconds": 45,
+      "options": [
+        {"text": "composer.json", "correct": true},
+        {"text": "composer.lock", "correct": true},
+        {"text": "Le dossier vendor/", "correct": false}
+      ]
+    },
+    {
+      "statement": "Avec l'autoload PSR-4 \"App\\\\\": \"src/\", où Composer cherche-t-il la classe App\\Service\\InscriptionService ?",
+      "type": "SINGLE_CHOICE",
+      "points": 1,
+      "timeLimitSeconds": 45,
+      "options": [
+        {"text": "src/Service/InscriptionService.php", "correct": true},
+        {"text": "App/Service/InscriptionService.php", "correct": false},
+        {"text": "vendor/Service/InscriptionService.php", "correct": false},
+        {"text": "src/InscriptionService.php", "correct": false}
+      ]
+    },
+    {
+      "statement": "Quelle commande installe exactement les versions décrites dans composer.lock ?",
+      "type": "SINGLE_CHOICE",
+      "points": 1,
+      "timeLimitSeconds": 30,
+      "options": [
+        {"text": "composer install", "correct": true},
+        {"text": "composer update", "correct": false},
+        {"text": "composer require", "correct": false},
+        {"text": "composer dump-autoload", "correct": false}
+      ]
+    }
+  ]
+}

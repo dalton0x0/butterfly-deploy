@@ -1,0 +1,100 @@
+{
+  "questions": [
+    {
+      "statement": "Quelle méthode HTTP utiliser pour envoyer un formulaire qui crée des données ?",
+      "type": "SINGLE_CHOICE",
+      "points": 1,
+      "timeLimitSeconds": 30,
+      "options": [
+        {"text": "POST", "correct": true},
+        {"text": "GET", "correct": false},
+        {"text": "HEAD", "correct": false},
+        {"text": "OPTIONS", "correct": false}
+      ]
+    },
+    {
+      "statement": "Pourquoi rediriger vers une page en GET après le traitement réussi d'un formulaire en POST ?",
+      "type": "SINGLE_CHOICE",
+      "points": 1,
+      "timeLimitSeconds": 45,
+      "options": [
+        {"text": "Pour éviter qu'une actualisation de la page renvoie le formulaire une seconde fois", "correct": true},
+        {"text": "Pour chiffrer les données envoyées", "correct": false},
+        {"text": "Parce que PHP ne peut pas afficher de HTML après un POST", "correct": false},
+        {"text": "Pour vider la session de l'utilisateur", "correct": false}
+      ]
+    },
+    {
+      "statement": "Quelle est la meilleure protection contre l'injection SQL ?",
+      "type": "SINGLE_CHOICE",
+      "points": 1,
+      "timeLimitSeconds": 30,
+      "options": [
+        {"text": "Les requêtes préparées", "correct": true},
+        {"text": "htmlspecialchars sur les données", "correct": false},
+        {"text": "Un jeton CSRF", "correct": false},
+        {"text": "Masquer les messages d'erreur", "correct": false}
+      ]
+    },
+    {
+      "statement": "Quelle fonction protège contre le XSS lors de l'affichage d'une donnée dans du HTML ?",
+      "type": "SINGLE_CHOICE",
+      "points": 1,
+      "timeLimitSeconds": 30,
+      "options": [
+        {"text": "htmlspecialchars", "correct": true},
+        {"text": "password_hash", "correct": false},
+        {"text": "trim", "correct": false},
+        {"text": "session_start", "correct": false}
+      ]
+    },
+    {
+      "statement": "Quelles options de PDO sont recommandées à la connexion ?",
+      "type": "MULTIPLE_CHOICE",
+      "points": 2,
+      "timeLimitSeconds": 50,
+      "options": [
+        {"text": "PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION", "correct": true},
+        {"text": "charset=utf8mb4 dans la chaîne de connexion", "correct": true},
+        {"text": "Écrire le mot de passe de la base en dur dans le code", "correct": false},
+        {"text": "PDO::ERRMODE_SILENT pour ne jamais voir d'erreur", "correct": false}
+      ]
+    },
+    {
+      "statement": "Contre quelle attaque un jeton aléatoire caché dans chaque formulaire protège-t-il ?",
+      "type": "SINGLE_CHOICE",
+      "points": 1,
+      "timeLimitSeconds": 30,
+      "options": [
+        {"text": "Le CSRF", "correct": true},
+        {"text": "L'injection SQL", "correct": false},
+        {"text": "La force brute sur les mots de passe", "correct": false},
+        {"text": "Le déni de service", "correct": false}
+      ]
+    },
+    {
+      "statement": "Comment stocker et vérifier correctement un mot de passe en PHP ?",
+      "type": "MULTIPLE_CHOICE",
+      "points": 2,
+      "timeLimitSeconds": 50,
+      "options": [
+        {"text": "password_hash à l'inscription", "correct": true},
+        {"text": "password_verify à la connexion", "correct": true},
+        {"text": "md5 du mot de passe", "correct": false},
+        {"text": "Le mot de passe en clair dans une colonne protégée", "correct": false}
+      ]
+    },
+    {
+      "statement": "Pourquoi la validation côté serveur reste-t-elle indispensable même avec les attributs required et type=\"email\" ?",
+      "type": "SINGLE_CHOICE",
+      "points": 1,
+      "timeLimitSeconds": 45,
+      "options": [
+        {"text": "Parce que les contrôles du navigateur se contournent facilement", "correct": true},
+        {"text": "Parce que ces attributs ne fonctionnent qu'en GET", "correct": false},
+        {"text": "Parce que PHP désactive ces attributs", "correct": false},
+        {"text": "Elle n'est pas indispensable dans ce cas", "correct": false}
+      ]
+    }
+  ]
+}

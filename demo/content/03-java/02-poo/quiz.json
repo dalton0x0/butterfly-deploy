@@ -1,0 +1,100 @@
+{
+  "questions": [
+    {
+      "statement": "Quel mot-clé crée une nouvelle instance d'une classe ?",
+      "type": "SINGLE_CHOICE",
+      "points": 1,
+      "timeLimitSeconds": 30,
+      "options": [
+        {"text": "new", "correct": true},
+        {"text": "this", "correct": false},
+        {"text": "class", "correct": false},
+        {"text": "static", "correct": false}
+      ]
+    },
+    {
+      "statement": "Quel est l'objectif principal de l'encapsulation ?",
+      "type": "SINGLE_CHOICE",
+      "points": 1,
+      "timeLimitSeconds": 40,
+      "options": [
+        {"text": "Empêcher le code extérieur de mettre un objet dans un état incohérent", "correct": true},
+        {"text": "Rendre le programme plus rapide", "correct": false},
+        {"text": "Permettre l'héritage multiple", "correct": false},
+        {"text": "Éviter d'écrire des constructeurs", "correct": false}
+      ]
+    },
+    {
+      "statement": "Quel est le rôle de l'annotation @Override ?",
+      "type": "SINGLE_CHOICE",
+      "points": 1,
+      "timeLimitSeconds": 40,
+      "options": [
+        {"text": "Faire vérifier par le compilateur que la méthode redéfinit bien une méthode existante", "correct": true},
+        {"text": "Rendre la méthode obligatoire pour les sous-classes", "correct": false},
+        {"text": "Empêcher la redéfinition de la méthode", "correct": false},
+        {"text": "Rendre la méthode statique", "correct": false}
+      ]
+    },
+    {
+      "statement": "Combien de classes parentes une classe Java peut-elle étendre directement ?",
+      "type": "SINGLE_CHOICE",
+      "points": 1,
+      "timeLimitSeconds": 30,
+      "options": [
+        {"text": "Une seule", "correct": true},
+        {"text": "Deux", "correct": false},
+        {"text": "Autant que nécessaire", "correct": false},
+        {"text": "Aucune, Java ne gère pas l'héritage", "correct": false}
+      ]
+    },
+    {
+      "statement": "Quelles affirmations sur les interfaces sont vraies ?",
+      "type": "MULTIPLE_CHOICE",
+      "points": 2,
+      "timeLimitSeconds": 50,
+      "options": [
+        {"text": "Une classe peut implémenter plusieurs interfaces", "correct": true},
+        {"text": "Une interface peut proposer une méthode par défaut avec default", "correct": true},
+        {"text": "Une interface peut être instanciée directement avec new", "correct": false},
+        {"text": "Une interface possède un constructeur", "correct": false}
+      ]
+    },
+    {
+      "statement": "Une variable de type Utilisateur désigne un objet Formateur qui redéfinit description(). Quelle méthode est exécutée par utilisateur.description() ?",
+      "type": "SINGLE_CHOICE",
+      "points": 1,
+      "timeLimitSeconds": 45,
+      "options": [
+        {"text": "Celle de Formateur, le type réel de l'objet", "correct": true},
+        {"text": "Celle d'Utilisateur, le type de la variable", "correct": false},
+        {"text": "Les deux, l'une après l'autre", "correct": false},
+        {"text": "Aucune, le code ne compile pas", "correct": false}
+      ]
+    },
+    {
+      "statement": "Qu'est-ce que le compilateur génère automatiquement pour un record ?",
+      "type": "MULTIPLE_CHOICE",
+      "points": 2,
+      "timeLimitSeconds": 50,
+      "options": [
+        {"text": "Un constructeur prenant tous les composants", "correct": true},
+        {"text": "Des accesseurs pour chaque composant", "correct": true},
+        {"text": "Les méthodes equals, hashCode et toString", "correct": true},
+        {"text": "Des setters pour chaque composant", "correct": false}
+      ]
+    },
+    {
+      "statement": "Une méthode enchaîne des tests instanceof pour choisir un comportement selon le type de l'objet. Quelle amélioration est généralement la plus adaptée ?",
+      "type": "SINGLE_CHOICE",
+      "points": 1,
+      "timeLimitSeconds": 45,
+      "options": [
+        {"text": "Déplacer le comportement dans une méthode redéfinie par chaque sous-classe", "correct": true},
+        {"text": "Ajouter d'autres tests instanceof pour couvrir tous les cas", "correct": false},
+        {"text": "Rendre tous les attributs publics", "correct": false},
+        {"text": "Remplacer les classes par des chaînes de caractères", "correct": false}
+      ]
+    }
+  ]
+}
