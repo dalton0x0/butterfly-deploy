@@ -1,0 +1,101 @@
+{
+  "questions": [
+    {
+      "statement": "Que fait la requête UPDATE formations SET prix = 0; ?",
+      "type": "SINGLE_CHOICE",
+      "points": 1,
+      "timeLimitSeconds": 30,
+      "options": [
+        {"text": "Elle met le prix de toutes les formations à 0", "correct": true},
+        {"text": "Elle est refusée faute de WHERE", "correct": false},
+        {"text": "Elle modifie seulement la première formation", "correct": false},
+        {"text": "Elle supprime la colonne prix", "correct": false}
+      ]
+    },
+    {
+      "statement": "Quel est le bon réflexe avant d'exécuter un UPDATE ou un DELETE ?",
+      "type": "SINGLE_CHOICE",
+      "points": 1,
+      "timeLimitSeconds": 40,
+      "options": [
+        {"text": "Exécuter un SELECT avec le même WHERE pour vérifier les lignes ciblées", "correct": true},
+        {"text": "Supprimer les index de la table", "correct": false},
+        {"text": "Désactiver les clés étrangères", "correct": false},
+        {"text": "Redémarrer le serveur MySQL", "correct": false}
+      ]
+    },
+    {
+      "statement": "Que fait ROLLBACK dans une transaction ouverte ?",
+      "type": "SINGLE_CHOICE",
+      "points": 1,
+      "timeLimitSeconds": 30,
+      "options": [
+        {"text": "Il annule toutes les modifications faites depuis le début de la transaction", "correct": true},
+        {"text": "Il annule seulement la dernière requête", "correct": false},
+        {"text": "Il valide définitivement la transaction", "correct": false},
+        {"text": "Il supprime la base de données", "correct": false}
+      ]
+    },
+    {
+      "statement": "Quelles propriétés font partie de l'acronyme ACID ?",
+      "type": "MULTIPLE_CHOICE",
+      "points": 2,
+      "timeLimitSeconds": 45,
+      "options": [
+        {"text": "Atomicité", "correct": true},
+        {"text": "Isolation", "correct": true},
+        {"text": "Durabilité", "correct": true},
+        {"text": "Accélération", "correct": false},
+        {"text": "Indexation", "correct": false}
+      ]
+    },
+    {
+      "statement": "Quel est l'effet de ON DELETE CASCADE sur une clé étrangère ?",
+      "type": "SINGLE_CHOICE",
+      "points": 1,
+      "timeLimitSeconds": 40,
+      "options": [
+        {"text": "Supprimer le parent supprime aussi les lignes enfants qui le référencent", "correct": true},
+        {"text": "La suppression du parent est toujours refusée", "correct": false},
+        {"text": "Les lignes enfants voient leur clé étrangère passer à NULL", "correct": false},
+        {"text": "Les lignes enfants sont copiées dans une table d'archive", "correct": false}
+      ]
+    },
+    {
+      "statement": "Dans le résultat d'un EXPLAIN, que signale type = ALL ?",
+      "type": "SINGLE_CHOICE",
+      "points": 1,
+      "timeLimitSeconds": 40,
+      "options": [
+        {"text": "Un parcours complet de la table, sans index utilisé", "correct": true},
+        {"text": "L'utilisation de tous les index disponibles", "correct": false},
+        {"text": "Une requête optimale", "correct": false},
+        {"text": "Une erreur de syntaxe", "correct": false}
+      ]
+    },
+    {
+      "statement": "Un index existe sur (apprenant_id, inscrit_le). Quelles conditions peuvent l'utiliser ?",
+      "type": "MULTIPLE_CHOICE",
+      "points": 2,
+      "timeLimitSeconds": 50,
+      "options": [
+        {"text": "WHERE apprenant_id = 3", "correct": true},
+        {"text": "WHERE apprenant_id = 3 AND inscrit_le >= '2026-01-01'", "correct": true},
+        {"text": "WHERE inscrit_le >= '2026-01-01' seulement", "correct": false},
+        {"text": "WHERE YEAR(inscrit_le) = 2026 seulement", "correct": false}
+      ]
+    },
+    {
+      "statement": "Pourquoi ne pas créer un index sur toutes les colonnes par précaution ?",
+      "type": "SINGLE_CHOICE",
+      "points": 1,
+      "timeLimitSeconds": 45,
+      "options": [
+        {"text": "Chaque index occupe de l'espace et ralentit les insertions et mises à jour", "correct": true},
+        {"text": "MySQL limite une table à un seul index", "correct": false},
+        {"text": "Un index rend les lectures plus lentes", "correct": false},
+        {"text": "Les index empêchent l'utilisation des transactions", "correct": false}
+      ]
+    }
+  ]
+}

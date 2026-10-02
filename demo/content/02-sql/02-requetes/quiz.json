@@ -1,0 +1,100 @@
+{
+  "questions": [
+    {
+      "statement": "Quelle condition sélectionne les inscriptions qui n'ont pas encore de note ?",
+      "type": "SINGLE_CHOICE",
+      "points": 1,
+      "timeLimitSeconds": 30,
+      "options": [
+        {"text": "WHERE note_finale IS NULL", "correct": true},
+        {"text": "WHERE note_finale = NULL", "correct": false},
+        {"text": "WHERE note_finale = 0", "correct": false},
+        {"text": "WHERE note_finale = ''", "correct": false}
+      ]
+    },
+    {
+      "statement": "Quels titres sont trouvés par la condition titre LIKE 'Java%' ?",
+      "type": "MULTIPLE_CHOICE",
+      "points": 2,
+      "timeLimitSeconds": 45,
+      "options": [
+        {"text": "Java", "correct": true},
+        {"text": "JavaScript", "correct": true},
+        {"text": "Java avancé", "correct": true},
+        {"text": "Initiation à Java", "correct": false}
+      ]
+    },
+    {
+      "statement": "Quelle jointure garde toutes les lignes de la table de gauche, même sans correspondance à droite ?",
+      "type": "SINGLE_CHOICE",
+      "points": 1,
+      "timeLimitSeconds": 30,
+      "options": [
+        {"text": "LEFT JOIN", "correct": true},
+        {"text": "INNER JOIN", "correct": false},
+        {"text": "CROSS JOIN", "correct": false},
+        {"text": "Aucune, il faut une sous-requête", "correct": false}
+      ]
+    },
+    {
+      "statement": "Comment trouver les apprenants inscrits à aucune formation ?",
+      "type": "SINGLE_CHOICE",
+      "points": 1,
+      "timeLimitSeconds": 50,
+      "options": [
+        {"text": "apprenants LEFT JOIN inscriptions, puis WHERE inscriptions.apprenant_id IS NULL", "correct": true},
+        {"text": "apprenants INNER JOIN inscriptions, puis WHERE inscriptions.apprenant_id IS NULL", "correct": false},
+        {"text": "SELECT * FROM apprenants WHERE inscriptions = 0", "correct": false},
+        {"text": "apprenants INNER JOIN inscriptions ORDER BY apprenant_id", "correct": false}
+      ]
+    },
+    {
+      "statement": "Quelle clause filtre des groupes après le calcul des agrégats ?",
+      "type": "SINGLE_CHOICE",
+      "points": 1,
+      "timeLimitSeconds": 30,
+      "options": [
+        {"text": "HAVING", "correct": true},
+        {"text": "WHERE", "correct": false},
+        {"text": "ORDER BY", "correct": false},
+        {"text": "LIMIT", "correct": false}
+      ]
+    },
+    {
+      "statement": "Une table contient 10 inscriptions, dont 3 avec une note_finale à NULL. Que renvoie COUNT(note_finale) ?",
+      "type": "SINGLE_CHOICE",
+      "points": 1,
+      "timeLimitSeconds": 40,
+      "options": [
+        {"text": "7", "correct": true},
+        {"text": "10", "correct": false},
+        {"text": "3", "correct": false},
+        {"text": "NULL", "correct": false}
+      ]
+    },
+    {
+      "statement": "Pourquoi un alias défini dans le SELECT ne peut-il pas être utilisé dans le WHERE ?",
+      "type": "SINGLE_CHOICE",
+      "points": 1,
+      "timeLimitSeconds": 45,
+      "options": [
+        {"text": "Parce que WHERE est exécuté avant SELECT", "correct": true},
+        {"text": "Parce que les alias sont interdits en SQL", "correct": false},
+        {"text": "Parce qu'un alias ne peut être utilisé que dans une jointure", "correct": false},
+        {"text": "Parce que WHERE ne connaît que les clés primaires", "correct": false}
+      ]
+    },
+    {
+      "statement": "Dans une requête avec GROUP BY c.id, c.nom, quelles colonnes peuvent figurer dans le SELECT ?",
+      "type": "MULTIPLE_CHOICE",
+      "points": 2,
+      "timeLimitSeconds": 50,
+      "options": [
+        {"text": "c.nom", "correct": true},
+        {"text": "COUNT(*)", "correct": true},
+        {"text": "AVG(f.prix)", "correct": true},
+        {"text": "f.titre, sans fonction d'agrégation", "correct": false}
+      ]
+    }
+  ]
+}

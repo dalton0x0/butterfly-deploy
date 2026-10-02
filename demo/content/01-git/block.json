@@ -1,0 +1,88 @@
+{
+  "name": "Git",
+  "description": "Versionner son code et travailler en équipe avec Git : commits, branches, fusions, dépôts distants et bonnes pratiques de collaboration. Un outil utilisé dans tous les autres blocs.",
+  "prerequisites": [],
+  "modules": [
+    {
+      "name": "Les fondamentaux de Git",
+      "description": "Comprendre l'intérêt d'un gestionnaire de versions, initialiser un dépôt et maîtriser le cycle modification, indexation et commit.",
+      "content": [
+        {
+          "type": "course",
+          "name": "Pourquoi un gestionnaire de versions ?",
+          "description": "Les problèmes que Git résout et son modèle de fonctionnement.",
+          "file": "01-fondamentaux/01-pourquoi-git.md"
+        },
+        {
+          "type": "course",
+          "name": "Le cycle de travail : add, commit et log",
+          "description": "Les trois zones de Git et les commandes du quotidien.",
+          "file": "01-fondamentaux/02-cycle-de-travail.md"
+        },
+        {
+          "type": "exercise",
+          "name": "Versionner un premier projet",
+          "file": "01-fondamentaux/03-exercice-premier-depot.md"
+        },
+        {
+          "type": "course",
+          "name": "Corriger et annuler",
+          "description": "Revenir en arrière sans perdre son travail : restore, amend, revert et reset.",
+          "file": "01-fondamentaux/04-corriger-annuler.md"
+        }
+      ],
+      "quiz": {
+        "name": "Quiz : les fondamentaux de Git",
+        "instructions": "Huit questions sur le cycle de travail et les commandes de base. Il faut au moins 70 % des points pour valider le module.",
+        "file": "01-fondamentaux/quiz.json",
+        "shuffleQuestions": true,
+        "shuffleOptions": true,
+        "feedbackMode": "SCORE_AND_MISSED",
+        "showCorrectionOnPass": true
+      }
+    },
+    {
+      "name": "Branches et travail collaboratif",
+      "description": "Isoler un développement dans une branche, fusionner, résoudre un conflit et collaborer à travers un dépôt distant et des pull requests.",
+      "content": [
+        {
+          "type": "course",
+          "name": "Branches et fusions",
+          "description": "Créer une branche, fusionner et résoudre un conflit.",
+          "file": "02-collaboration/01-branches-fusions.md"
+        },
+        {
+          "type": "exercise",
+          "name": "Résoudre un conflit de fusion",
+          "file": "02-collaboration/02-exercice-conflit.md"
+        },
+        {
+          "type": "course",
+          "name": "Dépôts distants et pull requests",
+          "description": "Cloner, pousser, récupérer et proposer ses modifications.",
+          "file": "02-collaboration/03-depots-distants.md"
+        },
+        {
+          "type": "course",
+          "name": "Conventions de travail en équipe",
+          "description": "Nommer ses branches, écrire de bons messages de commit et marquer ses versions.",
+          "file": "02-collaboration/04-conventions.md"
+        },
+        {
+          "type": "exercise",
+          "name": "Contribuer à un projet en équipe",
+          "file": "02-collaboration/05-exercice-contribution.md"
+        }
+      ],
+      "quiz": {
+        "name": "Quiz : branches et collaboration",
+        "instructions": "Huit questions sur les branches, les dépôts distants et les conventions. Certaines questions acceptent plusieurs bonnes réponses.",
+        "file": "02-collaboration/quiz.json",
+        "shuffleQuestions": true,
+        "shuffleOptions": true,
+        "feedbackMode": "SCORE_AND_MISSED",
+        "showCorrectionOnPass": true
+      }
+    }
+  ]
+}

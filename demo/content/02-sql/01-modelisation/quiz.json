@@ -1,0 +1,101 @@
+{
+  "questions": [
+    {
+      "statement": "Quel est le rôle d'une clé primaire ?",
+      "type": "SINGLE_CHOICE",
+      "points": 1,
+      "timeLimitSeconds": 30,
+      "options": [
+        {"text": "Identifier chaque ligne d'une table de façon unique", "correct": true},
+        {"text": "Trier les lignes par ordre alphabétique", "correct": false},
+        {"text": "Faire référence à une autre table", "correct": false},
+        {"text": "Chiffrer les données de la table", "correct": false}
+      ]
+    },
+    {
+      "statement": "Quel type de colonne choisir pour stocker le prix d'une formation ?",
+      "type": "SINGLE_CHOICE",
+      "points": 1,
+      "timeLimitSeconds": 30,
+      "options": [
+        {"text": "DECIMAL(8,2)", "correct": true},
+        {"text": "FLOAT", "correct": false},
+        {"text": "VARCHAR(10)", "correct": false},
+        {"text": "INT", "correct": false}
+      ]
+    },
+    {
+      "statement": "Une catégorie contient plusieurs formations, une formation appartient à une seule catégorie. Où place-t-on la clé étrangère ?",
+      "type": "SINGLE_CHOICE",
+      "points": 1,
+      "timeLimitSeconds": 40,
+      "options": [
+        {"text": "Dans la table formations, qui référence categories", "correct": true},
+        {"text": "Dans la table categories, qui référence formations", "correct": false},
+        {"text": "Dans une table d'association obligatoire", "correct": false},
+        {"text": "Dans les deux tables", "correct": false}
+      ]
+    },
+    {
+      "statement": "Comment traduire une relation plusieurs à plusieurs entre apprenants et formations ?",
+      "type": "SINGLE_CHOICE",
+      "points": 1,
+      "timeLimitSeconds": 40,
+      "options": [
+        {"text": "Avec une table d'association portant deux clés étrangères", "correct": true},
+        {"text": "Avec une colonne contenant la liste des formations dans la table apprenants", "correct": false},
+        {"text": "Avec une seule clé étrangère dans la table formations", "correct": false},
+        {"text": "En fusionnant les deux tables", "correct": false}
+      ]
+    },
+    {
+      "statement": "Quelles contraintes font respecter une règle par la base de données elle-même ?",
+      "type": "MULTIPLE_CHOICE",
+      "points": 2,
+      "timeLimitSeconds": 45,
+      "options": [
+        {"text": "UNIQUE", "correct": true},
+        {"text": "FOREIGN KEY", "correct": true},
+        {"text": "CHECK", "correct": true},
+        {"text": "ORDER BY", "correct": false},
+        {"text": "GROUP BY", "correct": false}
+      ]
+    },
+    {
+      "statement": "Une colonne telephones contient « 0601020304, 0702030405 ». Quelle forme normale est violée ?",
+      "type": "SINGLE_CHOICE",
+      "points": 1,
+      "timeLimitSeconds": 40,
+      "options": [
+        {"text": "La première forme normale : la valeur n'est pas atomique", "correct": true},
+        {"text": "La deuxième forme normale", "correct": false},
+        {"text": "La troisième forme normale", "correct": false},
+        {"text": "Aucune, c'est une pratique correcte", "correct": false}
+      ]
+    },
+    {
+      "statement": "Quelles anomalies une table non normalisée peut-elle provoquer ?",
+      "type": "MULTIPLE_CHOICE",
+      "points": 2,
+      "timeLimitSeconds": 45,
+      "options": [
+        {"text": "Une anomalie de mise à jour : une même information à corriger sur plusieurs lignes", "correct": true},
+        {"text": "Une anomalie de suppression : perdre une information en supprimant une autre", "correct": true},
+        {"text": "Une anomalie d'insertion : ne pas pouvoir enregistrer une donnée isolée", "correct": true},
+        {"text": "Une impossibilité totale de lire les données", "correct": false}
+      ]
+    },
+    {
+      "statement": "Dans la table inscriptions (apprenant_id, formation_id), à quoi sert la clé primaire composée des deux colonnes ?",
+      "type": "SINGLE_CHOICE",
+      "points": 1,
+      "timeLimitSeconds": 45,
+      "options": [
+        {"text": "Empêcher d'inscrire deux fois le même apprenant à la même formation", "correct": true},
+        {"text": "Limiter chaque apprenant à une seule formation", "correct": false},
+        {"text": "Limiter chaque formation à un seul apprenant", "correct": false},
+        {"text": "Rendre les deux colonnes facultatives", "correct": false}
+      ]
+    }
+  ]
+}

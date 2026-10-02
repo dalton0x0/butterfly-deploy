@@ -1,0 +1,114 @@
+{
+  "name": "SQL et bases de données",
+  "description": "Concevoir une base de données relationnelle, l'interroger et la faire évoluer en SQL. Modélisation, jointures, agrégations, transactions et index, avec MySQL comme support.",
+  "prerequisites": [],
+  "modules": [
+    {
+      "name": "Modéliser une base de données",
+      "description": "Passer d'un besoin métier à un schéma relationnel : tables, types, clés primaires et étrangères, cardinalités et normalisation.",
+      "content": [
+        {
+          "type": "course",
+          "name": "Tables, clés et relations",
+          "description": "Les briques d'une base relationnelle et la création de tables en SQL.",
+          "file": "01-modelisation/01-tables-cles-relations.md"
+        },
+        {
+          "type": "course",
+          "name": "Cardinalités et normalisation",
+          "description": "Traduire les relations un à plusieurs et plusieurs à plusieurs, et éviter la redondance.",
+          "file": "01-modelisation/02-cardinalites-normalisation.md"
+        },
+        {
+          "type": "exercise",
+          "name": "Modéliser une médiathèque",
+          "file": "01-modelisation/03-exercice-mediatheque.md"
+        }
+      ],
+      "quiz": {
+        "name": "Quiz : modélisation relationnelle",
+        "instructions": "Huit questions sur les clés, les relations et la normalisation. Il faut au moins 70 % des points pour valider le module.",
+        "file": "01-modelisation/quiz.json",
+        "shuffleQuestions": true,
+        "shuffleOptions": true,
+        "feedbackMode": "SCORE_AND_MISSED",
+        "showCorrectionOnPass": true
+      }
+    },
+    {
+      "name": "Interroger les données",
+      "description": "Extraire l'information utile avec SELECT : filtres, tris, jointures, agrégations et sous-requêtes.",
+      "content": [
+        {
+          "type": "course",
+          "name": "SELECT, filtres et tris",
+          "description": "Lire les données d'une table et ne garder que ce qui est utile.",
+          "file": "02-requetes/01-select-filtres.md"
+        },
+        {
+          "type": "course",
+          "name": "Les jointures",
+          "description": "Combiner plusieurs tables avec INNER JOIN et LEFT JOIN.",
+          "file": "02-requetes/02-jointures.md"
+        },
+        {
+          "type": "exercise",
+          "name": "Explorer une base de formations",
+          "file": "02-requetes/03-exercice-requetes.md"
+        },
+        {
+          "type": "course",
+          "name": "Agrégations et sous-requêtes",
+          "description": "Compter, sommer, regrouper avec GROUP BY et filtrer les groupes avec HAVING.",
+          "file": "02-requetes/04-agregations.md"
+        },
+        {
+          "type": "exercise",
+          "name": "Construire un tableau de bord en SQL",
+          "file": "02-requetes/05-exercice-tableau-de-bord.md"
+        }
+      ],
+      "quiz": {
+        "name": "Quiz : interroger les données",
+        "instructions": "Huit questions sur SELECT, les jointures et les agrégations. Lisez attentivement les requêtes proposées.",
+        "file": "02-requetes/quiz.json",
+        "shuffleQuestions": true,
+        "shuffleOptions": true,
+        "feedbackMode": "SCORE_AND_MISSED",
+        "showCorrectionOnPass": true
+      }
+    },
+    {
+      "name": "Modifier les données et optimiser",
+      "description": "Insérer, modifier et supprimer des données en toute sécurité grâce aux transactions, puis accélérer les requêtes avec des index.",
+      "content": [
+        {
+          "type": "course",
+          "name": "INSERT, UPDATE, DELETE et transactions",
+          "description": "Modifier les données sans risque et garantir la cohérence avec les transactions.",
+          "file": "03-modification/01-modifier-transactions.md"
+        },
+        {
+          "type": "course",
+          "name": "Index et performances",
+          "description": "Comprendre les index, lire un plan d'exécution et éviter les pièges courants.",
+          "file": "03-modification/02-index-performances.md"
+        },
+        {
+          "type": "exercise",
+          "name": "Script de migration sécurisé",
+          "file": "03-modification/03-exercice-migration.md"
+        }
+      ],
+      "quiz": {
+        "name": "Quiz : modification et optimisation",
+        "instructions": "Huit questions sur la modification des données, les transactions et les index.",
+        "file": "03-modification/quiz.json",
+        "shuffleQuestions": true,
+        "shuffleOptions": true,
+        "feedbackMode": "SCORE_AND_MISSED",
+        "showCorrectionOnPass": true
+      }
+    }
+  ]
+}

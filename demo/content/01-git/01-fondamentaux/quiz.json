@@ -1,0 +1,101 @@
+{
+  "questions": [
+    {
+      "statement": "Que signifie le fait que Git soit un gestionnaire de versions distribué ?",
+      "type": "SINGLE_CHOICE",
+      "points": 1,
+      "timeLimitSeconds": 40,
+      "options": [
+        {"text": "Chaque développeur possède une copie complète du dépôt et de son historique", "correct": true},
+        {"text": "Le dépôt est réparti en morceaux sur plusieurs serveurs", "correct": false},
+        {"text": "Il faut une connexion réseau pour créer un commit", "correct": false},
+        {"text": "Seul le serveur central conserve l'historique", "correct": false}
+      ]
+    },
+    {
+      "statement": "Quelle commande ajoute un fichier modifié à l'index ?",
+      "type": "SINGLE_CHOICE",
+      "points": 1,
+      "timeLimitSeconds": 30,
+      "options": [
+        {"text": "git add", "correct": true},
+        {"text": "git commit", "correct": false},
+        {"text": "git push", "correct": false},
+        {"text": "git init", "correct": false}
+      ]
+    },
+    {
+      "statement": "Quelle commande affiche les modifications déjà indexées, prêtes pour le prochain commit ?",
+      "type": "SINGLE_CHOICE",
+      "points": 1,
+      "timeLimitSeconds": 40,
+      "options": [
+        {"text": "git diff --staged", "correct": true},
+        {"text": "git diff", "correct": false},
+        {"text": "git log", "correct": false},
+        {"text": "git show HEAD~1", "correct": false}
+      ]
+    },
+    {
+      "statement": "Quels fichiers ont généralement leur place dans le .gitignore ?",
+      "type": "MULTIPLE_CHOICE",
+      "points": 2,
+      "timeLimitSeconds": 45,
+      "options": [
+        {"text": "Le fichier .env contenant des secrets", "correct": true},
+        {"text": "Le dossier node_modules/", "correct": true},
+        {"text": "Les fichiers compilés du dossier target/", "correct": true},
+        {"text": "Le code source de l'application", "correct": false},
+        {"text": "Le README.md", "correct": false}
+      ]
+    },
+    {
+      "statement": "Un fichier déjà commité est ajouté au .gitignore. Que se passe-t-il ?",
+      "type": "SINGLE_CHOICE",
+      "points": 1,
+      "timeLimitSeconds": 45,
+      "options": [
+        {"text": "Il reste suivi tant qu'il n'est pas retiré avec git rm --cached", "correct": true},
+        {"text": "Il est automatiquement supprimé de l'historique", "correct": false},
+        {"text": "Il est supprimé du disque", "correct": false},
+        {"text": "Git refuse de modifier le .gitignore", "correct": false}
+      ]
+    },
+    {
+      "statement": "Un commit déjà poussé sur une branche partagée introduit un bug. Quelle est la façon la plus sûre de l'annuler ?",
+      "type": "SINGLE_CHOICE",
+      "points": 1,
+      "timeLimitSeconds": 45,
+      "options": [
+        {"text": "git revert suivi de l'empreinte du commit", "correct": true},
+        {"text": "git reset --hard HEAD~1 puis git push --force", "correct": false},
+        {"text": "git commit --amend", "correct": false},
+        {"text": "Supprimer le dossier .git", "correct": false}
+      ]
+    },
+    {
+      "statement": "Qu'est-ce qui caractérise un bon commit ?",
+      "type": "MULTIPLE_CHOICE",
+      "points": 2,
+      "timeLimitSeconds": 45,
+      "options": [
+        {"text": "Il regroupe une seule modification logique et cohérente", "correct": true},
+        {"text": "Son message explique pourquoi la modification a été faite", "correct": true},
+        {"text": "Il contient toutes les modifications de la journée", "correct": false},
+        {"text": "Son message se limite à « modifs »", "correct": false}
+      ]
+    },
+    {
+      "statement": "Après un git reset --hard malencontreux, quelle commande aide à retrouver le commit perdu ?",
+      "type": "SINGLE_CHOICE",
+      "points": 1,
+      "timeLimitSeconds": 40,
+      "options": [
+        {"text": "git reflog", "correct": true},
+        {"text": "git status", "correct": false},
+        {"text": "git stash", "correct": false},
+        {"text": "git init", "correct": false}
+      ]
+    }
+  ]
+}

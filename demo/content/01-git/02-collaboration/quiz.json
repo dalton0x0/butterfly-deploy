@@ -1,0 +1,100 @@
+{
+  "questions": [
+    {
+      "statement": "Quelle commande crée une nouvelle branche et s'y place immédiatement ?",
+      "type": "SINGLE_CHOICE",
+      "points": 1,
+      "timeLimitSeconds": 30,
+      "options": [
+        {"text": "git switch -c feature/login", "correct": true},
+        {"text": "git branch -d feature/login", "correct": false},
+        {"text": "git merge feature/login", "correct": false},
+        {"text": "git push feature/login", "correct": false}
+      ]
+    },
+    {
+      "statement": "Pour fusionner feature/login dans main, depuis quelle branche lance-t-on git merge ?",
+      "type": "SINGLE_CHOICE",
+      "points": 1,
+      "timeLimitSeconds": 40,
+      "options": [
+        {"text": "Depuis main, la branche qui reçoit les modifications", "correct": true},
+        {"text": "Depuis feature/login", "correct": false},
+        {"text": "Depuis n'importe quelle branche", "correct": false},
+        {"text": "Depuis origin", "correct": false}
+      ]
+    },
+    {
+      "statement": "Dans quel cas un conflit de fusion apparaît-il ?",
+      "type": "SINGLE_CHOICE",
+      "points": 1,
+      "timeLimitSeconds": 40,
+      "options": [
+        {"text": "Quand les deux branches ont modifié les mêmes lignes d'un même fichier", "correct": true},
+        {"text": "À chaque fusion de deux branches", "correct": false},
+        {"text": "Quand les deux branches ont modifié des fichiers différents", "correct": false},
+        {"text": "Quand la branche fusionnée contient plus de dix commits", "correct": false}
+      ]
+    },
+    {
+      "statement": "Quelle est la différence entre git fetch et git pull ?",
+      "type": "SINGLE_CHOICE",
+      "points": 1,
+      "timeLimitSeconds": 45,
+      "options": [
+        {"text": "fetch télécharge les commits sans fusionner, pull télécharge puis fusionne", "correct": true},
+        {"text": "fetch envoie les commits, pull les récupère", "correct": false},
+        {"text": "Les deux commandes sont strictement identiques", "correct": false},
+        {"text": "pull ne fonctionne qu'avec GitHub", "correct": false}
+      ]
+    },
+    {
+      "statement": "Pourquoi git push --force est-il dangereux sur une branche partagée ?",
+      "type": "SINGLE_CHOICE",
+      "points": 1,
+      "timeLimitSeconds": 45,
+      "options": [
+        {"text": "Il peut faire disparaître des commits poussés par d'autres personnes", "correct": true},
+        {"text": "Il supprime le dépôt local", "correct": false},
+        {"text": "Il désactive les pull requests", "correct": false},
+        {"text": "Il est plus lent qu'un push classique", "correct": false}
+      ]
+    },
+    {
+      "statement": "Quels messages respectent la convention Conventional Commits ?",
+      "type": "MULTIPLE_CHOICE",
+      "points": 2,
+      "timeLimitSeconds": 50,
+      "options": [
+        {"text": "feat(auth): add password reset by email", "correct": true},
+        {"text": "fix(quiz): reject late answers", "correct": true},
+        {"text": "correction du bug", "correct": false},
+        {"text": "WIP", "correct": false}
+      ]
+    },
+    {
+      "statement": "Une version passe de 1.4.2 à 1.5.0. Qu'indique ce changement selon le versionnage sémantique ?",
+      "type": "SINGLE_CHOICE",
+      "points": 1,
+      "timeLimitSeconds": 40,
+      "options": [
+        {"text": "Une fonctionnalité a été ajoutée sans rupture de compatibilité", "correct": true},
+        {"text": "Une rupture de compatibilité", "correct": false},
+        {"text": "Uniquement des corrections de bugs", "correct": false},
+        {"text": "Rien de particulier, le numéro est arbitraire", "correct": false}
+      ]
+    },
+    {
+      "statement": "Quels sont les apports d'une pull request ?",
+      "type": "MULTIPLE_CHOICE",
+      "points": 2,
+      "timeLimitSeconds": 50,
+      "options": [
+        {"text": "Permettre la relecture du code avant la fusion", "correct": true},
+        {"text": "Déclencher les vérifications de l'intégration continue", "correct": true},
+        {"text": "Remplacer les commits par un fichier compressé", "correct": false},
+        {"text": "Éviter d'avoir à créer des branches", "correct": false}
+      ]
+    }
+  ]
+}
