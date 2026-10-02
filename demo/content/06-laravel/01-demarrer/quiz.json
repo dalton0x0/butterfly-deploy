@@ -1,0 +1,100 @@
+{
+  "questions": [
+    {
+      "statement": "Quel est le seul dossier d'un projet Laravel qui doit être exposé par le serveur web ?",
+      "type": "SINGLE_CHOICE",
+      "points": 1,
+      "timeLimitSeconds": 30,
+      "options": [
+        {"text": "public", "correct": true},
+        {"text": "app", "correct": false},
+        {"text": "resources", "correct": false},
+        {"text": "storage", "correct": false}
+      ]
+    },
+    {
+      "statement": "Pourquoi APP_DEBUG doit-il valoir false en production ?",
+      "type": "SINGLE_CHOICE",
+      "points": 1,
+      "timeLimitSeconds": 40,
+      "options": [
+        {"text": "Pour ne pas afficher aux visiteurs les traces d'erreur et des informations de configuration", "correct": true},
+        {"text": "Pour accélérer les migrations", "correct": false},
+        {"text": "Pour désactiver la protection CSRF", "correct": false},
+        {"text": "Pour que Blade n'échappe plus les variables", "correct": false}
+      ]
+    },
+    {
+      "statement": "Quelle commande génère un modèle avec sa migration, sa factory et son seeder ?",
+      "type": "SINGLE_CHOICE",
+      "points": 1,
+      "timeLimitSeconds": 40,
+      "options": [
+        {"text": "php artisan make:model Formation -mfs", "correct": true},
+        {"text": "php artisan migrate Formation", "correct": false},
+        {"text": "composer require Formation", "correct": false},
+        {"text": "php artisan route:list Formation", "correct": false}
+      ]
+    },
+    {
+      "statement": "Pourquoi générer les URL avec route('formations.show', $formation) plutôt que les écrire à la main ?",
+      "type": "SINGLE_CHOICE",
+      "points": 1,
+      "timeLimitSeconds": 40,
+      "options": [
+        {"text": "Changer l'URL d'une route ne demande alors aucune modification dans les vues", "correct": true},
+        {"text": "C'est la seule façon de créer un lien en Blade", "correct": false},
+        {"text": "Cela chiffre l'URL", "correct": false},
+        {"text": "Cela rend la route accessible sans authentification", "correct": false}
+      ]
+    },
+    {
+      "statement": "Que fait Laravel si la route /formations/{formation} reçoit un identifiant qui n'existe pas, avec la liaison de modèle ?",
+      "type": "SINGLE_CHOICE",
+      "points": 1,
+      "timeLimitSeconds": 40,
+      "options": [
+        {"text": "Il renvoie automatiquement une réponse 404", "correct": true},
+        {"text": "Il passe null au contrôleur", "correct": false},
+        {"text": "Il crée une formation vide", "correct": false},
+        {"text": "Il renvoie une erreur 500", "correct": false}
+      ]
+    },
+    {
+      "statement": "Quelles affirmations sur l'affichage en Blade sont vraies ?",
+      "type": "MULTIPLE_CHOICE",
+      "points": 2,
+      "timeLimitSeconds": 50,
+      "options": [
+        {"text": "{{ $variable }} échappe la valeur et protège du XSS", "correct": true},
+        {"text": "{!! $variable !!} affiche la valeur sans l'échapper", "correct": true},
+        {"text": "{!! $variable !!} est recommandé pour afficher un commentaire d'utilisateur", "correct": false},
+        {"text": "{{ $variable }} exécute le code PHP contenu dans la variable", "correct": false}
+      ]
+    },
+    {
+      "statement": "Combien de routes déclare Route::resource('formations', FormationController::class) ?",
+      "type": "SINGLE_CHOICE",
+      "points": 1,
+      "timeLimitSeconds": 30,
+      "options": [
+        {"text": "7", "correct": true},
+        {"text": "4", "correct": false},
+        {"text": "5", "correct": false},
+        {"text": "1", "correct": false}
+      ]
+    },
+    {
+      "statement": "Quelles directives sont nécessaires dans un formulaire qui supprime une formation ?",
+      "type": "MULTIPLE_CHOICE",
+      "points": 2,
+      "timeLimitSeconds": 45,
+      "options": [
+        {"text": "@csrf", "correct": true},
+        {"text": "@method('DELETE')", "correct": true},
+        {"text": "@forelse", "correct": false},
+        {"text": "{!! $formation !!}", "correct": false}
+      ]
+    }
+  ]
+}

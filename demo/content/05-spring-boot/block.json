@@ -1,0 +1,115 @@
+{
+  "name": "Spring Boot",
+  "description": "Construire une API REST professionnelle avec Spring Boot : injection de dépendances, configuration, contrôleurs, validation, gestion des erreurs, persistance avec Spring Data JPA et tests. Nécessite les blocs Java et SQL.",
+  "prerequisites": ["Java", "SQL et bases de données"],
+  "modules": [
+    {
+      "name": "Démarrer avec Spring Boot",
+      "description": "Comprendre ce qu'apportent Spring et Spring Boot, l'injection de dépendances, la structure d'un projet et sa configuration.",
+      "content": [
+        {
+          "type": "course",
+          "name": "Spring, Spring Boot et l'injection de dépendances",
+          "description": "Le conteneur Spring, les beans et l'injection par constructeur.",
+          "file": "01-demarrer/01-injection-dependances.md"
+        },
+        {
+          "type": "course",
+          "name": "Structure d'un projet et configuration",
+          "description": "Architecture en couches, fichiers de configuration, profils et propriétés typées.",
+          "file": "01-demarrer/02-structure-configuration.md"
+        },
+        {
+          "type": "exercise",
+          "name": "Premier service Spring Boot",
+          "file": "01-demarrer/03-exercice-premier-service.md"
+        }
+      ],
+      "quiz": {
+        "name": "Quiz : démarrer avec Spring Boot",
+        "instructions": "Huit questions sur l'injection de dépendances et la configuration. Il faut au moins 70 % des points pour valider le module.",
+        "file": "01-demarrer/quiz.json",
+        "shuffleQuestions": true,
+        "shuffleOptions": true,
+        "feedbackMode": "SCORE_AND_MISSED",
+        "showCorrectionOnPass": true
+      }
+    },
+    {
+      "name": "Construire une API REST",
+      "description": "Exposer des ressources avec des contrôleurs REST, séparer les DTO des entités, valider les entrées et centraliser la gestion des erreurs.",
+      "content": [
+        {
+          "type": "course",
+          "name": "Contrôleurs REST",
+          "description": "Principes REST, verbes HTTP, codes de statut et annotations des contrôleurs.",
+          "file": "02-api-rest/01-controleurs-rest.md"
+        },
+        {
+          "type": "course",
+          "name": "DTO et validation",
+          "description": "Séparer le contrat de l'API du modèle interne et valider les données reçues.",
+          "file": "02-api-rest/02-dto-validation.md"
+        },
+        {
+          "type": "exercise",
+          "name": "API de gestion de formations",
+          "file": "02-api-rest/03-exercice-api-formations.md"
+        },
+        {
+          "type": "course",
+          "name": "Gestion centralisée des erreurs",
+          "description": "Exceptions métier, gestionnaire global et réponses d'erreur cohérentes.",
+          "file": "02-api-rest/04-gestion-erreurs.md"
+        }
+      ],
+      "quiz": {
+        "name": "Quiz : construire une API REST",
+        "instructions": "Huit questions sur les contrôleurs, les DTO, la validation et la gestion des erreurs. Certaines questions acceptent plusieurs bonnes réponses.",
+        "file": "02-api-rest/quiz.json",
+        "shuffleQuestions": true,
+        "shuffleOptions": true,
+        "feedbackMode": "SCORE_AND_MISSED",
+        "showCorrectionOnPass": true
+      }
+    },
+    {
+      "name": "Persistance avec Spring Data JPA",
+      "description": "Relier l'API à une base MySQL : entités et relations JPA, repositories, requêtes, transactions et tests.",
+      "content": [
+        {
+          "type": "course",
+          "name": "Entités et relations JPA",
+          "description": "Mapper des classes Java sur des tables et décrire leurs relations.",
+          "file": "03-jpa/01-entites-relations.md"
+        },
+        {
+          "type": "course",
+          "name": "Repositories et requêtes",
+          "description": "Requêtes dérivées, JPQL, pagination et problème N+1.",
+          "file": "03-jpa/02-repositories-requetes.md"
+        },
+        {
+          "type": "course",
+          "name": "Transactions et tests",
+          "description": "@Transactional et les tests de service, de contrôleur et de repository.",
+          "file": "03-jpa/03-transactions-tests.md"
+        },
+        {
+          "type": "exercise",
+          "name": "Persister les inscriptions",
+          "file": "03-jpa/04-exercice-inscriptions.md"
+        }
+      ],
+      "quiz": {
+        "name": "Quiz : Spring Data JPA",
+        "instructions": "Huit questions sur les entités, les repositories, les transactions et les tests. La correction complète est affichée après une réussite.",
+        "file": "03-jpa/quiz.json",
+        "shuffleQuestions": true,
+        "shuffleOptions": true,
+        "feedbackMode": "SCORE_AND_MISSED",
+        "showCorrectionOnPass": true
+      }
+    }
+  ]
+}

@@ -1,0 +1,100 @@
+{
+  "questions": [
+    {
+      "statement": "Quelle URL respecte le mieux les conventions REST pour lister les formations ?",
+      "type": "SINGLE_CHOICE",
+      "points": 1,
+      "timeLimitSeconds": 30,
+      "options": [
+        {"text": "GET /api/formations", "correct": true},
+        {"text": "GET /api/getAllFormations", "correct": false},
+        {"text": "POST /api/formations/list", "correct": false},
+        {"text": "GET /api/formation/lister", "correct": false}
+      ]
+    },
+    {
+      "statement": "Quel code de statut renvoyer après la création réussie d'une ressource ?",
+      "type": "SINGLE_CHOICE",
+      "points": 1,
+      "timeLimitSeconds": 30,
+      "options": [
+        {"text": "201 Created", "correct": true},
+        {"text": "200 OK", "correct": false},
+        {"text": "204 No Content", "correct": false},
+        {"text": "302 Found", "correct": false}
+      ]
+    },
+    {
+      "statement": "Quelles raisons justifient de ne pas renvoyer directement une entité JPA depuis un contrôleur ?",
+      "type": "MULTIPLE_CHOICE",
+      "points": 2,
+      "timeLimitSeconds": 50,
+      "options": [
+        {"text": "Des champs sensibles comme un mot de passe haché pourraient être exposés", "correct": true},
+        {"text": "Le contrat de l'API serait couplé à la structure de la base", "correct": true},
+        {"text": "Les relations bidirectionnelles peuvent provoquer des boucles de sérialisation", "correct": true},
+        {"text": "Une entité ne peut pas être convertie en JSON en Java", "correct": false}
+      ]
+    },
+    {
+      "statement": "Quelle annotation déclenche la validation d'un DTO reçu dans le corps de la requête ?",
+      "type": "SINGLE_CHOICE",
+      "points": 1,
+      "timeLimitSeconds": 30,
+      "options": [
+        {"text": "@Valid", "correct": true},
+        {"text": "@NotNull", "correct": false},
+        {"text": "@Service", "correct": false},
+        {"text": "@Transactional", "correct": false}
+      ]
+    },
+    {
+      "statement": "Quelle contrainte refuse une chaîne null, vide ou composée uniquement d'espaces ?",
+      "type": "SINGLE_CHOICE",
+      "points": 1,
+      "timeLimitSeconds": 30,
+      "options": [
+        {"text": "@NotBlank", "correct": true},
+        {"text": "@NotNull", "correct": false},
+        {"text": "@NotEmpty", "correct": false},
+        {"text": "@Size(min = 0)", "correct": false}
+      ]
+    },
+    {
+      "statement": "Où vérifier la règle « deux formations ne peuvent pas avoir le même titre » ?",
+      "type": "SINGLE_CHOICE",
+      "points": 1,
+      "timeLimitSeconds": 40,
+      "options": [
+        {"text": "Dans le service, qui consulte la base", "correct": true},
+        {"text": "Uniquement dans le front", "correct": false},
+        {"text": "Avec l'annotation @Size sur le titre", "correct": false},
+        {"text": "Dans le gestionnaire global des exceptions", "correct": false}
+      ]
+    },
+    {
+      "statement": "Quel est le rôle d'une classe annotée @RestControllerAdvice ?",
+      "type": "SINGLE_CHOICE",
+      "points": 1,
+      "timeLimitSeconds": 40,
+      "options": [
+        {"text": "Traduire les exceptions levées par tous les contrôleurs en réponses HTTP cohérentes", "correct": true},
+        {"text": "Conseiller le développeur sur les bonnes pratiques REST", "correct": false},
+        {"text": "Remplacer les services", "correct": false},
+        {"text": "Valider automatiquement les entités", "correct": false}
+      ]
+    },
+    {
+      "statement": "Que doit faire le gestionnaire d'une exception inattendue ?",
+      "type": "MULTIPLE_CHOICE",
+      "points": 2,
+      "timeLimitSeconds": 50,
+      "options": [
+        {"text": "Journaliser l'erreur complète côté serveur", "correct": true},
+        {"text": "Renvoyer un statut 500 avec un message générique", "correct": true},
+        {"text": "Renvoyer la trace de pile au client pour faciliter le débogage", "correct": false},
+        {"text": "Renvoyer 200 pour ne pas inquiéter l'utilisateur", "correct": false}
+      ]
+    }
+  ]
+}

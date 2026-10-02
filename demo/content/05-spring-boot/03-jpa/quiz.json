@@ -1,0 +1,100 @@
+{
+  "questions": [
+    {
+      "statement": "Quel est le rôle d'Hibernate dans une application Spring Boot ?",
+      "type": "SINGLE_CHOICE",
+      "points": 1,
+      "timeLimitSeconds": 40,
+      "options": [
+        {"text": "C'est l'implémentation de JPA qui traduit les opérations sur les entités en requêtes SQL", "correct": true},
+        {"text": "C'est le serveur web embarqué", "correct": false},
+        {"text": "C'est le moteur de base de données", "correct": false},
+        {"text": "C'est un outil de migration de schéma", "correct": false}
+      ]
+    },
+    {
+      "statement": "Pourquoi préférer @Enumerated(EnumType.STRING) à la valeur par défaut ?",
+      "type": "SINGLE_CHOICE",
+      "points": 1,
+      "timeLimitSeconds": 45,
+      "options": [
+        {"text": "Avec ORDINAL, ajouter un cas au milieu de l'énumération décale les données existantes", "correct": true},
+        {"text": "STRING prend moins de place en base", "correct": false},
+        {"text": "ORDINAL est interdit par MySQL", "correct": false},
+        {"text": "STRING rend les requêtes plus rapides", "correct": false}
+      ]
+    },
+    {
+      "statement": "Quelle valeur de spring.jpa.hibernate.ddl-auto convient quand le schéma est géré par Flyway ?",
+      "type": "SINGLE_CHOICE",
+      "points": 1,
+      "timeLimitSeconds": 40,
+      "options": [
+        {"text": "validate", "correct": true},
+        {"text": "update", "correct": false},
+        {"text": "create-drop", "correct": false},
+        {"text": "create", "correct": false}
+      ]
+    },
+    {
+      "statement": "Quelle requête génère la méthode findByNiveauOrderByTitreAsc(Niveau niveau) ?",
+      "type": "SINGLE_CHOICE",
+      "points": 1,
+      "timeLimitSeconds": 45,
+      "options": [
+        {"text": "Les formations du niveau donné, triées par titre croissant", "correct": true},
+        {"text": "Toutes les formations triées par niveau", "correct": false},
+        {"text": "Le nombre de formations du niveau donné", "correct": false},
+        {"text": "Une erreur : ce nom de méthode n'est pas reconnu", "correct": false}
+      ]
+    },
+    {
+      "statement": "Qu'est-ce que le problème N+1 ?",
+      "type": "SINGLE_CHOICE",
+      "points": 1,
+      "timeLimitSeconds": 45,
+      "options": [
+        {"text": "Une requête pour la liste, puis une requête supplémentaire par élément pour charger une relation", "correct": true},
+        {"text": "Une table qui contient une colonne de trop", "correct": false},
+        {"text": "Un identifiant auto-incrémenté qui saute une valeur", "correct": false},
+        {"text": "Une transaction ouverte une fois de trop", "correct": false}
+      ]
+    },
+    {
+      "statement": "Quelles solutions corrigent un problème N+1 sur la relation categorie ?",
+      "type": "MULTIPLE_CHOICE",
+      "points": 2,
+      "timeLimitSeconds": 50,
+      "options": [
+        {"text": "Une requête JPQL avec JOIN FETCH f.categorie", "correct": true},
+        {"text": "Un @EntityGraph(attributePaths = \"categorie\")", "correct": true},
+        {"text": "Le chargement par lots avec default_batch_fetch_size", "correct": true},
+        {"text": "Appeler findById dans une boucle", "correct": false}
+      ]
+    },
+    {
+      "statement": "Une méthode @Transactional lève une RuntimeException. Que deviennent ses modifications en base ?",
+      "type": "SINGLE_CHOICE",
+      "points": 1,
+      "timeLimitSeconds": 40,
+      "options": [
+        {"text": "Elles sont annulées", "correct": true},
+        {"text": "Elles sont validées", "correct": false},
+        {"text": "Seule la dernière est annulée", "correct": false},
+        {"text": "Elles restent en attente jusqu'au redémarrage", "correct": false}
+      ]
+    },
+    {
+      "statement": "Quelles affirmations sur les tests sont vraies ?",
+      "type": "MULTIPLE_CHOICE",
+      "points": 2,
+      "timeLimitSeconds": 50,
+      "options": [
+        {"text": "Un test unitaire de service avec Mockito ne démarre pas Spring", "correct": true},
+        {"text": "@WebMvcTest charge la couche web et permet de vérifier les statuts HTTP", "correct": true},
+        {"text": "@DataJpaTest sert à tester les requêtes des repositories", "correct": true},
+        {"text": "@SpringBootTest est le type de test le plus rapide", "correct": false}
+      ]
+    }
+  ]
+}

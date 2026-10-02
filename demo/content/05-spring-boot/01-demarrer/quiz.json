@@ -1,0 +1,100 @@
+{
+  "questions": [
+    {
+      "statement": "Qu'apporte Spring Boot par rapport à Spring seul ?",
+      "type": "MULTIPLE_CHOICE",
+      "points": 2,
+      "timeLimitSeconds": 45,
+      "options": [
+        {"text": "Des starters qui regroupent les dépendances utiles", "correct": true},
+        {"text": "Une auto-configuration selon les dépendances présentes", "correct": true},
+        {"text": "Un serveur web embarqué", "correct": true},
+        {"text": "Le remplacement du langage Java par Kotlin", "correct": false}
+      ]
+    },
+    {
+      "statement": "Qu'est-ce que l'inversion de contrôle ?",
+      "type": "SINGLE_CHOICE",
+      "points": 1,
+      "timeLimitSeconds": 45,
+      "options": [
+        {"text": "Les objets reçoivent leurs dépendances au lieu de les créer eux-mêmes", "correct": true},
+        {"text": "Le client contrôle le serveur", "correct": false},
+        {"text": "Les méthodes s'exécutent dans l'ordre inverse", "correct": false},
+        {"text": "Le contrôleur appelle directement la base de données", "correct": false}
+      ]
+    },
+    {
+      "statement": "Quelle forme d'injection de dépendances est recommandée ?",
+      "type": "SINGLE_CHOICE",
+      "points": 1,
+      "timeLimitSeconds": 30,
+      "options": [
+        {"text": "Par constructeur, avec des champs final", "correct": true},
+        {"text": "Par @Autowired sur chaque champ", "correct": false},
+        {"text": "Par des setters publics", "correct": false},
+        {"text": "Par des attributs statiques", "correct": false}
+      ]
+    },
+    {
+      "statement": "Quelle annotation marque une classe portant la logique métier ?",
+      "type": "SINGLE_CHOICE",
+      "points": 1,
+      "timeLimitSeconds": 30,
+      "options": [
+        {"text": "@Service", "correct": true},
+        {"text": "@Entity", "correct": false},
+        {"text": "@RestController", "correct": false},
+        {"text": "@Bean", "correct": false}
+      ]
+    },
+    {
+      "statement": "Deux beans implémentent la même interface injectée dans un service. Que se passe-t-il sans autre précision ?",
+      "type": "SINGLE_CHOICE",
+      "points": 1,
+      "timeLimitSeconds": 45,
+      "options": [
+        {"text": "Le démarrage échoue : Spring ne sait pas lequel choisir", "correct": true},
+        {"text": "Spring choisit le premier par ordre alphabétique", "correct": false},
+        {"text": "Spring injecte les deux à tour de rôle", "correct": false},
+        {"text": "Spring crée une troisième implémentation", "correct": false}
+      ]
+    },
+    {
+      "statement": "Pourquoi un service Spring ne doit-il pas stocker de données propres à une requête dans ses attributs ?",
+      "type": "SINGLE_CHOICE",
+      "points": 1,
+      "timeLimitSeconds": 45,
+      "options": [
+        {"text": "Parce qu'il est un singleton partagé par toutes les requêtes simultanées", "correct": true},
+        {"text": "Parce que Spring efface les attributs après chaque requête", "correct": false},
+        {"text": "Parce que les attributs d'un service sont interdits", "correct": false},
+        {"text": "Parce que cela ralentit le démarrage", "correct": false}
+      ]
+    },
+    {
+      "statement": "Quels avantages offre un record @ConfigurationProperties par rapport à des @Value dispersés ?",
+      "type": "MULTIPLE_CHOICE",
+      "points": 2,
+      "timeLimitSeconds": 50,
+      "options": [
+        {"text": "Les propriétés d'un même sujet sont regroupées et typées", "correct": true},
+        {"text": "Une valeur invalide peut faire échouer le démarrage grâce à la validation", "correct": true},
+        {"text": "Les secrets n'ont plus besoin d'être protégés", "correct": false},
+        {"text": "Les profils deviennent inutiles", "correct": false}
+      ]
+    },
+    {
+      "statement": "Le profil prod est actif. Quels fichiers de configuration sont pris en compte ?",
+      "type": "SINGLE_CHOICE",
+      "points": 1,
+      "timeLimitSeconds": 40,
+      "options": [
+        {"text": "application.yml, complété et surchargé par application-prod.yml", "correct": true},
+        {"text": "Seulement application-prod.yml", "correct": false},
+        {"text": "Seulement application.yml", "correct": false},
+        {"text": "Tous les fichiers application-*.yml du projet", "correct": false}
+      ]
+    }
+  ]
+}

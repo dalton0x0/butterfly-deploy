@@ -1,0 +1,100 @@
+{
+  "questions": [
+    {
+      "statement": "Un utilisateur connecté tente de modifier une formation dont il n'est pas responsable. Quel code de statut attendre ?",
+      "type": "SINGLE_CHOICE",
+      "points": 1,
+      "timeLimitSeconds": 40,
+      "options": [
+        {"text": "403 Forbidden", "correct": true},
+        {"text": "401 Unauthorized", "correct": false},
+        {"text": "404 Not Found", "correct": false},
+        {"text": "422 Unprocessable Content", "correct": false}
+      ]
+    },
+    {
+      "statement": "Où placer les règles d'autorisation liées au modèle Formation ?",
+      "type": "SINGLE_CHOICE",
+      "points": 1,
+      "timeLimitSeconds": 30,
+      "options": [
+        {"text": "Dans une FormationPolicy", "correct": true},
+        {"text": "Dans la migration de la table formations", "correct": false},
+        {"text": "Uniquement dans les vues avec @can", "correct": false},
+        {"text": "Dans le fichier .env", "correct": false}
+      ]
+    },
+    {
+      "statement": "Pourquoi masquer un bouton avec @can ne suffit-il pas à protéger une action ?",
+      "type": "SINGLE_CHOICE",
+      "points": 1,
+      "timeLimitSeconds": 45,
+      "options": [
+        {"text": "Parce que la requête peut être envoyée directement sans passer par l'interface", "correct": true},
+        {"text": "Parce que @can ne fonctionne qu'en production", "correct": false},
+        {"text": "Parce que @can désactive la protection CSRF", "correct": false},
+        {"text": "Il suffit, aucune vérification serveur n'est nécessaire", "correct": false}
+      ]
+    },
+    {
+      "statement": "Quel est l'intérêt d'une API Resource ?",
+      "type": "MULTIPLE_CHOICE",
+      "points": 2,
+      "timeLimitSeconds": 50,
+      "options": [
+        {"text": "Contrôler précisément les champs renvoyés par l'API", "correct": true},
+        {"text": "Éviter d'exposer des colonnes internes ou sensibles du modèle", "correct": true},
+        {"text": "Inclure une relation seulement si elle a été chargée, avec whenLoaded", "correct": true},
+        {"text": "Remplacer les migrations", "correct": false}
+      ]
+    },
+    {
+      "statement": "Quelles routes déclare Route::apiResource par rapport à Route::resource ?",
+      "type": "SINGLE_CHOICE",
+      "points": 1,
+      "timeLimitSeconds": 45,
+      "options": [
+        {"text": "Les mêmes, sans les routes de formulaire create et edit", "correct": true},
+        {"text": "Seulement index et show", "correct": false},
+        {"text": "Les mêmes, avec en plus une route de connexion", "correct": false},
+        {"text": "Exactement les mêmes sept routes", "correct": false}
+      ]
+    },
+    {
+      "statement": "Quel est le rôle du trait RefreshDatabase dans un test ?",
+      "type": "SINGLE_CHOICE",
+      "points": 1,
+      "timeLimitSeconds": 40,
+      "options": [
+        {"text": "Remettre la base de test dans un état propre pour que chaque test soit indépendant", "correct": true},
+        {"text": "Vider la base de production après les tests", "correct": false},
+        {"text": "Recharger la page du navigateur", "correct": false},
+        {"text": "Rafraîchir le jeton Sanctum", "correct": false}
+      ]
+    },
+    {
+      "statement": "Quelles assertions vérifient qu'une requête d'API a échoué à cause de la validation du titre ?",
+      "type": "MULTIPLE_CHOICE",
+      "points": 2,
+      "timeLimitSeconds": 50,
+      "options": [
+        {"text": "assertUnprocessable()", "correct": true},
+        {"text": "assertJsonValidationErrors(['titre'])", "correct": true},
+        {"text": "assertCreated()", "correct": false},
+        {"text": "assertOk()", "correct": false}
+      ]
+    },
+    {
+      "statement": "Un apprenant change l'identifiant dans l'URL et consulte l'inscription d'un autre. Comment s'appelle cette faille ?",
+      "type": "SINGLE_CHOICE",
+      "points": 1,
+      "timeLimitSeconds": 40,
+      "options": [
+        {"text": "IDOR, une référence directe à un objet non vérifiée", "correct": true},
+        {"text": "XSS", "correct": false},
+        {"text": "CSRF", "correct": false},
+        {"text": "Injection SQL", "correct": false}
+      ]
+    }
+  ]
+}

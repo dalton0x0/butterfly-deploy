@@ -1,0 +1,115 @@
+{
+  "name": "Laravel",
+  "description": "Développer des applications web et des API avec Laravel : routes, contrôleurs, Blade, Eloquent, validation, authentification, autorisation et tests. Nécessite les blocs PHP et SQL.",
+  "prerequisites": ["PHP", "SQL et bases de données"],
+  "modules": [
+    {
+      "name": "Démarrer avec Laravel",
+      "description": "Installer un projet, comprendre sa structure et le cycle d'une requête, écrire des routes, des contrôleurs et des vues Blade.",
+      "content": [
+        {
+          "type": "course",
+          "name": "Installation, structure et Artisan",
+          "description": "Créer un projet, parcourir son arborescence et utiliser la ligne de commande Artisan.",
+          "file": "01-demarrer/01-installation-structure.md"
+        },
+        {
+          "type": "course",
+          "name": "Routes, contrôleurs et vues Blade",
+          "description": "Le cycle d'une requête, du routeur à la vue.",
+          "file": "01-demarrer/02-routes-controleurs-blade.md"
+        },
+        {
+          "type": "exercise",
+          "name": "Site vitrine d'un organisme de formation",
+          "file": "01-demarrer/03-exercice-site-vitrine.md"
+        }
+      ],
+      "quiz": {
+        "name": "Quiz : démarrer avec Laravel",
+        "instructions": "Huit questions sur la structure d'un projet, les routes, les contrôleurs et Blade. Il faut au moins 70 % des points pour valider le module.",
+        "file": "01-demarrer/quiz.json",
+        "shuffleQuestions": true,
+        "shuffleOptions": true,
+        "feedbackMode": "SCORE_AND_MISSED",
+        "showCorrectionOnPass": true
+      }
+    },
+    {
+      "name": "Eloquent et base de données",
+      "description": "Faire évoluer le schéma avec les migrations, manipuler les données avec Eloquent, décrire les relations et valider les formulaires.",
+      "content": [
+        {
+          "type": "course",
+          "name": "Migrations et modèles Eloquent",
+          "description": "Versionner le schéma et manipuler les données avec l'ORM de Laravel.",
+          "file": "02-eloquent/01-migrations-modeles.md"
+        },
+        {
+          "type": "course",
+          "name": "Relations Eloquent",
+          "description": "Décrire les relations entre modèles et éviter le problème N+1.",
+          "file": "02-eloquent/02-relations.md"
+        },
+        {
+          "type": "exercise",
+          "name": "Gestion d'un catalogue de formations",
+          "file": "02-eloquent/03-exercice-catalogue.md"
+        },
+        {
+          "type": "course",
+          "name": "Validation et Form Requests",
+          "description": "Valider les données reçues et afficher les erreurs.",
+          "file": "02-eloquent/04-validation.md"
+        }
+      ],
+      "quiz": {
+        "name": "Quiz : Eloquent et base de données",
+        "instructions": "Huit questions sur les migrations, Eloquent, les relations et la validation. Certaines questions acceptent plusieurs bonnes réponses.",
+        "file": "02-eloquent/quiz.json",
+        "shuffleQuestions": true,
+        "shuffleOptions": true,
+        "feedbackMode": "SCORE_AND_MISSED",
+        "showCorrectionOnPass": true
+      }
+    },
+    {
+      "name": "Sécurité, API et tests",
+      "description": "Authentifier les utilisateurs, contrôler leurs droits avec les policies, exposer une API REST et tester l'application.",
+      "content": [
+        {
+          "type": "course",
+          "name": "Authentification et autorisation",
+          "description": "Kits de démarrage, middleware auth, gates et policies.",
+          "file": "03-api-tests/01-authentification-autorisation.md"
+        },
+        {
+          "type": "course",
+          "name": "Construire une API REST",
+          "description": "Routes d'API, API Resources, pagination et Sanctum.",
+          "file": "03-api-tests/02-api-rest.md"
+        },
+        {
+          "type": "course",
+          "name": "Tester une application Laravel",
+          "description": "Tests de fonctionnalité, factories et base de test.",
+          "file": "03-api-tests/03-tests.md"
+        },
+        {
+          "type": "exercise",
+          "name": "API d'inscription aux formations",
+          "file": "03-api-tests/04-exercice-api-inscriptions.md"
+        }
+      ],
+      "quiz": {
+        "name": "Quiz : sécurité, API et tests",
+        "instructions": "Huit questions sur l'authentification, les policies, les API Resources et les tests. La correction complète est affichée après une réussite.",
+        "file": "03-api-tests/quiz.json",
+        "shuffleQuestions": true,
+        "shuffleOptions": true,
+        "feedbackMode": "SCORE_AND_MISSED",
+        "showCorrectionOnPass": true
+      }
+    }
+  ]
+}

@@ -1,0 +1,100 @@
+{
+  "questions": [
+    {
+      "statement": "Une migration a déjà été appliquée sur le serveur de recette et contient une erreur. Que faire ?",
+      "type": "SINGLE_CHOICE",
+      "points": 1,
+      "timeLimitSeconds": 40,
+      "options": [
+        {"text": "Écrire une nouvelle migration qui corrige le schéma", "correct": true},
+        {"text": "Modifier la migration existante et la relancer", "correct": false},
+        {"text": "Supprimer la migration du projet", "correct": false},
+        {"text": "Corriger la table directement en SQL sur chaque serveur", "correct": false}
+      ]
+    },
+    {
+      "statement": "Que fait Formation::findOrFail(12) si aucune formation n'a l'identifiant 12 ?",
+      "type": "SINGLE_CHOICE",
+      "points": 1,
+      "timeLimitSeconds": 30,
+      "options": [
+        {"text": "Il lève une exception qui se traduit par une réponse 404", "correct": true},
+        {"text": "Il renvoie null", "correct": false},
+        {"text": "Il crée la formation", "correct": false},
+        {"text": "Il renvoie la première formation", "correct": false}
+      ]
+    },
+    {
+      "statement": "À quoi sert la propriété $fillable d'un modèle Eloquent ?",
+      "type": "SINGLE_CHOICE",
+      "points": 1,
+      "timeLimitSeconds": 40,
+      "options": [
+        {"text": "Lister les colonnes modifiables par affectation de masse, pour bloquer les autres", "correct": true},
+        {"text": "Lister les colonnes obligatoires", "correct": false},
+        {"text": "Remplir automatiquement la table avec des données de test", "correct": false},
+        {"text": "Définir les index de la table", "correct": false}
+      ]
+    },
+    {
+      "statement": "Quelle relation déclare-t-on dans le modèle Formation pour accéder à sa catégorie ?",
+      "type": "SINGLE_CHOICE",
+      "points": 1,
+      "timeLimitSeconds": 30,
+      "options": [
+        {"text": "belongsTo", "correct": true},
+        {"text": "hasMany", "correct": false},
+        {"text": "belongsToMany", "correct": false},
+        {"text": "hasManyThrough", "correct": false}
+      ]
+    },
+    {
+      "statement": "Comment éviter le problème N+1 en affichant chaque formation avec sa catégorie ?",
+      "type": "SINGLE_CHOICE",
+      "points": 1,
+      "timeLimitSeconds": 40,
+      "options": [
+        {"text": "Formation::with('categorie')->get()", "correct": true},
+        {"text": "Formation::all() puis $formation->categorie dans la boucle", "correct": false},
+        {"text": "Categorie::find() dans la boucle", "correct": false},
+        {"text": "DB::table('formations')->get()", "correct": false}
+      ]
+    },
+    {
+      "statement": "Quelles affirmations sur la validation sont vraies ?",
+      "type": "MULTIPLE_CHOICE",
+      "points": 2,
+      "timeLimitSeconds": 50,
+      "options": [
+        {"text": "$request->validated() ne renvoie que les champs soumis à des règles", "correct": true},
+        {"text": "Une requête d'API invalide reçoit une réponse 422 avec les erreurs par champ", "correct": true},
+        {"text": "Une Form Request est validée avant l'appel de la méthode du contrôleur", "correct": true},
+        {"text": "Il faut passer $request->all() à create pour enregistrer les données", "correct": false}
+      ]
+    },
+    {
+      "statement": "Que vérifie la règle exists:categories,id ?",
+      "type": "SINGLE_CHOICE",
+      "points": 1,
+      "timeLimitSeconds": 30,
+      "options": [
+        {"text": "Que la valeur correspond à un identifiant présent dans la table categories", "correct": true},
+        {"text": "Que la valeur n'existe pas encore dans la table categories", "correct": false},
+        {"text": "Que le champ est présent dans la requête", "correct": false},
+        {"text": "Que la table categories existe", "correct": false}
+      ]
+    },
+    {
+      "statement": "Quels éléments permettent de réafficher correctement un formulaire après une erreur de validation ?",
+      "type": "MULTIPLE_CHOICE",
+      "points": 2,
+      "timeLimitSeconds": 45,
+      "options": [
+        {"text": "old('titre') pour la valeur saisie", "correct": true},
+        {"text": "La directive @error('titre') pour le message", "correct": true},
+        {"text": "{!! $request->all() !!}", "correct": false},
+        {"text": "Un appel à migrate:fresh", "correct": false}
+      ]
+    }
+  ]
+}
