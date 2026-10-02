@@ -1,6 +1,6 @@
 # Historique des versions - Butterfly Deploy
 
-Toutes les versions notables de l'interface Butterfly, de la plus récente à la plus ancienne.
+Toutes les versions notables du dépôt de déploiement Butterfly, de la plus récente à la plus ancienne.
 
 Le projet suit le versionnage sémantique. Une version majeure marque une rupture de
 compatibilité, une mineure ajoute des capacités, un correctif répare sans rien ajouter.
@@ -8,6 +8,25 @@ compatibilité, une mineure ajoute des capacités, un correctif répare sans rie
 Chaque version correspond à un tag Git annoté du même nom. Le titre de chaque section
 renvoie vers la comparaison GitHub avec la version précédente, c'est-à-dire l'ensemble des
 commits qu'elle apporte. La toute première version renvoie vers son tag n'ayant pas de prédécesseur.
+
+---
+
+## [v1.4.0](https://github.com/dalton0x0/butterfly-deploy/compare/v1.3.2...v1.4.0) - 2026-10-01
+
+Contenus de démonstration. Le dossier `demo` charge par l'API six blocs complets (Git, SQL, Java,
+PHP, Spring Boot et Laravel), soit 17 modules, 46 cours, 22 exercices notés et 17 quiz, ainsi qu'un
+formateur et deux apprenants assignés à ces blocs. Le chargement passe par l'API et non par la base :
+chaque contenu subit les validations d'une saisie dans l'interface et les options de quiz sont
+mélangées à l'insertion comme le fait le backend. Aucune migration Flyway n'est concernée, rien ne
+peut donc atteindre une base de production par accident. Les adresses des comptes sont confirmées
+par le vrai parcours, le jeton étant lu dans Mailpit puis présenté à l'API. Le script peut être
+relancé : un compte ou un bloc existant est conservé tel quel et tous les fichiers sont lus avant le
+premier appel pour qu'un JSON invalide n'interrompe pas un bloc à moitié créé. `node --env-file`
+coupant une valeur sans guillemets au premier `#` là où Docker Compose la garde entière, un mot de
+passe administrateur qui en contient un doit être placé entre guillemets dans le `.env`, ce que le
+script rappelle en cas de connexion refusée. Le README complète la table des versions compatibles
+qui s'arrêtait à la v1.3.0 et décrit enfin l'ordre de démarrage réel : le frontend n'attend plus la
+bonne santé du backend depuis la v1.2.0.
 
 ---
 

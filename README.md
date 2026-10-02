@@ -16,6 +16,7 @@ applicatif : le backend et le frontend vivent dans leurs propres dépôts et y p
 - [Configuration](#configuration)
 - [Données persistantes](#données-persistantes)
 - [SonarQube](#sonarqube)
+- [Contenus de démonstration](#contenus-de-démonstration)
 - [Commandes utiles](#commandes-utiles)
 - [Sauvegarde des données](#sauvegarde-des-données)
 - [Limites assumées](#limites-assumées)
@@ -44,9 +45,10 @@ compose fournit au backend et au frontend des variables que leurs versions doive
 connaître.
 
 | Version de ce dépôt | Backend | Frontend |
-|---|---|---|
-| 1.3.0 | 1.9.0 | 1.8.0 |
-| 1.2.0 | 1.8.0 | 1.7.0 |
+|---------------------|---------|----------|
+| 1.4.0               | 2.0.1   | 2.0.1    |
+| 1.3.0               | 1.9.0   | 1.8.0    |
+| 1.2.0               | 1.8.0   | 1.7.0    |
 
 Rien ne vérifie cet accord au démarrage. Un dépôt de déploiement récent associé à un
 backend plus ancien fournit des variables d'environnement que celui-ci ignore sans
@@ -111,10 +113,14 @@ démarrage du backend.
 
 ## Ordre de démarrage et contrôles de santé
 
-Le backend n'est lancé qu'une fois MySQL déclaré sain (`condition: service_healthy`) et le
-frontend qu'une fois le backend sain. C'est la différence entre « le conteneur tourne » et « le
-service répond » : MySQL accepte des connexions bien avant d'être prêt et Spring Boot met
-plusieurs dizaines de secondes à démarrer.
+Le backend n'est lancé qu'une fois MySQL déclaré sain (`condition: service_healthy`). C'est la
+différence entre « le conteneur tourne » et « le service répond » : MySQL accepte des connexions
+bien avant d'être prêt.
+
+Le frontend, lui, démarre dès que le conteneur du backend est lancé (`condition: service_started`)
+sans attendre sa bonne santé. Spring Boot met plusieurs dizaines de secondes à démarrer : servie
+tout de suite, l'interface affiche au moins sa page de connexion et le message d'erreur du premier
+appel, là où l'attente donnerait une connexion refusée sans aucune indication.
 
 - MySQL : `mysqladmin ping` sans mot de passe. La commande renvoie 0 dès que le serveur est
   vivant et passer le mot de passe l'inscrirait dans la configuration du conteneur, lisible par
@@ -175,6 +181,18 @@ docker compose --profile tools up -d
 
 L'interface est disponible sur `http://localhost:9000`. L'analyse elle-même se lance depuis les
 dépôts backend et frontend selon leurs README respectifs.
+
+## Contenus de démonstration
+
+Le dossier `demo` charge par l'API des blocs complets (modules, cours, exercices et quiz), un
+formateur et deux apprenants dont l'adresse est confirmée. Une fois la pile démarrée et le backend
+sain :
+
+```bash
+node --env-file=.env demo/seed.mjs
+```
+
+Le détail des comptes créés et des options figure dans [demo/README.md](demo/README.md).
 
 ## Commandes utiles
 
@@ -248,6 +266,6 @@ contenu de la version.
 
 ## Historique des versions
 
-Version courante : **v1.3.2**.
+Version courante : **v1.4.0**.
 
 L'historique complet des versions avec le détail de chaque livraison est dans [CHANGELOG.md](CHANGELOG.md).
