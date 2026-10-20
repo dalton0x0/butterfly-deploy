@@ -62,7 +62,7 @@ Variables facultatives :
 | Variable           | Défaut                                   | Rôle                                  |
 |--------------------|------------------------------------------|---------------------------------------|
 | `DEMO_PASSWORD`    | `Butterfly-Demo2026`                     | Mot de passe des comptes créés        |
-| `DEMO_API_URL`     | `http://localhost:${FRONTEND_PORT}/api`  | API visée, par exemple un backend lancé hors conteneur (`http://localhost:8080/api`) |
+| `DEMO_API_URL`     | `http://localhost:${FRONTEND_PORT}/api`  | Racine de l'API visée sans version, par exemple un backend lancé hors conteneur (`http://localhost:8080/api`). Le script ajoute lui-même `/v1` |
 | `DEMO_MAILPIT_URL` | `http://localhost:${MAILPIT_UI_PORT}`    | Interface de Mailpit                  |
 
 ## Fonctionnement

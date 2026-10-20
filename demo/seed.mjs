@@ -16,7 +16,11 @@ import {fileURLToPath} from 'node:url'
 const CONTENT_DIR = path.join(path.dirname(fileURLToPath(import.meta.url)), 'content')
 
 // Adresses vues depuis la machine hôte. Elles reprennent les ports du .env de la pile.
-const API_URL = process.env.DEMO_API_URL ?? `http://localhost:${process.env.FRONTEND_PORT ?? 80}/api`
+// DEMO_API_URL désigne la racine /api. La version est ajoutée ici : elle décrit le contrat
+// que ce script sait appeler et ne dépend pas de l'environnement.
+const API_ROOT = process.env.DEMO_API_URL ?? `http://localhost:${process.env.FRONTEND_PORT ?? 80}/api`
+const API_VERSION = 'v1'
+const API_URL = `${API_ROOT.replace(/\/$/, '')}/${API_VERSION}`
 const MAILPIT_URL = process.env.DEMO_MAILPIT_URL ?? `http://localhost:${process.env.MAILPIT_UI_PORT ?? 8025}`
 
 // Mot de passe commun aux comptes de démonstration. Il respecte la règle du backend :
