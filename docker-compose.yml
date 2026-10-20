@@ -153,6 +153,12 @@ services:
       # les liens des e-mails sont ouverts hors des conteneurs.
       MAIL_FRONT_BASE_URL: ${MAIL_FRONT_BASE_URL:-http://localhost}
 
+      # Notifications pédagogiques (file d'envoi vidée par lots). Le débit par défaut, 20
+      # messages toutes les 30 secondes, reste à régler selon les limites du fournisseur.
+      NOTIFICATIONS_ENABLED: ${NOTIFICATIONS_ENABLED:-true}
+      NOTIFICATIONS_BATCH_SIZE: ${NOTIFICATIONS_BATCH_SIZE:-20}
+      NOTIFICATIONS_DIGEST_CRON: ${NOTIFICATIONS_DIGEST_CRON:-0 0 18 * * *}
+
       STORAGE_LOCATION: /app/uploads/exercise-submissions
       # Répertoire distinct des soumissions : les consignes du formateur et les rendus des
       # apprenants n'ont ni les mêmes auteurs ni la même durée de vie. Une purge des rendus
