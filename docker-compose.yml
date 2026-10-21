@@ -177,6 +177,9 @@ services:
       MAIL_ENABLED: ${MAIL_ENABLED:-true}
       MAIL_FROM: ${MAIL_FROM:-no-reply@butterfly.local}
       MAIL_FROM_NAME: ${MAIL_FROM_NAME:-Butterfly}
+      # Même slogan que le pied de page de l'interface affiché sous le nom en tête des
+      # e-mails. Vide : le backend reprend le slogan par défaut du front.
+      MAIL_TAGLINE: ${APP_TAGLINE:-}
       # Adresse vue depuis le navigateur de l'utilisateur et non depuis le réseau Docker :
       # les liens des e-mails sont ouverts hors des conteneurs.
       MAIL_FRONT_BASE_URL: ${MAIL_FRONT_BASE_URL:-http://localhost}
