@@ -17,6 +17,7 @@ applicatif : le backend et le frontend vivent dans leurs propres dépôts et y p
 - [Données persistantes](#données-persistantes)
 - [SonarQube](#sonarqube)
 - [Test de charge](#test-de-charge)
+- [Pré-production](#pré-production)
 - [Contenus de démonstration](#contenus-de-démonstration)
 - [Commandes utiles](#commandes-utiles)
 - [Sauvegarde des données](#sauvegarde-des-données)
@@ -105,7 +106,8 @@ démarrage du backend.
 - **mailpit** : serveur SMTP de développement. Il capture tous les messages émis par le backend
   (vérification d'adresse, réinitialisation de mot de passe) et les présente dans une interface
   web sans qu'aucun ne quitte la machine.
-- **backend** : API Spring Boot construite depuis le dépôt backend avec le profil Spring `docker`.
+- **backend** : API Spring Boot construite depuis le dépôt backend avec le profil Spring `docker`
+  (`prod` en pré-production).
   Elle n'expose aucun port sur l'hôte : seul nginx la joint par le réseau interne.
 - **frontend** : fichiers statiques Vue servis par nginx (variante non privilégiée, sans root,
   écoutant sur le port 8080 interne), qui réachemine aussi `/api/` vers le backend. C'est le seul
@@ -114,6 +116,8 @@ démarrage du backend.
   Rien n'est écrit sur disque et la mémoire est bornée (`REDIS_MAXMEMORY`). Le backend n'attend pas
   qu'il soit prêt et lit la base directement s'il est absent. `CACHE_TYPE=simple` dans
   `.env` permet de s'en passer.
+- **caddy** (pré-production seulement, `docker-compose.preprod.yml`) : terminaison HTTPS et
+  certificat Let's Encrypt automatique devant nginx. Voir [PREPROD.md](PREPROD.md).
 - **sonarqube** : analyse de qualité dans un profil séparé (voir plus bas).
 
 ## Ordre de démarrage et contrôles de santé
@@ -201,7 +205,7 @@ docker run --rm -i --network host -e BASE_URL=http://localhost -e VUS=20 \
 Le test monte à `VUS` utilisateurs simultanés en 30 secondes, tient 2 minutes puis redescend.
 Il échoue si plus de 1 % des requêtes sont en erreur ou si le 95e centile dépasse 500 ms
 (800 ms pour la recherche). Chaque compte ne se connecte qu'une fois au début : la connexion est
-limitée à 20 tentatives par minute et par adresse IP.
+limitée à 20 tentatives en rafale par adresse IP régénérées en 5 minutes.
 
 Pour viser la pré-production depuis un autre poste, remplacer `BASE_URL` par son adresse. Tous les
 utilisateurs virtuels partagent alors la même adresse IP, ce qui ne gêne pas ce test.
@@ -210,6 +214,18 @@ Pour vérifier le cache des images, la seconde demande d'une même image doit re
 
 ```bash
 curl -sI http://localhost/api/media/images/<chemin> | grep X-Cache-Status
+```
+
+## Pré-production
+
+`docker-compose.preprod.yml` complète la pile pour un serveur exposé à Internet : Caddy termine le
+HTTPS avec un certificat Let's Encrypt obtenu et renouvelé automatiquement, et devient le seul
+accès public. Le backend y tourne avec le profil Spring `prod` et non `docker`, pour que la
+pré-production teste la configuration de production. Le guide pas à pas (serveur, DNS, pare-feu,
+Brevo, sauvegardes, mises à jour) est dans [PREPROD.md](PREPROD.md).
+
+```bash
+docker compose -f docker-compose.yml -f docker-compose.preprod.yml up -d --build
 ```
 
 ## Contenus de démonstration
@@ -253,18 +269,22 @@ docker run --rm -v butterfly-deploy_backend_uploads:/data -v "$PWD":/sauvegarde 
 Le préfixe des volumes correspond au nom du répertoire contenant le `docker-compose.yml`.
 `docker volume ls` donne les noms exacts.
 
+`scripts/backup.sh` automatise ces deux sauvegardes avec une rotation sur 7 jours. Son usage
+avec cron et la restauration sont décrits dans [PREPROD.md](PREPROD.md#8-sauvegardes).
+
 ## Limites assumées
 
-Cette orchestration vise la démonstration et l'intégration, pas la production exposée :
+Sans le complément de pré-production, cette orchestration vise la démonstration et
+l'intégration, pas un serveur exposé :
 
-- le backend tourne avec le profil Spring `docker` : schéma créé par les migrations Flyway et
-  connexion à la base sans TLS, les conteneurs communiquant sur un réseau privé. Un déploiement
-  réellement exposé passerait par le profil `prod`, qui exige TLS vers la base,
+- le backend tourne avec le profil Spring `docker` : connexion à la base sans TLS et Swagger
+  actif. `docker-compose.preprod.yml` le passe sur le profil `prod`, qui exige TLS vers la base et
+  coupe Swagger,
 - Mailpit et SonarQube ne sont joignables que depuis la machine hôte (`127.0.0.1`). Pour les
   consulter depuis un autre poste, passer par un tunnel SSH plutôt que d'ouvrir leurs ports,
-- l'interface est servie en HTTP simple sans terminaison TLS. L'authentification basique qui
-  protège la documentation de l'API circule donc en clair : elle écarte un visiteur de passage,
-  pas quelqu'un capable d'écouter le réseau,
+- sans le complément de pré-production, l'interface est servie en HTTP simple. L'authentification
+  basique qui protège la documentation de l'API circule alors en clair. Sur un serveur exposé,
+  toujours démarrer avec `docker-compose.preprod.yml`, qui ajoute le HTTPS,
 - une image supprimée peut encore être servie par le cache de nginx pendant une journée au plus,
   et par le cache du navigateur tant qu'il la garde. Son nom étant un UUID, il faut déjà connaître
   l'adresse pour la demander,

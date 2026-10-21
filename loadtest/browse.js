@@ -13,7 +13,7 @@
 //   VUS            nombre d'utilisateurs simultanés au palier (20 par défaut)
 //
 // La connexion n'a lieu qu'une fois par compte, dans setup(). Le backend limite les
-// connexions à 20 par minute et par adresse IP : se connecter à chaque itération
+// connexions à 20 en rafale par adresse IP, régénérées en 5 minutes : se connecter à chaque itération
 // mesurerait la limitation et non l'application.
 import http from 'k6/http'
 import {check, group, sleep} from 'k6'
