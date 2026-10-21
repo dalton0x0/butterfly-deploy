@@ -11,6 +11,25 @@ commits qu'elle apporte. La toute première version renvoie vers son tag n'ayant
 
 ---
 
+## [v1.5.0](https://github.com/dalton0x0/butterfly-deploy/compare/v1.4.0...v1.5.0) - 2026-10-21
+
+Pré-production. `docker-compose.preprod.yml` ajoute Caddy qui obtient et renouvelle le certificat
+Let's Encrypt et devient le seul accès public et passe le backend sur le profil `prod` pour que la
+pré-production teste la configuration de production : connexion chiffrée à MySQL, Swagger coupé,
+journaux limités à la sortie standard. `PREPROD.md` décrit l'installation pas à pas du choix du
+serveur aux mises à jour en passant par le DNS, le pare-feu, Brevo et la restauration.
+`scripts/backup.sh` sauvegarde la base et les fichiers téléversés avec une rotation sur sept jours
+et n'écrit jamais d'archive tronquée. La CI valide aussi le fichier de pré-production.
+
+Un service Redis sans persistance et à mémoire bornée sert de cache au backend (`CACHE_TYPE`). Les
+variables des notifications, le slogan des e-mails repris de `APP_TAGLINE` et le plafond des
+tentatives de connexion par adresse IP (`RATE_LIMIT_IP_CAPACITY`) atteignent maintenant le backend.
+Le script de démonstration appelle l'API `v1`. `loadtest/browse.js` simule avec k6 des apprenants
+et un formateur qui parcourent les contenus et cherchent avec des seuils d'acceptation sur le
+temps de réponse et le taux d'erreur.
+
+---
+
 ## [v1.4.0](https://github.com/dalton0x0/butterfly-deploy/compare/v1.3.2...v1.4.0) - 2026-10-01
 
 Contenus de démonstration. Le dossier `demo` charge par l'API six blocs complets (Git, SQL, Java,
