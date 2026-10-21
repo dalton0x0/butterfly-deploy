@@ -16,6 +16,7 @@ applicatif : le backend et le frontend vivent dans leurs propres dépôts et y p
 - [Configuration](#configuration)
 - [Données persistantes](#données-persistantes)
 - [SonarQube](#sonarqube)
+- [Test de charge](#test-de-charge)
 - [Contenus de démonstration](#contenus-de-démonstration)
 - [Commandes utiles](#commandes-utiles)
 - [Sauvegarde des données](#sauvegarde-des-données)
@@ -109,6 +110,10 @@ démarrage du backend.
 - **frontend** : fichiers statiques Vue servis par nginx (variante non privilégiée, sans root,
   écoutant sur le port 8080 interne), qui réachemine aussi `/api/` vers le backend. C'est le seul
   point d'entrée de la plateforme.
+- **redis** : cache de l'état des comptes et des sessions, relu à chaque requête authentifiée.
+  Rien n'est écrit sur disque et la mémoire est bornée (`REDIS_MAXMEMORY`). Le backend n'attend pas
+  qu'il soit prêt et lit la base directement s'il est absent. `CACHE_TYPE=simple` dans
+  `.env` permet de s'en passer.
 - **sonarqube** : analyse de qualité dans un profil séparé (voir plus bas).
 
 ## Ordre de démarrage et contrôles de santé
@@ -182,6 +187,31 @@ docker compose --profile tools up -d
 L'interface est disponible sur `http://localhost:9000`. L'analyse elle-même se lance depuis les
 dépôts backend et frontend selon leurs README respectifs.
 
+## Test de charge
+
+`loadtest/browse.js` simule des apprenants et un formateur qui parcourent la plateforme : profil,
+blocs, modules, cours et recherche. Il utilise les comptes créés par `demo/seed.mjs`, à lancer
+avant. [k6](https://k6.io) tourne dans un conteneur, rien n'est à installer :
+
+```bash
+docker run --rm -i --network host -e BASE_URL=http://localhost -e VUS=20 \
+  grafana/k6:1.0.0 run - < loadtest/browse.js
+```
+
+Le test monte à `VUS` utilisateurs simultanés en 30 secondes, tient 2 minutes puis redescend.
+Il échoue si plus de 1 % des requêtes sont en erreur ou si le 95e centile dépasse 500 ms
+(800 ms pour la recherche). Chaque compte ne se connecte qu'une fois au début : la connexion est
+limitée à 20 tentatives par minute et par adresse IP.
+
+Pour viser la pré-production depuis un autre poste, remplacer `BASE_URL` par son adresse. Tous les
+utilisateurs virtuels partagent alors la même adresse IP, ce qui ne gêne pas ce test.
+
+Pour vérifier le cache des images, la seconde demande d'une même image doit renvoyer `HIT` :
+
+```bash
+curl -sI http://localhost/api/media/images/<chemin> | grep X-Cache-Status
+```
+
 ## Contenus de démonstration
 
 Le dossier `demo` charge par l'API des blocs complets (modules, cours, exercices et quiz), un
@@ -235,6 +265,9 @@ Cette orchestration vise la démonstration et l'intégration, pas la production 
 - l'interface est servie en HTTP simple sans terminaison TLS. L'authentification basique qui
   protège la documentation de l'API circule donc en clair : elle écarte un visiteur de passage,
   pas quelqu'un capable d'écouter le réseau,
+- une image supprimée peut encore être servie par le cache de nginx pendant une journée au plus,
+  et par le cache du navigateur tant qu'il la garde. Son nom étant un UUID, il faut déjà connaître
+  l'adresse pour la demander,
 - les plafonds mémoire sont dimensionnés pour un poste de développement. Un serveur avec
   plusieurs utilisateurs simultanés demanderait de les relever et de mesurer plutôt que
   de deviner.
