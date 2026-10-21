@@ -22,3 +22,6 @@ Desktop.ini
 
 # Identifiants d'accès à la documentation de l'API
 swagger.htpasswd
+
+# Sauvegardes produites par scripts/backup.sh
+backups/
