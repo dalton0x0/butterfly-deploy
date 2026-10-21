@@ -1,0 +1,63 @@
+# Complément pour la pré-production sur un VPS exposé à Internet.
+#
+# docker compose -f docker-compose.yml -f docker-compose.preprod.yml up -d --build
+#
+# Il fait deux choses : il ajoute Caddy qui termine le HTTPS devant le nginx du
+# frontend et il passe le backend sur le profil Spring prod. Tout le reste vient de
+# docker-compose.yml et du .env. Le guide complet est dans PREPROD.md.
+#
+# Dans le .env du VPS, FRONTEND_PORT doit valoir 127.0.0.1:8081 : nginx n'est alors
+# joignable que depuis le serveur lui-même et Caddy reste le seul accès public. Oublié,
+# nginx réclame le port 80 déjà pris par Caddy et le démarrage échoue avec
+# "port is already allocated" : l'erreur se voit tout de suite.
+
+services:
+
+  # La pré-production doit ressembler à la production : c'est ce qu'elle sert à tester.
+  # Le profil prod remplace donc le profil docker, pensé pour une démonstration locale.
+  # Ce qui change pour le backend :
+  #   - connexion à MySQL chiffrée (sslMode=REQUIRED). MySQL 8.4 génère lui-même son
+  #     certificat au premier démarrage, rien n'est à fournir ;
+  #   - Swagger et la description OpenAPI désactivés ;
+  #   - détails de /actuator/health réservés aux utilisateurs authentifiés.
+  # Les migrations Flyway s'appliquent au démarrage dans les deux profils.
+  backend:
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      # Le profil prod écrit aussi les journaux dans un fichier, utile sur un serveur
+      # sans Docker. Dans un conteneur, Docker collecte déjà la sortie standard :
+      # une valeur vide désactive ce fichier qui serait une copie perdue à chaque
+      # recréation du conteneur.
+      LOG_FILE_PATH: ""
+
+  caddy:
+    # Version épinglée sur la release mineure, comme les autres images.
+    image: caddy:${CADDY_VERSION:-2.10-alpine}
+    container_name: butterfly-caddy
+    restart: unless-stopped
+    depends_on:
+      frontend:
+        condition: service_started
+    ports:
+      # 80 sert au défi Let's Encrypt et à la redirection vers HTTPS.
+      - "80:80"
+      - "443:443"
+      # HTTP/3 passe par UDP.
+      - "443:443/udp"
+    environment:
+      # :? arrête le démarrage avec ce message si la variable manque au .env.
+      DOMAIN: ${DOMAIN:?DOMAIN est obligatoire en pré-production (ex. butterfly.cheridanh.fr)}
+      ACME_EMAIL: ${ACME_EMAIL:?ACME_EMAIL est obligatoire en pré-production}
+    volumes:
+      - ./caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      # Certificats et clés : sans ce volume, chaque recréation du conteneur redemande
+      # un certificat et Let's Encrypt bloque le domaine au-delà de 5 par semaine.
+      - caddy_data:/data
+      - caddy_config:/config
+    mem_limit: ${CADDY_MEM_LIMIT:-128m}
+    networks:
+      - butterfly
+
+volumes:
+  caddy_data:
+  caddy_config:

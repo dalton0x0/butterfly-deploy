@@ -33,3 +33,10 @@ jobs:
         run: |
           BACKEND_PATH=. FRONTEND_PATH=. \
             docker compose --env-file .env.example config --quiet
+
+      - name: Validation du complément de pré-production
+        # DOMAIN et ACME_EMAIL sont commentés dans l'exemple : des valeurs factices
+        # suffisent, la commande ne contacte personne.
+        run: |
+          BACKEND_PATH=. FRONTEND_PATH=. DOMAIN=preprod.example.test ACME_EMAIL=ci@example.test \
+            docker compose --env-file .env.example -f docker-compose.yml -f docker-compose.preprod.yml config --quiet

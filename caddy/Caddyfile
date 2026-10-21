@@ -1,0 +1,27 @@
+# Point d'entrée HTTPS de la pré-production.
+#
+# Caddy obtient et renouvelle seul le certificat Let's Encrypt du domaine, et redirige
+# HTTP vers HTTPS. Il ne fait rien d'autre : le service des fichiers, le cache des images
+# et le réacheminement de l'API restent dans le nginx du frontend, comme en local.
+#
+# Chaîne des requêtes : navigateur -> Caddy (443) -> nginx (frontend:8080) -> backend.
+#
+# DOMAIN et ACME_EMAIL viennent du .env transmis par docker-compose.preprod.yml.
+{
+	# Adresse prévenue par Let's Encrypt en cas de problème de renouvellement.
+	email {$ACME_EMAIL}
+}
+
+{$DOMAIN} {
+	# Le navigateur retient pendant un an que ce domaine n'existe qu'en HTTPS.
+	# Pas de includeSubDomains : les autres sous-domaines ne sont pas gérés ici.
+	header Strict-Transport-Security "max-age=31536000"
+
+	# Caddy remplace l'en-tête X-Forwarded-For envoyé par le client par l'adresse réelle
+	# de la connexion. nginx lui fait confiance (set_real_ip_from) et la transmet au
+	# backend pour la limitation de débit.
+	#
+	# Aucune limite de taille ni de délai ici : les envois de vidéos (200 Mo) sont
+	# transmis au fil de l'eau et nginx applique déjà les siennes.
+	reverse_proxy frontend:8080
+}
