@@ -213,6 +213,8 @@ services:
       # Plafond de la taille de page acceptée. Au delà, Spring rabaisse la valeur en
       # silence : à remonter en même temps que les tailles demandées par le frontend.
       PAGE_MAX_SIZE: ${PAGE_MAX_SIZE:-100}
+      # Plafond des tentatives d'authentification par adresse IP (voir .env.example).
+      RATE_LIMIT_IP_CAPACITY: ${RATE_LIMIT_IP_CAPACITY:-20}
     volumes:
       # Volumes nommés : les fichiers téléversés et les journaux survivent à la
       # reconstruction de l'image, contrairement à tout ce qui reste dans le conteneur.
