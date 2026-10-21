@@ -4,15 +4,15 @@
 // profil, blocs, modules, cours et recherche. Les comptes sont ceux créés par
 // demo/seed.mjs.
 //
-// Lancement sans rien installer depuis ce dépôt :
+// Lancement sans rien installer, depuis ce dépôt :
 //   docker run --rm -i --network host -e BASE_URL=http://localhost grafana/k6:1.0.0 run - < loadtest/browse.js
 //
 // Variables :
-//   BASE_URL : adresse de l'interface, nginx compris (http://localhost par défaut)
-//   DEMO_PASSWORD : mot de passe des comptes de démonstration
-//   VUS : nombre d'utilisateurs simultanés au palier (20 par défaut)
+//   BASE_URL       adresse de l'interface, nginx compris (http://localhost par défaut)
+//   DEMO_PASSWORD  mot de passe des comptes de démonstration
+//   VUS            nombre d'utilisateurs simultanés au palier (20 par défaut)
 //
-// La connexion n'a lieu qu'une fois par compte dans setup(). Le backend limite les
+// La connexion n'a lieu qu'une fois par compte, dans setup(). Le backend limite les
 // connexions à 20 par minute et par adresse IP : se connecter à chaque itération
 // mesurerait la limitation et non l'application.
 import http from 'k6/http'
@@ -75,9 +75,9 @@ function collectContent(token) {
         const modules = http.get(`${API}/modules/block/${block.id}?size=50`, authHeaders(token)).json('data.content') || []
         for (const module of modules) {
             moduleIds.push(module.id)
-            for (const course of module.courses || []) {
-                courseIds.push(course.id)
-            }
+            // La liste des modules ne porte pas leurs cours : ils sont demandés à part.
+            const courses = http.get(`${API}/courses/module/${module.id}?size=50`, authHeaders(token)).json('data.content') || []
+            courseIds.push(...courses.map((c) => c.id))
         }
     }
     return {blockIds: blocks.map((b) => b.id), moduleIds, courseIds}
