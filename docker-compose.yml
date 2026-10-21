@@ -84,6 +84,30 @@ services:
       - butterfly
 
   # ---------------------------------------------------------------------------
+  # Cache partagé
+  # ---------------------------------------------------------------------------
+  redis:
+    # Version épinglée sur la release mineure, comme MySQL et Mailpit.
+    image: redis:${REDIS_VERSION:-8.2-alpine}
+    container_name: butterfly-redis
+    restart: unless-stopped
+    # Redis ne sert ici que de cache. Rien n'est écrit sur disque (--save "" et pas
+    # d'appendonly) : au redémarrage le cache repart vide et l'application relit la base.
+    # maxmemory borne la mémoire. allkeys-lru retire alors les clés les moins utilisées
+    # au lieu de refuser les écritures.
+    command: ["redis-server", "--save", "", "--appendonly", "no",
+              "--maxmemory", "${REDIS_MAXMEMORY:-64mb}", "--maxmemory-policy", "allkeys-lru"]
+    # Aucun port publié : seul le backend le joint, par le réseau interne de Compose.
+    mem_limit: ${REDIS_MEM_LIMIT:-128m}
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    networks:
+      - butterfly
+
+  # ---------------------------------------------------------------------------
   # API Spring Boot
   # ---------------------------------------------------------------------------
   backend:
@@ -101,6 +125,10 @@ services:
         # c'est la différence entre "le conteneur tourne" et "la base répond".
         condition: service_healthy
       mailpit:
+        condition: service_started
+      redis:
+        # service_started suffit : si Redis manque, le backend lit la base directement
+        # et journalise un avertissement. Le cache ne doit pas empêcher le démarrage.
         condition: service_started
     environment:
       SPRING_PROFILES_ACTIVE: docker
@@ -158,6 +186,12 @@ services:
       NOTIFICATIONS_ENABLED: ${NOTIFICATIONS_ENABLED:-true}
       NOTIFICATIONS_BATCH_SIZE: ${NOTIFICATIONS_BATCH_SIZE:-20}
       NOTIFICATIONS_DIGEST_CRON: ${NOTIFICATIONS_DIGEST_CRON:-0 0 18 * * *}
+
+      # Cache de l'état des comptes et des sessions, relu à chaque requête authentifiée.
+      # CACHE_TYPE=simple le garde en mémoire du backend sans Redis.
+      CACHE_TYPE: ${CACHE_TYPE:-redis}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
 
       STORAGE_LOCATION: /app/uploads/exercise-submissions
       # Répertoire distinct des soumissions : les consignes du formateur et les rendus des
