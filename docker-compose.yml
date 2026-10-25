@@ -213,6 +213,8 @@ services:
       # Plafond de la taille de page acceptée. Au delà, Spring rabaisse la valeur en
       # silence : à remonter en même temps que les tailles demandées par le frontend.
       PAGE_MAX_SIZE: ${PAGE_MAX_SIZE:-100}
+      # Validité du lien d'invitation d'un compte créé par l'administrateur.
+      TOKEN_ACCOUNT_ACTIVATION_TTL: ${TOKEN_ACCOUNT_ACTIVATION_TTL:-72h}
       # Plafond des tentatives d'authentification par adresse IP (voir .env.example).
       RATE_LIMIT_IP_CAPACITY: ${RATE_LIMIT_IP_CAPACITY:-20}
     volumes:
