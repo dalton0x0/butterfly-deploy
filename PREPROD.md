@@ -31,7 +31,9 @@ Internet -> Caddy (80, 443) -> nginx du frontend (127.0.0.1:8081) -> backend -> 
 - **2 vCPU, 4 Go de mémoire, 40 Go de disque.** Les plafonds du compose totalisent environ
   2,2 Go (MySQL 768 Mo, backend 1 Go, Redis et Caddy 128 Mo chacun). La construction Maven de
   l'image backend demande aussi de la mémoire : 2 Go ne suffisent pas.
-- **Ubuntu Server LTS** (24.04 ou plus récente).
+- **Ubuntu Server LTS** (24.04 ou plus récente) ou **Debian** (13 Trixie de préférence, 12
+  Bookworm accepté). Les deux sont pris en charge par Docker et le guide couvre les deux : les
+  rares différences sont signalées par une note **Debian**.
 - Un hébergeur européen (Hetzner, OVHcloud, Scaleway...) garde les données des testeurs dans
   l'Union européenne. Les prix ont beaucoup bougé en 2026 avec la hausse du coût de la mémoire :
   comparer les offres au moment de commander.
@@ -55,6 +57,10 @@ VPS. Sans cela, Let's Encrypt refuse le certificat.
 Connecté en `root` la première fois :
 
 ```bash
+# Debian : sudo et ufw ne sont pas toujours installés sur une image minimale.
+# Sur Ubuntu, la commande est sans effet : les paquets sont déjà là.
+apt update && apt install -y sudo ufw
+
 # Utilisateur courant avec sudo, la connexion root sera fermée
 adduser butterfly
 usermod -aG sudo butterfly
@@ -72,6 +78,23 @@ ufw allow 443/tcp
 ufw allow 443/udp
 ufw enable
 ```
+
+**Debian** : le système n'écrit plus `/var/log/auth.log`, les journaux passent par journald.
+Sans précision, la surveillance SSH de fail2ban cherche ce fichier et ne démarre pas. Il faut
+lui indiquer de lire journald :
+
+```bash
+apt install -y python3-systemd
+cat > /etc/fail2ban/jail.local <<'EOF'
+[sshd]
+enabled = true
+backend = systemd
+EOF
+systemctl restart fail2ban
+fail2ban-client status sshd   # doit afficher la surveillance sans erreur
+```
+
+Ce réglage fonctionne aussi sur Ubuntu, il n'y est simplement pas nécessaire.
 
 Puis dans `/etc/ssh/sshd_config` : `PermitRootLogin no` et `PasswordAuthentication no`, suivis de
 `systemctl restart ssh`. Certaines images cloud ajoutent un fichier dans `/etc/ssh/sshd_config.d/`
@@ -91,8 +114,38 @@ Caddy. Ne jamais publier un autre port sans ce préfixe.
 
 ## 4. Installer Docker et les dépôts
 
-Installer Docker Engine et le plugin Compose depuis le dépôt officiel en suivant
-[la documentation Docker pour Ubuntu](https://docs.docker.com/engine/install/ubuntu/), puis :
+Installer Docker Engine et le plugin Compose depuis le dépôt officiel de Docker, et non le
+paquet `docker.io` de la distribution, souvent plus ancien et sans le plugin Compose. Les
+commandes viennent de la documentation Docker ([Ubuntu](https://docs.docker.com/engine/install/ubuntu/),
+[Debian](https://docs.docker.com/engine/install/debian/)). Seule l'adresse du dépôt diffère entre
+les deux systèmes : `$ID` est lu dans `/etc/os-release` et vaut `ubuntu` ou `debian`.
+
+```bash
+sudo apt update
+sudo apt install -y ca-certificates curl git
+sudo install -m 0755 -d /etc/apt/keyrings
+. /etc/os-release
+sudo curl -fsSL "https://download.docker.com/linux/$ID/gpg" -o /etc/apt/keyrings/docker.asc
+sudo chmod a+r /etc/apt/keyrings/docker.asc
+sudo tee /etc/apt/sources.list.d/docker.sources <<EOF
+Types: deb
+URIs: https://download.docker.com/linux/$ID
+Suites: $VERSION_CODENAME
+Components: stable
+Architectures: $(dpkg --print-architecture)
+Signed-By: /etc/apt/keyrings/docker.asc
+EOF
+sudo apt update
+sudo apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+
+docker --version && docker compose version   # les deux doivent répondre
+```
+
+**Debian** : `git` n'est pas installé sur une image minimale, d'où sa présence dans la
+première commande. Docker n'accepte que `iptables-nft` ou `iptables-legacy` : ne pas écrire de
+règles `nft` à la main sur ce serveur, ufw suffit.
+
+Puis :
 
 ```bash
 sudo usermod -aG docker butterfly   # se reconnecter ensuite
