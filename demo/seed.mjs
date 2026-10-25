@@ -34,8 +34,11 @@ const DEMO_USERS = [
     {firstName: 'Emma', lastName: 'Petit', email: 'emma.petit@butterfly.local', role: 'USER'}
 ]
 
-// Objet du message de confirmation envoyé par EmailVerificationServiceImpl.
+// Objets des messages lus dans Mailpit. Ils doivent suivre ceux du backend :
+// EmailVerificationServiceImpl pour la confirmation, AccountInvitationServiceImpl pour
+// l'invitation envoyée à un compte créé par l'administrateur.
 const VERIFICATION_SUBJECT = 'Confirmez votre adresse e-mail'
+const INVITATION_SUBJECT = 'Activez votre compte'
 const MAIL_POLL_ATTEMPTS = 15
 const MAIL_POLL_DELAY_MS = 1000
 const PAGE_SIZE = 100
@@ -124,7 +127,10 @@ async function findUserByEmail(email) {
 }
 
 /**
- * Crée le compte s'il n'existe pas encore, puis confirme son adresse.
+ * Crée le compte s'il n'existe pas encore, puis l'active ou confirme son adresse.
+ *
+ * Depuis le backend v3.1.0, un compte créé par l'administrateur n'a pas de mot de passe :
+ * il reçoit une invitation et c'est en l'acceptant que le mot de passe est choisi.
  *
  * @returns {Promise<object>} le compte tel que renvoyé par l'API
  */
@@ -133,16 +139,46 @@ async function ensureUser(demoUser) {
     const created = user === null
 
     if (created) {
-        user = await api('POST', '/users', {...demoUser, password: DEMO_PASSWORD})
+        user = await api('POST', '/users', demoUser)
         console.log(`Compte créé : ${user.email} (${user.role})`)
     } else {
         console.log(`Compte existant conservé : ${user.email}`)
     }
 
-    if (!user.emailVerified) {
+    if (user.pendingActivation) {
+        await activateAccount(user, created)
+    } else if (!user.emailVerified) {
+        // Compte créé par une version antérieure, qui avait déjà un mot de passe.
         await verifyEmail(user.email, created)
     }
     return user
+}
+
+/**
+ * Active un compte invité en suivant le vrai parcours : le lien d'invitation est lu dans
+ * Mailpit puis son jeton est présenté à l'API avec le mot de passe de démonstration.
+ */
+async function activateAccount(user, justCreated) {
+    const requestedAt = new Date()
+
+    // Un compte déjà existant n'a peut-être plus de lien valide : on en redemande un.
+    if (!justCreated) {
+        await api('POST', `/users/${user.id}/invitation`)
+    }
+
+    const token = await waitForToken(user.email, INVITATION_SUBJECT, requestedAt)
+    if (!token) {
+        console.warn(`  Compte non activé pour ${user.email} : aucune invitation trouvée dans Mailpit (${MAILPIT_URL}).`)
+        console.warn('  Relancez le script une fois Mailpit joignable.')
+        return
+    }
+
+    await api('POST', '/auth/activate-account', {
+        token,
+        newPassword: DEMO_PASSWORD,
+        confirmPassword: DEMO_PASSWORD
+    })
+    console.log(`  Compte activé : ${user.email}`)
 }
 
 /**
@@ -157,7 +193,7 @@ async function verifyEmail(email, justCreated) {
         await api('POST', '/auth/resend-verification', {email})
     }
 
-    const token = await waitForVerificationToken(email, requestedAt)
+    const token = await waitForToken(email, VERIFICATION_SUBJECT, requestedAt)
     if (!token) {
         console.warn(`  Adresse non confirmée pour ${email} : aucun message trouvé dans Mailpit (${MAILPIT_URL}).`)
         console.warn('  Le compte reste utilisable pendant le délai de grâce. Relancez le script une fois Mailpit joignable.')
@@ -169,12 +205,12 @@ async function verifyEmail(email, justCreated) {
 }
 
 /**
- * Attend le message de confirmation dans Mailpit. L'envoi est asynchrone et part après la
+ * Attend un message portant un jeton dans Mailpit. L'envoi est asynchrone et part après la
  * validation de la transaction : le message arrive quelques instants après la réponse.
  * Seul un message reçu après la demande compte, un ancien jeton ayant pu être consommé.
  */
-async function waitForVerificationToken(email, notBefore) {
-    const query = encodeURIComponent(`to:"${email}" subject:"${VERIFICATION_SUBJECT}"`)
+async function waitForToken(email, subject, notBefore) {
+    const query = encodeURIComponent(`to:"${email}" subject:"${subject}"`)
 
     for (let attempt = 0; attempt < MAIL_POLL_ATTEMPTS; attempt++) {
         const token = await readLatestToken(query, notBefore)

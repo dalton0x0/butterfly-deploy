@@ -72,10 +72,12 @@ validations qu'une saisie dans l'interface et les options de quiz sont mélangé
 comme le fait le backend. Aucune migration Flyway n'est concernée : rien ne peut atteindre une
 base de production par accident.
 
-Les adresses des comptes sont confirmées par le vrai parcours. Le script lit le lien de
-confirmation dans Mailpit puis présente son jeton à l'API comme le ferait l'interface. Si Mailpit
-n'est pas joignable, par exemple avec un relais SMTP réel, les comptes restent utilisables pendant
-le délai de grâce et le script le signale.
+Les comptes sont activés par le vrai parcours. Depuis le backend v3.1.0, un compte créé par
+l'administrateur n'a pas de mot de passe : il reçoit une invitation. Le script lit ce lien dans
+Mailpit puis présente son jeton à l'API avec le mot de passe de démonstration, comme le ferait la
+page d'activation. Si Mailpit n'est pas joignable, par exemple avec un relais SMTP réel, les comptes
+restent **inutilisables** faute de mot de passe : le script le signale et il suffit de le relancer
+une fois Mailpit disponible, une nouvelle invitation est alors demandée.
 
 L'ordre du parcours suit l'ordre déclaré dans `block.json`. Cours et exercices partagent la même
 suite de positions dans un module : un exercice reste verrouillé tant que les cours placés avant
@@ -85,7 +87,9 @@ lui ne sont pas terminés.
 
 Le script peut être relancé sans risque :
 
-- un compte qui existe déjà est conservé, son adresse est confirmée si elle ne l'était pas ;
+- un compte qui existe déjà est conservé. S'il attend son activation, une nouvelle invitation est
+  demandée puis acceptée. Un compte plus ancien qui a déjà un mot de passe, voit seulement son
+  adresse confirmée si elle ne l'était pas ;
 - un bloc qui existe déjà (même nom) est conservé tel quel, sans être mis à jour ;
 - les blocs de démonstration sont ajoutés aux blocs déjà assignés à chaque compte, sans en retirer.
 
