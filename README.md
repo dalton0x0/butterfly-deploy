@@ -192,6 +192,19 @@ docker compose --profile tools up -d
 L'interface est disponible sur `http://localhost:9000`. L'analyse elle-même se lance depuis les
 dépôts backend et frontend selon leurs README respectifs.
 
+Le premier accès se fait avec `admin` / `admin` et SonarQube impose aussitôt un nouveau mot de
+passe. Ce mot de passe est enregistré dans le volume `sonarqube_data` avec les projets et les
+jetons : il survit à la suppression du conteneur et au changement de version de l'image. Si
+`admin` / `admin` est refusé, c'est donc qu'un volume d'une installation précédente est réutilisé.
+Sans l'ancien mot de passe, repartir de volumes vides efface l'historique des analyses :
+
+```bash
+docker compose --profile tools rm -sf sonarqube
+docker volume ls --filter name=sonarqube        # noter les noms exacts, préfixés par le projet
+docker volume rm butterfly-deploy_sonarqube_data butterfly-deploy_sonarqube_extensions butterfly-deploy_sonarqube_logs
+docker compose --profile tools up -d sonarqube
+```
+
 ## Test de charge
 
 `loadtest/browse.js` simule des apprenants et un formateur qui parcourent la plateforme : profil,

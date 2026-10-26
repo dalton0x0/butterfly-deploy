@@ -304,7 +304,7 @@ services:
     profiles:
       - tools
     # Même précaution que pour Mailpit : SonarQube démarre avec le compte admin/admin
-      # tant que son mot de passe n'a pas été changé.
+    # tant que son mot de passe n'a pas été changé.
     ports:
       - "127.0.0.1:${SONARQUBE_PORT:-9000}:9000"
     volumes:
