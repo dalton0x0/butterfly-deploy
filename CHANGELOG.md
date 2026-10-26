@@ -11,6 +11,22 @@ commits qu'elle apporte. La toute première version renvoie vers son tag n'ayant
 
 ---
 
+## [v1.6.0](https://github.com/dalton0x0/butterfly-deploy/compare/v1.5.0...v1.6.0) - 2026-10-26
+
+Accompagne le backend v3.1.0 et le frontend v3.1.0 où un compte créé par l'administrateur reçoit
+une invitation au lieu d'un mot de passe. Le script de démonstration active désormais ses comptes
+en lisant l'invitation dans Mailpit, ce qui évite qu'ils restent sans mot de passe. La validité du
+lien d'invitation se règle avec `TOKEN_ACCOUNT_ACTIVATION_TTL`, transmise au backend par le
+compose. Le guide de pré-production couvre Debian 13 et 12 en plus d'Ubuntu : installation de
+`sudo`, `ufw` et `git`, fail2ban branché sur journald et dépôt Docker choisi selon la distribution.
+
+SonarQube démarre de nouveau : le tag `25-community` n'existe pas sur Docker Hub, l'image est
+épinglée sur un numéro complet (`25.11.0.114957-community`) et `.env.example` indique comment lister
+les plus récents. Le README explique le premier accès et comment repartir d'un volume vide quand le
+mot de passe administrateur d'une installation précédente est perdu.
+
+---
+
 ## [v1.5.0](https://github.com/dalton0x0/butterfly-deploy/compare/v1.4.0...v1.5.0) - 2026-10-21
 
 Pré-production. `docker-compose.preprod.yml` ajoute Caddy qui obtient et renouvelle le certificat
