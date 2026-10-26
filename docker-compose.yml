@@ -288,7 +288,9 @@ services:
     # Version épinglée comme les autres images. Le tag community seul suit la dernière
     # version majeure : une montée change les règles d'analyse et fait apparaître des
     # dizaines de signalements du jour au lendemain sans que le code ait bougé.
-    image: sonarqube:${SONARQUBE_VERSION:-25-community}
+    # Les images Community Build portent un numéro complet (année.mois.correctif.build) :
+    # il n'existe pas de tag court par année comme 25-community.
+    image: sonarqube:${SONARQUBE_VERSION:-25.11.0.114957-community}
     container_name: butterfly-sonarqube
     # restart "no" et non "unless-stopped", contrairement aux services applicatifs.
     #
