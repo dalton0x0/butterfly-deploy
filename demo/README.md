@@ -121,8 +121,9 @@ content/
   visuel : écrivez un paragraphe sur une seule ligne.
 - Les quiz suivent le format d'import de questions de l'interface. Un fichier `quiz.json` peut donc
   aussi être importé à la main depuis l'éditeur de quiz.
-- Les rendus d'exercice acceptent PDF, PNG, JPEG, texte et ZIP. Un énoncé demande donc une archive
-  `.zip` plutôt que des fichiers source dont le type ne serait pas reconnu.
+- Les rendus d'exercice acceptent PDF, Office, OpenDocument, texte (txt, md, csv), PNG, JPEG et ZIP
+  (liste `UploadFileType` du backend). Un énoncé demande donc une archive `.zip` plutôt que des
+  fichiers source (`.php`, `.java`) dont le format n'est pas accepté.
 
 ## Limites
 
