@@ -85,7 +85,11 @@ lui ne sont pas terminés.
 
 ## Relancer le script
 
-Le script peut être relancé sans risque :
+Pour revenir à l'état initial après des essais (progression, rendus, comptes créés à la main),
+`scripts/reset-demo.sh` vide la base et les fichiers téléversés puis relance ce script. Voir le
+README du dépôt.
+
+Le script peut aussi être relancé seul, sans risque :
 
 - un compte qui existe déjà est conservé. S'il attend son activation, une nouvelle invitation est
   demandée puis acceptée. Un compte plus ancien qui a déjà un mot de passe, voit seulement son
