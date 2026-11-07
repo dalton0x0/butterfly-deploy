@@ -1,0 +1,12 @@
+# Mises à jour automatiques des actions GitHub utilisées par la CI.
+#
+# Les images Docker du fichier compose ne sont pas suivies ici : leurs versions passent
+# par des variables du .env (REDIS_VERSION, CADDY_VERSION...) que Dependabot ne sait pas
+# lire. Elles se mettent à jour à la main en suivant le CHANGELOG de chaque image.
+
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
