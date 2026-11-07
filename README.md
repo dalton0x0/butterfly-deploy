@@ -48,6 +48,7 @@ connaître.
 
 | Version de ce dépôt | Backend | Frontend |
 |---------------------|---------|----------|
+| 1.6.0               | 3.1.0   | 3.1.0    |
 | 1.5.0               | 3.0.0   | 3.0.0    |
 | 1.4.0               | 2.0.1   | 2.0.1    |
 | 1.3.0               | 1.9.0   | 1.8.0    |
@@ -253,6 +254,15 @@ node --env-file=.env demo/seed.mjs
 ```
 
 Le détail des comptes créés et des options figure dans [demo/README.md](demo/README.md).
+
+Pour repartir d'une base vierge après des essais sur un poste de développement uniquement :
+
+```bash
+scripts/reset-demo.sh
+```
+
+Le script supprime la base et les fichiers téléversés, redémarre la pile puis recharge la démo.
+Il refuse de tourner si le `.env` désigne un vrai relais SMTP, signe d'une pré-production.
 
 ## Commandes utiles
 

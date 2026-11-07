@@ -275,16 +275,45 @@ l'hébergeur. Une restauration jamais essayée n'est pas une sauvegarde : la tes
 
 ## 9. Mettre à jour
 
+Le serveur se met à jour **par tag** et non sur la dernière version de `main`. Il exécute ainsi
+une combinaison connue, celle du tableau « Versions compatibles » du README et revenir en arrière
+consiste simplement à repasser sur les tags précédents.
+
+Noter d'abord les versions en place pour un éventuel retour arrière :
+
 ```bash
 cd ~/workspace
-git -C butterfly pull && git -C butterfly-front pull && git -C butterfly-deploy pull
+for repo in butterfly butterfly-front butterfly-deploy; do echo "$repo $(git -C $repo describe --tags)"; done
+```
+
+Puis passer sur les nouveaux tags (exemple pour la ligne 1.6.0 du tableau) :
+
+```bash
+for repo in butterfly butterfly-front butterfly-deploy; do git -C $repo fetch --tags; done
+git -C butterfly checkout v3.1.0
+git -C butterfly-front checkout v3.1.0
+git -C butterfly-deploy checkout v1.6.0
 cd butterfly-deploy
 scripts/backup.sh
 docker compose -f docker-compose.yml -f docker-compose.preprod.yml up -d --build
 ```
 
-Les migrations Flyway s'appliquent au démarrage du backend. La sauvegarde juste avant permet de
-revenir en arrière si l'une d'elles pose problème.
+Git signale un état « detached HEAD » : c'est normal, le serveur ne fait que lire ces versions.
+
+Les migrations Flyway s'appliquent au démarrage du backend.
+
+### Revenir en arrière
+
+1. Repasser chaque dépôt sur le tag noté avant la mise à jour (`git -C butterfly checkout v3.0.0`,
+   etc.).
+2. Si la nouvelle version contenait une migration Flyway, restaurer la sauvegarde faite juste
+   avant (section 8). Flyway ne sait pas annuler une migration : l'ancien backend tournerait sur
+   un schéma qu'il ne connaît pas. Au mieux Hibernate refuse de démarrer, au pire les erreurs
+   n'apparaissent qu'en cours d'utilisation.
+3. Relancer `docker compose -f docker-compose.yml -f docker-compose.preprod.yml up -d --build`.
+
+Les données saisies entre la mise à jour et le retour arrière sont perdues à l'étape 2. D'où
+l'intérêt de vérifier une nouvelle version juste après l'avoir déployée.
 
 ## Dépannage
 
