@@ -17,6 +17,9 @@
 	# Pas de includeSubDomains : les autres sous-domaines ne sont pas gérés ici.
 	header Strict-Transport-Security "max-age=31536000"
 
+	# Retire l'en-tête Server (« Caddy ») qui renseigne sur le logiciel utilisé.
+	header -Server
+
 	# Caddy remplace l'en-tête X-Forwarded-For envoyé par le client par l'adresse réelle
 	# de la connexion. nginx lui fait confiance (set_real_ip_from) et la transmet au
 	# backend pour la limitation de débit.
