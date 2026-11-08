@@ -48,6 +48,7 @@ connaître.
 
 | Version de ce dépôt | Backend | Frontend |
 |---------------------|---------|----------|
+| 1.7.0               | 3.2.0   | 3.2.0    |
 | 1.6.0               | 3.1.0   | 3.1.0    |
 | 1.5.0               | 3.0.0   | 3.0.0    |
 | 1.4.0               | 2.0.1   | 2.0.1    |
@@ -343,6 +344,6 @@ contenu de la version.
 
 ## Historique des versions
 
-Version courante : **v1.6.0**.
+Version courante : **v1.7.0**.
 
 L'historique complet des versions avec le détail de chaque livraison est dans [CHANGELOG.md](CHANGELOG.md).

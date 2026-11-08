@@ -286,13 +286,13 @@ cd ~/workspace
 for repo in butterfly butterfly-front butterfly-deploy; do echo "$repo $(git -C $repo describe --tags)"; done
 ```
 
-Puis passer sur les nouveaux tags (exemple pour la ligne 1.6.0 du tableau) :
+Puis passer sur les nouveaux tags (exemple pour la ligne 1.7.0 du tableau) :
 
 ```bash
 for repo in butterfly butterfly-front butterfly-deploy; do git -C $repo fetch --tags; done
-git -C butterfly checkout v3.1.0
-git -C butterfly-front checkout v3.1.0
-git -C butterfly-deploy checkout v1.6.0
+git -C butterfly checkout v3.2.0
+git -C butterfly-front checkout v3.2.0
+git -C butterfly-deploy checkout v1.7.0
 cd butterfly-deploy
 scripts/backup.sh
 docker compose -f docker-compose.yml -f docker-compose.preprod.yml up -d --build
@@ -304,7 +304,7 @@ Les migrations Flyway s'appliquent au démarrage du backend.
 
 ### Revenir en arrière
 
-1. Repasser chaque dépôt sur le tag noté avant la mise à jour (`git -C butterfly checkout v3.0.0`,
+1. Repasser chaque dépôt sur le tag noté avant la mise à jour (`git -C butterfly checkout v3.1.0`,
    etc.).
 2. Si la nouvelle version contenait une migration Flyway, restaurer la sauvegarde faite juste
    avant (section 8). Flyway ne sait pas annuler une migration : l'ancien backend tournerait sur

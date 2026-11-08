@@ -11,6 +11,23 @@ commits qu'elle apporte. La toute première version renvoie vers son tag n'ayant
 
 ---
 
+## [v1.7.0](https://github.com/dalton0x0/butterfly-deploy/compare/v1.6.0...v1.7.0) - 2026-11-08
+
+Accompagne le backend v3.2.0 et le frontend v3.2.0 qui élargissent les formats de fichier acceptés.
+`scripts/reset-demo.sh` remet la pile locale à zéro (base, fichiers téléversés, Redis, cache nginx)
+puis recharge la démonstration. Il refuse de tourner quand le `.env` désigne un vrai relais SMTP,
+signe d'une pré-production.
+
+La mise à jour de la pré-production se fait par tag sur une combinaison du tableau des versions
+compatibles et `PREPROD.md` décrit le retour arrière : tags précédents puis restauration de la
+sauvegarde quand une migration Flyway est passée. Le tableau manquait la ligne 1.6.0, ajoutée.
+
+Caddy retire l'en-tête `Server`. `.env.example` ne propose plus de générer `JWT_SECRET` sur un site
+en ligne : un secret produit par un tiers peut être connu de lui. Dependabot surveille les actions
+GitHub de la CI.
+
+---
+
 ## [v1.6.0](https://github.com/dalton0x0/butterfly-deploy/compare/v1.5.0...v1.6.0) - 2026-10-26
 
 Accompagne le backend v3.1.0 et le frontend v3.1.0 où un compte créé par l'administrateur reçoit
