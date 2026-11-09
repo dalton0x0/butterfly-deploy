@@ -1,0 +1,36 @@
+# cert-manager : obtient et renouvelle les certificats HTTPS auprès de Let's Encrypt.
+#
+# Installé depuis son chart Helm officiel, en version épinglée. La montée de version
+# se fait en changeant targetRevision, après lecture des notes de version et de la
+# matrice de compatibilité avec Kubernetes.
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: cert-manager
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://charts.jetstack.io
+    chart: cert-manager
+    targetRevision: v1.21.3
+    helm:
+      valuesObject:
+        crds:
+          # Le chart installe ses définitions de ressources (Certificate, ClusterIssuer...).
+          enabled: true
+          # Conservées si l'application est supprimée : leur suppression effacerait
+          # tous les certificats du cluster.
+          keep: true
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: cert-manager
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      # Les définitions de ressources de cert-manager sont volumineuses : l'application
+      # côté serveur évite la limite de taille des annotations.
+      - ServerSideApply=true

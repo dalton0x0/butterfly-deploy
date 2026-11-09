@@ -10,18 +10,30 @@ Docker Compose, à la racine du dépôt, reste l'outil du développement local.
 
 ```text
 k8s/
-  apps/   Applications Argo CD, une par composant (modèle « app of apps »)
+  apps/                         Applications Argo CD, une par composant (« app of apps »)
+  infrastructure/
+    cert-issuers/               Émetteurs Let's Encrypt (test et production)
 ```
 
-Le dossier s'enrichira au fil des étapes : cert-manager, puis Butterfly avec une base commune et
-une variante par environnement (staging, prod).
+Le dossier s'enrichira de Butterfly, avec une base commune et une variante par environnement
+(staging, prod).
 
 ## Démarrage d'un cluster
 
 Trois étapes manuelles, une seule fois par serveur, depuis le dossier `server/` :
 
 1. `harden.sh` : durcissement du système (utilisateur dédié, SSH par clé, pare-feu, fail2ban).
-2. `k3s-config.yaml` puis l'installeur officiel de k3s.
+2. `k3s-config.yaml` puis l'installeur officiel de k3s, en version épinglée :
+
+   ```bash
+   sudo install -D -m 644 k3s-config.yaml /etc/rancher/k3s/config.yaml
+   curl -sfL https://get.k3s.io | INSTALL_K3S_VERSION=v1.36.6+k3s1 sh -
+   ```
+
+   La version de Kubernetes suit celle des outils installés dessus et non la dernière
+   publiée : cert-manager 1.21 n'est supporté que jusqu'à Kubernetes 1.36. Avant toute
+   montée de version de k3s, vérifier la matrice de compatibilité de cert-manager et
+   d'Argo CD.
 3. `install-argocd.sh` : Argo CD, accès au dépôt et application racine.
 
 Argo CD crée ensuite tout le reste à partir de `k8s/apps`.

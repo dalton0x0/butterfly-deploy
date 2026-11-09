@@ -1,0 +1,42 @@
+# Deux émetteurs Let's Encrypt, utilisables par tous les namespaces (ClusterIssuer).
+#
+#   - letsencrypt-staging : environnement de test de Let's Encrypt. Certificats non
+#     reconnus par les navigateurs, mais limites de débit très larges. À utiliser pour
+#     valider une configuration.
+#   - letsencrypt-prod : certificats reconnus. Les limites de débit sont strictes : une
+#     configuration se valide d'abord avec l'émetteur de test.
+#
+# Validation HTTP-01 : Let's Encrypt appelle une URL temporaire sur le port 80, servie
+# par Traefik. Le domaine doit donc pointer vers le serveur et le port 80 être ouvert.
+#
+# Pas d'adresse e-mail : elle est facultative, et Let's Encrypt n'envoie plus d'alerte
+# d'expiration. cert-manager renouvelle les certificats de lui-même, 30 jours avant
+# leur échéance.
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-staging
+spec:
+  acme:
+    server: https://acme-staging-v02.api.letsencrypt.org/directory
+    # Clé du compte ACME, générée et conservée par cert-manager.
+    privateKeySecretRef:
+      name: letsencrypt-staging-account
+    solvers:
+      - http01:
+          ingress:
+            ingressClassName: traefik
+---
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-prod
+spec:
+  acme:
+    server: https://acme-v02.api.letsencrypt.org/directory
+    privateKeySecretRef:
+      name: letsencrypt-prod-account
+    solvers:
+      - http01:
+          ingress:
+            ingressClassName: traefik

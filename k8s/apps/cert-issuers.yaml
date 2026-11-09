@@ -1,0 +1,32 @@
+# Émetteurs de certificats Let's Encrypt, utilisés par les Ingress des applications.
+#
+# Séparés de cert-manager : ils dépendent de ses définitions de ressources
+# (ClusterIssuer), qui n'existent qu'une fois cert-manager installé.
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: cert-issuers
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: git@github.com:dalton0x0/butterfly-deploy.git
+    targetRevision: main
+    path: k8s/infrastructure/cert-issuers
+  destination:
+    server: https://kubernetes.default.svc
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      # Au premier démarrage, ClusterIssuer n'existe pas encore : sans cette option,
+      # la vérification préalable échoue au lieu d'attendre cert-manager.
+      - SkipDryRunOnMissingResource=true
+    # Nouvelles tentatives le temps que cert-manager soit prêt.
+    retry:
+      limit: 10
+      backoff:
+        duration: 30s
+        factor: 2
+        maxDuration: 5m
