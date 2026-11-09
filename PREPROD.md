@@ -182,7 +182,7 @@ MAIL_FRONT_BASE_URL=https://butterfly.cheridanh.fr
 ACME_EMAIL=vous@exemple.fr
 ```
 
-Pour une séance de test en groupe depuis un même réseau (école, entreprise), tous les testeurs
+Pour une séance de test en groupe depuis un même réseau (centre de formation, entreprise), tous les testeurs
 partagent une adresse IP et donc le quota de connexions. Relever `RATE_LIMIT_IP_CAPACITY` (100
 par exemple) le temps de la séance.
 

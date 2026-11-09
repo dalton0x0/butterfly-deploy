@@ -1,6 +1,6 @@
 {
-  "name": "Vie de l'école",
-  "description": "Règlement intérieur et informations pratiques de l'établissement. Un bloc informatif, visible par tous les comptes et sans progression.",
+  "name": "Livret d'accueil",
+  "description": "Règlement intérieur et informations pratiques de l'organisme. Un bloc informatif, visible par tous les comptes et sans progression.",
   "informational": true,
   "prerequisites": [],
   "modules": [
@@ -24,7 +24,7 @@
     },
     {
       "name": "Informations pratiques",
-      "description": "Contacts utiles et vie quotidienne dans l'établissement.",
+      "description": "Contacts utiles et vie quotidienne sur place.",
       "content": [
         {
           "type": "course",

@@ -2,7 +2,7 @@
 
 ## Le matériel
 
-Les postes de l'établissement sont partagés. Laissez-les propres et éteints en fin de journée. Signalez toute panne à l'accueil plutôt que de tenter une réparation.
+Les postes mis à disposition sont partagés. Laissez-les propres et éteints en fin de journée. Signalez toute panne à l'accueil plutôt que de tenter une réparation.
 
 ## Les comptes
 

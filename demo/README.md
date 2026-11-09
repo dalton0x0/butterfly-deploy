@@ -26,7 +26,7 @@ défaut :
 | Apprenant    | Emma Petit     | `emma.petit@butterfly.local`     |
 
 Six blocs pédagogiques, assignés au formateur et aux deux apprenants. La gestionnaire voit déjà tous
-les blocs : le backend refuse de lui en assigner. S'y ajoute le bloc informatif « Vie de l'école »
+les blocs : le backend refuse de lui en assigner. S'y ajoute le bloc informatif « Livret d'accueil »
 (règlement intérieur, informations pratiques), visible par tous les comptes sans assignation.
 
 | Bloc                    | Modules | Prérequis                    |
@@ -37,7 +37,7 @@ les blocs : le backend refuse de lui en assigner. S'y ajoute le bloc informatif 
 | PHP                     | 3       | Aucun                        |
 | Spring Boot             | 3       | Java, SQL et bases de données |
 | Laravel                 | 3       | PHP, SQL et bases de données  |
-| Vie de l'école          | 2       | Aucun (bloc informatif)       |
+| Livret d'accueil        | 2       | Aucun (bloc informatif)       |
 
 Les blocs pédagogiques totalisent 17 modules, 46 cours, 22 exercices notés sur 20 et 17 quiz de
 8 questions. Dans chaque bloc,
