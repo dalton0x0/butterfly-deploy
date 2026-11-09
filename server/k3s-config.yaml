@@ -1,0 +1,32 @@
+# Configuration de k3s, à copier dans /etc/rancher/k3s/config.yaml AVANT l'installation :
+#
+#   sudo install -D -m 644 k3s-config.yaml /etc/rancher/k3s/config.yaml
+#
+# Droits 644 : kubectl, fourni par le binaire k3s, lit aussi ce fichier. En 600, chaque
+# commande kubectl lancée sans sudo affiche « permission denied ». Le fichier ne doit
+# donc contenir aucun secret (pas de token ici).
+#
+# k3s lit ce fichier à chaque démarrage : après une modification,
+# `sudo systemctl restart k3s` suffit pour l'appliquer.
+
+# Fichier d'accès au cluster lisible par root uniquement. Il donne les pleins pouvoirs
+# sur le cluster : l'utilisateur d'administration en reçoit une copie personnelle.
+write-kubeconfig-mode: "0600"
+
+# Chiffre les Secrets Kubernetes (mots de passe, clé JWT, identifiants SMTP) dans la base
+# interne de k3s. Sans cette option, ils y sont seulement encodés en base64 : la lecture
+# du disque suffit à les obtenir.
+secrets-encryption: true
+
+# Algorithme de chiffrement : secretbox (XSalsa20 et Poly1305) plutôt que aescbc, le défaut.
+# La documentation de Kubernetes déconseille AES-CBC, exposé aux attaques par oracle de
+# remplissage. secretbox chiffre et authentifie : une donnée modifiée est détectée.
+# Le choix se fait de préférence avant le premier démarrage : changer d'algorithme sur un
+# cluster existant impose une rotation des clés.
+secrets-encryption-provider: secretbox
+
+# Composants fournis par k3s et conservés :
+#   - Traefik : reçoit le trafic HTTP et HTTPS et le route vers les applications (Ingress) ;
+#   - ServiceLB : expose Traefik sur les ports 80 et 443 de la machine ;
+#   - local-path : stocke les volumes (base de données, fichiers déposés) sur le disque ;
+#   - metrics-server : fournit la consommation de mémoire et de CPU (kubectl top).
