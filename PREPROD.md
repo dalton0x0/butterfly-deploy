@@ -211,7 +211,7 @@ Chargement des contenus sans installer Node sur le serveur :
 ```bash
 docker run --rm --network host --env-file .env \
   -e DEMO_API_URL=http://localhost:8081/api \
-  -v "$PWD/demo:/demo:ro" node:22-alpine node /demo/seed.mjs
+  -v "$PWD/demo:/demo:ro" node:24-alpine node /demo/seed.mjs
 ```
 
 `--network host` donne au conteneur l'accès à `127.0.0.1:8081` (nginx) et `127.0.0.1:8025`
@@ -287,13 +287,13 @@ cd ~/workspace
 for repo in butterfly butterfly-front butterfly-deploy; do echo "$repo $(git -C $repo describe --tags)"; done
 ```
 
-Puis passer sur les nouveaux tags (exemple pour la ligne 1.7.0 du tableau) :
+Puis passer sur les nouveaux tags (exemple pour la ligne 1.8.0 du tableau) :
 
 ```bash
 for repo in butterfly butterfly-front butterfly-deploy; do git -C $repo fetch --tags; done
-git -C butterfly checkout v3.2.0
-git -C butterfly-front checkout v3.2.0
-git -C butterfly-deploy checkout v1.7.0
+git -C butterfly checkout v3.3.0
+git -C butterfly-front checkout v3.3.0
+git -C butterfly-deploy checkout v1.8.0
 cd butterfly-deploy
 scripts/backup.sh
 docker compose -f docker-compose.yml -f docker-compose.preprod.yml up -d --build

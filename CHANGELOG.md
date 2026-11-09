@@ -11,6 +11,20 @@ commits qu'elle apporte. La toute première version renvoie vers son tag n'ayant
 
 ---
 
+## [v1.8.0](https://github.com/dalton0x0/butterfly-deploy/compare/v1.7.0...v1.8.0) - 2026-11-09
+
+Accompagne le backend v3.3.0 et le frontend v3.3.0 : rôle gestionnaire, blocs informatifs et
+inscription publique activable. La démonstration crée une gestionnaire qui voit déjà tous les blocs
+et ne reçoit donc aucune assignation et le bloc informatif « Livret d'accueil ». Un bloc déclaré
+`"informational": true` n'a ni quiz ni prérequis et n'est assigné à personne.
+
+L'inscription publique est fermée par défaut après la migration du backend. `PREPROD.md` rappelle de
+l'ouvrir depuis le tableau de bord avant de tester l'envoi des e-mails. Les textes ne supposent plus
+que l'organisme est une école. Le chargement de la démonstration sur le serveur utilise
+l'image `node:24-alpine` comme le frontend.
+
+---
+
 ## [v1.7.0](https://github.com/dalton0x0/butterfly-deploy/compare/v1.6.0...v1.7.0) - 2026-11-08
 
 Accompagne le backend v3.2.0 et le frontend v3.2.0 qui élargissent les formats de fichier acceptés.
