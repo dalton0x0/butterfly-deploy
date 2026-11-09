@@ -239,7 +239,8 @@ autour de `ADMIN_PASSWORD` dans le `.env`, ils feraient partie du mot de passe.
    ```
 
 5. Relancer le backend : `docker compose -f docker-compose.yml -f docker-compose.preprod.yml up -d backend`.
-6. Tester avec une vraie adresse : inscription, puis réception du message de confirmation.
+6. Tester avec une vraie adresse : ouvrir l'inscription depuis le tableau de bord admin (elle est
+   fermée par défaut), s'inscrire, puis vérifier la réception du message de confirmation.
 
 Les comptes de démonstration gardent leur adresse fictive. Désactiver leurs notifications dans
 **Profil, Notifications** évite que Brevo tente de leur écrire : un message vers une adresse
