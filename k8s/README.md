@@ -44,9 +44,13 @@ L'interface n'est pas exposée sur Internet. Elle s'ouvre depuis le poste local 
 tunnel SSH :
 
 ```bash
-ssh -L 8080:127.0.0.1:8080 <utilisateur>@<serveur> \
+ssh -L 8443:127.0.0.1:8080 <utilisateur>@<serveur> \
   kubectl --kubeconfig .kube/config port-forward -n argocd svc/argocd-server 8080:443
 ```
 
-puis https://localhost:8080. Le certificat est autosigné : l'avertissement du navigateur est
+puis https://localhost:8443. Le certificat est autosigné : l'avertissement du navigateur est
 attendu, le tunnel SSH assurant déjà le chiffrement.
+
+Le port local 8443 évite un conflit fréquent : 8080 est souvent déjà pris sur le poste (pile
+Docker Compose locale, serveur de développement). Dans ce cas, `ssh` n'ouvre pas le tunnel et le
+navigateur joint le service local en HTTP, d'où l'erreur `SSL_ERROR_RX_RECORD_TOO_LONG`.
