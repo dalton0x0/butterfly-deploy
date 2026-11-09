@@ -28,7 +28,14 @@ const MAILPIT_URL = process.env.DEMO_MAILPIT_URL ?? `http://localhost:${process.
 // Pas de # : node --env-file le prendrait pour le début d'un commentaire.
 const DEMO_PASSWORD = process.env.DEMO_PASSWORD ?? 'Butterfly-Demo2026'
 
+// Libellés affichés dans le récapitulatif de fin.
+const ROLE_LABELS = {MANAGER: 'Gestionnaire', TEACHER: 'Formateur', USER: 'Apprenant'}
+
+// Rôles dont la portée couvre déjà tous les blocs : le backend refuse de leur en assigner.
+const GLOBAL_SCOPE_ROLES = new Set(['ADMIN', 'MANAGER'])
+
 const DEMO_USERS = [
+    {firstName: 'Claire', lastName: 'Moreau', email: 'claire.moreau@butterfly.local', role: 'MANAGER'},
     {firstName: 'Sophie', lastName: 'Laurent', email: 'sophie.laurent@butterfly.local', role: 'TEACHER'},
     {firstName: 'Lucas', lastName: 'Bernard', email: 'lucas.bernard@butterfly.local', role: 'USER'},
     {firstName: 'Emma', lastName: 'Petit', email: 'emma.petit@butterfly.local', role: 'USER'}
@@ -366,7 +373,7 @@ async function createQuiz(quiz, moduleId) {
  * la liste entière : on repart donc des blocs actuels pour ne rien retirer.
  */
 async function assignBlocks(users, blockIds) {
-    for (const user of users) {
+    for (const user of users.filter((u) => !GLOBAL_SCOPE_ROLES.has(u.role))) {
         const current = await api('GET', `/users/${user.id}`)
         const merged = new Set([...(current.blocks ?? []).map((block) => block.id), ...blockIds])
         await api('PUT', `/users/${user.id}/blocks`, {blockIds: [...merged]})
@@ -405,7 +412,7 @@ async function main() {
 
     console.log('\nDémonstration prête. Comptes disponibles, mot de passe commun : ' + DEMO_PASSWORD)
     for (const user of DEMO_USERS) {
-        console.log(`  ${user.role === 'TEACHER' ? 'Formateur' : 'Apprenant'} : ${user.email}`)
+        console.log(`  ${ROLE_LABELS[user.role]} : ${user.email}`)
     }
 }
 

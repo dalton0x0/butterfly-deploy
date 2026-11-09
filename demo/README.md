@@ -1,7 +1,8 @@
 # Contenus de démonstration
 
 Ce dossier charge dans une instance Butterfly un jeu de contenus prêts à parcourir : des blocs
-complets avec leurs modules, cours, exercices et quiz, un formateur et deux apprenants.
+complets avec leurs modules, cours, exercices et quiz, une gestionnaire, un formateur et deux
+apprenants.
 
 ## Sommaire
 
@@ -14,16 +15,18 @@ complets avec leurs modules, cours, exercices et quiz, un formateur et deux appr
 
 ## Ce qui est créé
 
-Trois comptes avec une adresse confirmée et un mot de passe commun, `Butterfly-Demo2026` par
+Quatre comptes avec une adresse confirmée et un mot de passe commun, `Butterfly-Demo2026` par
 défaut :
 
-| Rôle       | Nom            | Adresse                          |
-|------------|----------------|----------------------------------|
-| Formateur  | Sophie Laurent | `sophie.laurent@butterfly.local` |
-| Apprenant  | Lucas Bernard  | `lucas.bernard@butterfly.local`  |
-| Apprenant  | Emma Petit     | `emma.petit@butterfly.local`     |
+| Rôle         | Nom            | Adresse                          |
+|--------------|----------------|----------------------------------|
+| Gestionnaire | Claire Moreau  | `claire.moreau@butterfly.local`  |
+| Formateur    | Sophie Laurent | `sophie.laurent@butterfly.local` |
+| Apprenant    | Lucas Bernard  | `lucas.bernard@butterfly.local`  |
+| Apprenant    | Emma Petit     | `emma.petit@butterfly.local`     |
 
-Six blocs, tous assignés à ces trois comptes :
+Six blocs, assignés au formateur et aux deux apprenants. La gestionnaire voit déjà tous les blocs :
+le backend refuse de lui en assigner.
 
 | Bloc                    | Modules | Prérequis                    |
 |-------------------------|---------|------------------------------|

@@ -246,8 +246,8 @@ docker compose -f docker-compose.yml -f docker-compose.preprod.yml up -d --build
 
 ## Contenus de démonstration
 
-Le dossier `demo` charge par l'API des blocs complets (modules, cours, exercices et quiz), un
-formateur et deux apprenants dont l'adresse est confirmée. Une fois la pile démarrée et le backend
+Le dossier `demo` charge par l'API des blocs complets (modules, cours, exercices et quiz), une
+gestionnaire, un formateur et deux apprenants dont l'adresse est confirmée. Une fois la pile démarrée et le backend
 sain :
 
 ```bash
@@ -256,7 +256,7 @@ node --env-file=.env demo/seed.mjs
 
 Le détail des comptes créés et des options figure dans [demo/README.md](demo/README.md).
 
-Pour repartir d'une base vierge après des essais sur un poste de développement uniquement :
+Pour repartir d'une base vierge après des essais, sur un poste de développement uniquement :
 
 ```bash
 scripts/reset-demo.sh
