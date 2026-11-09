@@ -281,8 +281,11 @@ async function loadBlockDefinitions() {
             for (const item of module.content) {
                 item.content = await readFile(path.join(directory, item.file), 'utf8')
             }
-            // Même format que l'import de questions de l'interface.
-            module.quiz.questions = (await readJson(path.join(directory, module.quiz.file))).questions
+            // Même format que l'import de questions de l'interface. Un module de bloc
+            // informatif n'a pas de quiz.
+            if (module.quiz) {
+                module.quiz.questions = (await readJson(path.join(directory, module.quiz.file))).questions
+            }
         }
         blocks.push(block)
     }
@@ -299,10 +302,16 @@ async function readJson(file) {
 
 /**
  * Crée un bloc complet : ses modules, leur contenu dans l'ordre déclaré et leurs quiz.
- * Chaque module a pour prérequis le module qui le précède.
+ * Chaque module a pour prérequis le module qui le précède, sauf dans un bloc informatif :
+ * il n'a pas de progression, donc pas de prérequis.
  */
 async function createBlock(block, blockIdsByName) {
-    const created = await api('POST', '/blocks', {name: block.name, description: block.description})
+    const informational = Boolean(block.informational)
+    const created = await api('POST', '/blocks', {
+        name: block.name,
+        description: block.description,
+        informational
+    })
     console.log(`Bloc créé : ${block.name}`)
 
     const prerequisiteIds = block.prerequisites.map((name) => {
@@ -319,7 +328,7 @@ async function createBlock(block, blockIdsByName) {
     let previousModuleId = null
     for (const module of block.modules) {
         const moduleId = await createModule(module, created.id)
-        if (previousModuleId !== null) {
+        if (previousModuleId !== null && !informational) {
             await api('PUT', `/modules/${moduleId}/prerequisites`, {prerequisiteIds: [previousModuleId]})
         }
         previousModuleId = moduleId
@@ -349,7 +358,9 @@ async function createModule(module, blockId) {
         }
     }
 
-    await createQuiz(module.quiz, created.id)
+    if (module.quiz) {
+        await createQuiz(module.quiz, created.id)
+    }
     console.log(`  Module créé : ${module.name}`)
     return created.id
 }
@@ -405,7 +416,10 @@ async function main() {
         } else {
             blockIdsByName.set(block.name, await createBlock(block, blockIdsByName))
         }
-        demoBlockIds.push(blockIdsByName.get(block.name))
+        // Un bloc informatif est déjà visible par tous : il ne s'assigne pas.
+        if (!block.informational) {
+            demoBlockIds.push(blockIdsByName.get(block.name))
+        }
     }
 
     await assignBlocks(users, demoBlockIds)

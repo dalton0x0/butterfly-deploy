@@ -1,0 +1,38 @@
+{
+  "name": "Vie de l'école",
+  "description": "Règlement intérieur et informations pratiques de l'établissement. Un bloc informatif, visible par tous les comptes et sans progression.",
+  "informational": true,
+  "prerequisites": [],
+  "modules": [
+    {
+      "name": "Règlement intérieur",
+      "description": "Les règles communes à tous les apprenants et à l'équipe pédagogique.",
+      "content": [
+        {
+          "type": "course",
+          "name": "Horaires et assiduité",
+          "description": "Horaires de la formation, retards et absences.",
+          "file": "01-reglement/01-horaires-assiduite.md"
+        },
+        {
+          "type": "course",
+          "name": "Charte informatique",
+          "description": "Bon usage du matériel, du réseau et des comptes.",
+          "file": "01-reglement/02-charte-informatique.md"
+        }
+      ]
+    },
+    {
+      "name": "Informations pratiques",
+      "description": "Contacts utiles et vie quotidienne dans l'établissement.",
+      "content": [
+        {
+          "type": "course",
+          "name": "Contacts et accès",
+          "description": "Qui contacter, et comment accéder aux locaux.",
+          "file": "02-pratique/01-contacts-acces.md"
+        }
+      ]
+    }
+  ]
+}

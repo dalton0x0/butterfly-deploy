@@ -25,8 +25,9 @@ défaut :
 | Apprenant    | Lucas Bernard  | `lucas.bernard@butterfly.local`  |
 | Apprenant    | Emma Petit     | `emma.petit@butterfly.local`     |
 
-Six blocs, assignés au formateur et aux deux apprenants. La gestionnaire voit déjà tous les blocs :
-le backend refuse de lui en assigner.
+Six blocs pédagogiques, assignés au formateur et aux deux apprenants. La gestionnaire voit déjà tous
+les blocs : le backend refuse de lui en assigner. S'y ajoute le bloc informatif « Vie de l'école »
+(règlement intérieur, informations pratiques), visible par tous les comptes sans assignation.
 
 | Bloc                    | Modules | Prérequis                    |
 |-------------------------|---------|------------------------------|
@@ -36,8 +37,10 @@ le backend refuse de lui en assigner.
 | PHP                     | 3       | Aucun                        |
 | Spring Boot             | 3       | Java, SQL et bases de données |
 | Laravel                 | 3       | PHP, SQL et bases de données  |
+| Vie de l'école          | 2       | Aucun (bloc informatif)       |
 
-Soit 17 modules, 46 cours, 22 exercices notés sur 20 et 17 quiz de 8 questions. Dans chaque bloc,
+Les blocs pédagogiques totalisent 17 modules, 46 cours, 22 exercices notés sur 20 et 17 quiz de
+8 questions. Dans chaque bloc,
 un module a pour prérequis le module qui le précède et se termine par un quiz de 10 points : il
 en faut 7 pour le réussir avec le seuil par défaut de 70 %. Les blocs Spring Boot et Laravel
 restent verrouillés tant que leurs blocs prérequis ne sont pas terminés, ce qui suppose que le
@@ -120,6 +123,8 @@ content/
       quiz.json
 ```
 
+- Un bloc marqué `"informational": true` est un bloc informatif : visible par tous, il ne contient
+  que des cours. Ses modules n'ont ni quiz ni prérequis et le bloc n'est assigné à personne.
 - Les cours et les énoncés sont en Markdown. L'interface convertit chaque retour à la ligne en saut
   visuel : écrivez un paragraphe sur une seule ligne.
 - Les quiz suivent le format d'import de questions de l'interface. Un fichier `quiz.json` peut donc
