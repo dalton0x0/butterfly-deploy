@@ -21,6 +21,7 @@ resources:
   - frontend.yaml
   - middlewares.yaml
   - network-policies.yaml
+  - backup.yaml
 
 # Configuration non sensible du backend, sous forme de variables d'environnement.
 # Kustomize ajoute au nom du ConfigMap une empreinte de son contenu : une valeur modifiée

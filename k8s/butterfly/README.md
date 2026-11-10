@@ -12,6 +12,7 @@ butterfly/
     frontend.yaml       nginx : interface Vue et réacheminement de /api
     middlewares.yaml    Traefik : redirection HTTPS et en-tête HSTS
     network-policies.yaml
+    backup.yaml         Sauvegarde nocturne vers un stockage S3 (restic)
     backend.env         Configuration non sensible du backend
   staging/              https://staging.butterfly.cheridanh.fr
     ingress.yaml        Domaine et certificat
@@ -187,4 +188,90 @@ kubectl -n butterfly-staging logs deployment/backend --previous   # avant le der
 
 Les volumes (base de données, fichiers téléversés) sont des dossiers du serveur, créés par
 le provisionneur `local-path` de k3s. Ils survivent aux redémarrages et aux mises à jour,
-mais pas à la perte du serveur : leur sauvegarde hors du serveur reste à mettre en place.
+mais pas à la perte du serveur : d'où la sauvegarde ci-dessous.
+
+## Sauvegardes
+
+Chaque nuit à 3 h 30, le CronJob `backup` exporte la base MySQL et copie les fichiers
+téléversés vers un stockage objet S3, hors du serveur, avec restic.
+
+- **Chiffrées** sur le serveur, avant l'envoi : le stockage ne voit que des données
+  illisibles. Sans le mot de passe du dépôt restic, personne ne peut les relire, pas même
+  leur propriétaire.
+- **Dédupliquées** : seul ce qui a changé depuis la veille est envoyé.
+- **Rétention** : 7 sauvegardes quotidiennes, 4 hebdomadaires et 6 mensuelles. Les plus
+  anciennes sont supprimées automatiquement.
+
+Chaque environnement a son propre dépôt restic, dans un dossier du bucket
+(`.../butterfly-backups/staging`, `.../butterfly-backups/prod`).
+
+Avec la clé Sealed Secrets (gestionnaire de mots de passe) et ce dépôt Git, ces sauvegardes
+suffisent à reconstruire un serveur perdu.
+
+### Mise en service
+
+1. Chez le fournisseur S3, créer un bucket privé (par exemple `butterfly-backups`) dans une
+   région européenne, puis une clé d'accès limitée à ce seul bucket.
+2. Chiffrer les accès : `k8s/butterfly/seal-secrets.sh staging backup-credentials`.
+3. Ajouter `secrets/backup-credentials.sealed.yaml` à la liste `resources` du
+   `kustomization.yaml` de l'environnement, puis commiter et pousser.
+
+Le premier passage crée le dépôt restic, chiffré avec le mot de passe saisi.
+
+### Lancer une sauvegarde à la demande
+
+Sur le serveur, par exemple avant une opération risquée ou pour tester :
+
+```bash
+kubectl -n butterfly-staging create job --from=cronjob/backup backup-manuel-$(date +%s)
+kubectl -n butterfly-staging get jobs                     # COMPLETE à 1/1 quand c'est fini
+kubectl -n butterfly-staging logs job/<nom> -c dump       # export de la base
+kubectl -n butterfly-staging logs job/<nom> -c restic     # envoi et rétention
+```
+
+### Restaurer
+
+Une sauvegarde n'est fiable qu'une fois sa restauration essayée. À tester sur le staging
+avant la mise en production, puis de temps en temps.
+
+Sur le serveur, avec restic (`sudo apt install restic`). Les accès se saisissent sans écho,
+pour ne pas les laisser dans l'historique du shell :
+
+```bash
+read -r -p 'Dépôt : ' RESTIC_REPOSITORY
+read -r -s -p 'Mot de passe du dépôt : ' RESTIC_PASSWORD; echo
+read -r -p 'Région : ' AWS_DEFAULT_REGION
+read -r -s -p 'Identifiant de clé : ' AWS_ACCESS_KEY_ID; echo
+read -r -s -p 'Clé secrète : ' AWS_SECRET_ACCESS_KEY; echo
+export RESTIC_REPOSITORY RESTIC_PASSWORD AWS_DEFAULT_REGION AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY
+
+restic snapshots                                    # sauvegardes disponibles
+restic restore latest --target ~/restauration       # ou un identifiant à la place de latest
+```
+
+Le dossier `~/restauration` contient alors `backup/butterfly.sql` et `app/uploads/`.
+
+Base de données : le dump recrée chaque table, en remplaçant son contenu actuel.
+
+```bash
+kubectl -n butterfly-staging exec -i mysql-0 -- \
+  sh -c 'mysql -u root -p"$MYSQL_ROOT_PASSWORD" "$MYSQL_DATABASE"' \
+  < ~/restauration/backup/butterfly.sql
+```
+
+Fichiers téléversés :
+
+```bash
+tar -C ~/restauration/app/uploads -c . \
+  | kubectl -n butterfly-staging exec -i deployment/backend -- tar -x -C /app/uploads
+```
+
+Puis redémarrer le backend, pour vider ses caches, et supprimer la copie locale :
+
+```bash
+kubectl -n butterfly-staging rollout restart deployment backend
+rm -rf ~/restauration
+```
+
+Le mot de passe root de MySQL n'est pas à saisir : `sh -c` le lit dans les variables du
+conteneur, où Kubernetes l'a placé depuis le secret `mysql-credentials`.

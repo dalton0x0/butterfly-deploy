@@ -20,6 +20,7 @@
 #   backend-secrets    clé JWT, compte administrateur, identifiants SMTP (prod)
 #   swagger-htpasswd   comptes autorisés à consulter Swagger
 #   ghcr-pull          jeton de lecture des images privées de GHCR
+#   backup-credentials dépôt restic et accès au stockage S3 des sauvegardes
 #
 # Les valeurs saisies se conservent dans un gestionnaire de mots de passe : un secret
 # chiffré ne se relit pas.
@@ -155,16 +156,42 @@ seal_ghcr_pull() {
     } | seal ghcr-pull
 }
 
+seal_backup_credentials() {
+    printf '\n--- backup-credentials\n' >&2
+    printf "Dépôt restic au format s3:https://<point d'accès S3>/<bucket>/<environnement>,\n" >&2
+    printf 'par exemple s3:https://s3.fr-par.scw.cloud/butterfly-backups/%s.\n' "$ENVIRONMENT" >&2
+    printf 'Mot de passe du dépôt : sans lui, les sauvegardes sont illisibles, même pour\n' >&2
+    printf 'leur propriétaire. Le ranger dans le gestionnaire de mots de passe.\n' >&2
+    local repository password region key_id key_secret
+    read -r -p "Dépôt restic : " repository
+    [[ "$repository" == s3:https://* ]] || fail "le dépôt doit commencer par s3:https://."
+    password="$(ask_secret "Mot de passe du dépôt restic")"
+    read -r -p "Région du stockage (exemples : fr-par, eu-central-003) : " region
+    [[ -n "$region" ]] || fail "valeur vide pour la région."
+    key_id="$(ask_secret "Identifiant de la clé d'accès S3")"
+    key_secret="$(ask_secret "Clé secrète S3")"
+    {
+        secret_header backup-credentials Opaque
+        printf '  RESTIC_REPOSITORY: %s\n' "$(b64 "$repository")"
+        printf '  RESTIC_PASSWORD: %s\n' "$(b64 "$password")"
+        printf '  AWS_DEFAULT_REGION: %s\n' "$(b64 "$region")"
+        printf '  AWS_ACCESS_KEY_ID: %s\n' "$(b64 "$key_id")"
+        printf '  AWS_SECRET_ACCESS_KEY: %s\n' "$(b64 "$key_secret")"
+    } | seal backup-credentials
+}
+
 case "$ONLY" in
     "")
         seal_mysql_credentials
         seal_backend_secrets
         seal_swagger_htpasswd
         seal_ghcr_pull
+        seal_backup_credentials
         ;;
     mysql-credentials) seal_mysql_credentials ;;
     backend-secrets) seal_backend_secrets ;;
     swagger-htpasswd) seal_swagger_htpasswd ;;
     ghcr-pull) seal_ghcr_pull ;;
+    backup-credentials) seal_backup_credentials ;;
     *) fail "secret inconnu : $ONLY." ;;
 esac
