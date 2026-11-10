@@ -17,6 +17,7 @@ resources:
   - secrets/backend-secrets.sealed.yaml
   - secrets/swagger-htpasswd.sealed.yaml
   - secrets/ghcr-pull.sealed.yaml
+  - secrets/backup-credentials.sealed.yaml
 
 # Valeurs propres au staging, ajoutées à celles de ../base/backend.env ou à leur place.
 configMapGenerator:

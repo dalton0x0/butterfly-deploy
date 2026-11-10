@@ -1,0 +1,176 @@
+# Sauvegarde nocturne, hors du serveur : base MySQL et fichiers téléversés.
+#
+# Deux étapes dans un même pod, avec les images officielles :
+#   1. dump (mysql) : export cohérent de la base, à chaud, dans un dossier temporaire ;
+#   2. restic : envoi du dump et des fichiers vers un stockage objet S3.
+#
+# restic chiffre tout sur le serveur, avant l'envoi : le stockage ne reçoit que des
+# données illisibles sans le mot de passe du dépôt restic. Il déduplique aussi : chaque
+# nuit, seul ce qui a changé est envoyé.
+#
+# Restauration et sauvegarde à la demande : voir ../README.md.
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: backup
+  labels:
+    app.kubernetes.io/name: backup
+spec:
+  schedule: "30 3 * * *"
+  timeZone: Europe/Paris
+  # Jamais deux sauvegardes en même temps sur le même dépôt restic.
+  concurrencyPolicy: Forbid
+  # Une sauvegarde manquée (serveur éteint à l'heure prévue) est rattrapée au
+  # redémarrage, si celui-ci a lieu dans les 6 heures.
+  startingDeadlineSeconds: 21600
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      activeDeadlineSeconds: 3600
+      template:
+        metadata:
+          labels:
+            app.kubernetes.io/name: backup
+        spec:
+          restartPolicy: Never
+          enableServiceLinks: false
+          automountServiceAccountToken: false
+          securityContext:
+            runAsNonRoot: true
+            seccompProfile:
+              type: RuntimeDefault
+          initContainers:
+            - name: dump
+              image: mysql:8.4
+              securityContext:
+                runAsUser: 999
+                runAsGroup: 999
+                allowPrivilegeEscalation: false
+                capabilities:
+                  drop: [ ALL ]
+              env:
+                - name: DB_NAME
+                  valueFrom:
+                    configMapKeyRef:
+                      name: backend-config
+                      key: DB_NAME
+                - name: DB_USERNAME
+                  valueFrom:
+                    secretKeyRef:
+                      name: mysql-credentials
+                      key: DB_USERNAME
+                - name: DB_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: mysql-credentials
+                      key: DB_PASSWORD
+              # Le mot de passe passe par un fichier d'options et non par la ligne de
+              # commande, visible de tous les processus.
+              # --single-transaction : instantané cohérent, sans verrouiller les tables
+              # ni interrompre le site.
+              # --no-tablespaces : le compte de l'application n'a pas le droit PROCESS
+              # qu'exigerait l'export des tablespaces, inutile ici.
+              # Pas de compression : restic compresse lui-même, et un fichier compressé
+              # change entièrement d'une nuit à l'autre, ce qui empêcherait la
+              # déduplication.
+              command:
+                - bash
+                - -c
+                - |
+                  set -euo pipefail
+                  trap 'rm -f /tmp/my.cnf' EXIT
+                  printf '[client]\nuser=%s\npassword=%s\n' "$DB_USERNAME" "$DB_PASSWORD" > /tmp/my.cnf
+                  mysqldump --defaults-extra-file=/tmp/my.cnf -h mysql \
+                    --single-transaction --no-tablespaces --set-gtid-purged=OFF \
+                    --result-file=/backup/butterfly.sql "$DB_NAME"
+                  ls -l /backup
+              resources:
+                requests:
+                  cpu: 50m
+                  memory: 64Mi
+                limits:
+                  memory: 256Mi
+              volumeMounts:
+                - name: dump
+                  mountPath: /backup
+                - name: tmp
+                  mountPath: /tmp
+          containers:
+            - name: restic
+              image: restic/restic:0.19.1
+              securityContext:
+                # Même utilisateur que le backend : lecture des fichiers téléversés.
+                runAsUser: 10001
+                runAsGroup: 10001
+                allowPrivilegeEscalation: false
+                readOnlyRootFilesystem: true
+                capabilities:
+                  drop: [ ALL ]
+              # Dépôt, mot de passe et accès au stockage (voir seal-secrets.sh).
+              envFrom:
+                - secretRef:
+                    name: backup-credentials
+              env:
+                - name: RESTIC_CACHE_DIR
+                  value: /tmp/restic-cache
+              # --host fixe : sans lui, restic prendrait le nom du pod, différent à
+              # chaque exécution. La rétention, qui raisonne par machine, ne
+              # supprimerait alors jamais rien.
+              # Rétention : 7 sauvegardes quotidiennes, 4 hebdomadaires, 6 mensuelles.
+              command:
+                - sh
+                - -c
+                - |
+                  set -eu
+                  # Premier passage : création du dépôt chiffré.
+                  restic cat config > /dev/null 2>&1 || restic init
+                  restic backup --host butterfly --tag nightly /backup /app/uploads
+                  restic forget --host butterfly --keep-daily 7 --keep-weekly 4 --keep-monthly 6 --prune
+                  restic snapshots --host butterfly --latest 3
+              resources:
+                requests:
+                  cpu: 100m
+                  memory: 128Mi
+                limits:
+                  memory: 512Mi
+              volumeMounts:
+                - name: dump
+                  mountPath: /backup
+                  readOnly: true
+                - name: uploads
+                  mountPath: /app/uploads
+                  readOnly: true
+                - name: tmp
+                  mountPath: /tmp
+          volumes:
+            # Dossiers temporaires, supprimés avec le pod : le dump n'est jamais
+            # conservé sur le serveur.
+            - name: dump
+              emptyDir: {}
+            - name: tmp
+              emptyDir: {}
+            - name: uploads
+              persistentVolumeClaim:
+                claimName: backend-uploads
+---
+# Le pod de sauvegarde est le seul, avec le backend, autorisé à joindre MySQL.
+# Le trafic sortant n'étant pas filtré, l'envoi vers le stockage S3 n'a besoin d'aucune
+# règle.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: mysql-from-backup
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: mysql
+  policyTypes: [ Ingress ]
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: backup
+      ports:
+        - port: 3306
