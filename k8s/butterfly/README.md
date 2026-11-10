@@ -33,7 +33,7 @@ kubectl kustomize k8s/butterfly/staging
   la configuration change, par variables d'environnement.
 - **Version fixée par le dépôt.** Chaque environnement désigne ses images par l'étiquette
   `sha-<commit>`, immuable. Déployer une version revient à modifier cette étiquette dans le
-  `kustomization.yaml` de l'environnement.
+  `kustomization.yaml` de l'environnement. Pour le staging, la CI s'en charge (voir plus bas).
 - **Moindre privilège.** Aucun conteneur ne tourne en root, aucun ne peut élever ses
   privilèges, et le réseau n'autorise que les flux nécessaires : Traefik vers l'interface,
   l'interface vers le backend, le backend vers MySQL, Redis et Mailpit.
@@ -131,9 +131,22 @@ toutes les migrations Flyway. Compter quelques minutes.
 
 ### Déployer une nouvelle version
 
-Modifier les étiquettes `newTag` de l'environnement, commiter et pousser. Argo CD remplace les
-pods. Le backend s'arrête avant que le nouveau ne démarre (stratégie `Recreate`) : l'API est
-indisponible pendant environ une minute.
+**Staging : automatique.** Après chaque image publiée depuis `main`, le job `deploy-staging` de
+la CI du backend ou du frontend inscrit la nouvelle étiquette dans
+`staging/kustomization.yaml` et pousse le changement sur `main`. Argo CD déploie ensuite dans
+les trois minutes. Les commits produits s'intitulent `chore(staging): deploy <dépôt> <étiquette>`
+et renvoient au commit source.
+
+Ces commits arrivent sur `main` sans passer par le poste : faire `git pull` avant de modifier
+le dépôt, sinon la poussée suivante est refusée.
+
+Le job écrit dans ce dépôt avec une clé de déploiement SSH par dépôt source (Settings, Deploy
+keys, droit d'écriture coché). La clé privée correspondante est le secret Actions
+`DEPLOY_REPO_SSH_KEY` du backend ou du frontend. Pour révoquer l'accès d'un dépôt, supprimer sa
+clé ici.
+
+**Production ou retour à une version précédente du staging :** modifier les étiquettes
+`newTag` de l'environnement, commiter et pousser. Argo CD remplace les pods. Le backend s'arrête avant que le nouveau ne démarre (stratégie `Recreate`) : l'API est indisponible pendant environ une minute.
 
 ### Modifier un secret
 
