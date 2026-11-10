@@ -27,7 +27,11 @@ configMapGenerator:
 
 # Version déployée : l'étiquette sha-<commit> publiée par la CI de chaque dépôt.
 # Une étiquette sha désigne une image précise et immuable, à la différence de main.
-# Déployer une nouvelle version revient à modifier ces deux lignes.
+#
+# Mise à jour automatique : après chaque image publiée depuis main, le job
+# deploy-staging de la CI du backend ou du frontend remplace l'étiquette et pousse le
+# changement. Chaque newTag doit rester sur la ligne qui suit son name : la CI
+# s'appuie sur cet ordre et échoue sinon.
 images:
   - name: ghcr.io/dalton0x0/butterfly
     newTag: sha-8a80b11
