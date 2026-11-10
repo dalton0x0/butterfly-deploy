@@ -1,0 +1,26 @@
+# Butterfly, environnement de staging : https://staging.butterfly.cheridanh.fr
+#
+# Manifestes dans k8s/butterfly/staging (base commune et réglages du staging).
+#
+# Les secrets chiffrés de k8s/butterfly/staging/secrets doivent exister avant l'ajout de
+# ce fichier : sans eux, la construction des manifestes échoue et rien n'est déployé.
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: butterfly-staging
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: git@github.com:dalton0x0/butterfly-deploy.git
+    targetRevision: main
+    path: k8s/butterfly/staging
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: butterfly-staging
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
