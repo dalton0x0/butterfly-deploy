@@ -1,0 +1,31 @@
+# Base commune à tous les environnements de Butterfly.
+#
+# Elle décrit ce qui ne change pas d'un environnement à l'autre : les composants, leurs
+# ressources, leurs contrôles de santé et leur isolation réseau. Chaque environnement
+# (dossiers staging/, prod/) la reprend et y ajoute ce qui lui est propre : namespace,
+# domaine, version des images, messagerie et secrets.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+# Ajouté à toutes les ressources, sans toucher aux sélecteurs : un sélecteur modifié
+# après coup empêche la mise à jour d'un Deployment existant.
+labels:
+  - pairs:
+      app.kubernetes.io/part-of: butterfly
+    includeSelectors: false
+
+resources:
+  - mysql.yaml
+  - redis.yaml
+  - backend.yaml
+  - frontend.yaml
+  - middlewares.yaml
+  - network-policies.yaml
+
+# Configuration non sensible du backend, sous forme de variables d'environnement.
+# Kustomize ajoute au nom du ConfigMap une empreinte de son contenu : une valeur modifiée
+# change le nom, donc le Deployment, et Kubernetes redémarre le backend de lui-même.
+configMapGenerator:
+  - name: backend-config
+    envs:
+      - backend.env
