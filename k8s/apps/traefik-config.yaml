@@ -1,0 +1,21 @@
+# Configuration du Traefik fourni par k3s (voir k8s/infrastructure/traefik).
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: traefik-config
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: git@github.com:dalton0x0/butterfly-deploy.git
+    targetRevision: main
+    path: k8s/infrastructure/traefik
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kube-system
+  syncPolicy:
+    automated:
+      # Pas de prune : supprimer ce fichier ne doit pas effacer la configuration de
+      # Traefik par surprise. Le retour aux valeurs par défaut se fait volontairement.
+      prune: false
+      selfHeal: true

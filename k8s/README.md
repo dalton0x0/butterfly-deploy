@@ -13,6 +13,8 @@ k8s/
   apps/                         Applications Argo CD, une par composant (« app of apps »)
   infrastructure/
     cert-issuers/               Émetteurs Let's Encrypt (test et production)
+    traefik/                    Réglages du Traefik fourni par k3s (IP réelle des clients)
+  sealed-secrets-cert.pem       Certificat public de Sealed Secrets pour chiffrer hors ligne
 ```
 
 Le dossier s'enrichira de Butterfly, avec une base commune et une variante par environnement
@@ -54,3 +56,64 @@ attendu, le tunnel SSH assurant déjà le chiffrement.
 Le port local 8443 évite un conflit fréquent : 8080 est souvent déjà pris sur le poste (pile
 Docker Compose locale, serveur de développement). Dans ce cas, `ssh` n'ouvre pas le tunnel et le
 navigateur joint le service local en HTTP, d'où l'erreur `SSL_ERROR_RX_RECORD_TOO_LONG`.
+
+## Secrets (Sealed Secrets)
+
+Un secret ne va jamais en clair dans le dépôt. Il est chiffré sur le poste avec `kubeseal` et le
+certificat public du contrôleur. Seul le contrôleur, dans le cluster, détient la clé privée qui le
+déchiffre : le fichier chiffré se commite sans risque.
+
+### Chiffrer un secret
+
+Le certificat public est versionné (`k8s/sealed-secrets-cert.pem`) : le chiffrement se fait hors
+ligne sans accès au cluster.
+
+```bash
+brew install kubeseal
+
+kubectl create secret generic <nom> -n <namespace> \
+  --from-literal=CLE=valeur --dry-run=client -o yaml \
+  | kubeseal --cert k8s/sealed-secrets-cert.pem --format yaml > <fichier>.sealed.yaml
+```
+
+Le secret chiffré est lié à son nom et à son namespace : il ne se déchiffre pas ailleurs. Garder les
+valeurs en clair dans un gestionnaire de mots de passe, jamais dans un fichier du dépôt.
+
+### Récupérer le certificat public
+
+Après l'installation du contrôleur ou après un renouvellement de clé sur le serveur :
+
+```bash
+kubectl -n kube-system get secret -l sealedsecrets.bitnami.com/sealed-secrets-key \
+  -o jsonpath='{.items[0].data.tls\.crt}' | base64 -d
+```
+
+Le résultat se copie dans `k8s/sealed-secrets-cert.pem`. Il est public : il ne permet que de chiffrer.
+
+### Sauvegarder la clé privée
+
+Indispensable : si le cluster est perdu, sa clé privée disparaît avec lui et plus aucun secret du
+dépôt ne peut être déchiffré. Une fois après l'installation, puis après chaque renouvellement :
+
+```bash
+kubectl -n kube-system get secret -l sealedsecrets.bitnami.com/sealed-secrets-key -o yaml \
+  > sealed-secrets-key.yaml
+```
+
+Ranger ce fichier dans un gestionnaire de mots de passe ou sur un support chiffré, **jamais dans
+Git**, puis le supprimer du serveur (`shred -u sealed-secrets-key.yaml`).
+
+Le renouvellement automatique de la clé (tous les 30 jours par défaut) est désactivé : chaque
+nouvelle clé devrait sinon être sauvegardée à son tour.
+
+### Restaurer la clé sur un nouveau cluster
+
+Après l'installation d'Argo CD, avant la synchronisation des applications qui contiennent des
+secrets :
+
+```bash
+kubectl apply -f sealed-secrets-key.yaml
+kubectl -n kube-system delete pod -l app.kubernetes.io/name=sealed-secrets
+```
+
+Le contrôleur redémarre avec l'ancienne clé, et tous les secrets du dépôt redeviennent lisibles.

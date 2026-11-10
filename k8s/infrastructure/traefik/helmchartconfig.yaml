@@ -1,0 +1,25 @@
+# Personnalisation du Traefik fourni par k3s.
+#
+# k3s installe Traefik à partir de son propre chart Helm. Ce fichier n'en modifie que les
+# valeurs listées : le reste suit les mises à jour de k3s.
+#
+# externalTrafficPolicy: Local conserve l'adresse IP réelle des clients. Avec la valeur
+# par défaut (Cluster), le trafic entrant subit une traduction d'adresse : toutes les
+# requêtes sembleraient venir du nœud lui-même. Le quota anti-abus du backend qui compte
+# les requêtes par adresse IP appliquerait alors un quota unique à tous les visiteurs.
+#
+# Traefik écarte par ailleurs les en-têtes X-Forwarded-For envoyés par les clients et
+# écrit lui-même l'adresse de la connexion : l'adresse transmise ne peut pas être falsifiée.
+#
+# Condition : ne pas définir node-external-ip dans la configuration de k3s, sinon
+# l'adresse source n'est pas conservée (documentation k3s, Networking Services).
+apiVersion: helm.cattle.io/v1
+kind: HelmChartConfig
+metadata:
+  name: traefik
+  namespace: kube-system
+spec:
+  valuesContent: |-
+    service:
+      spec:
+        externalTrafficPolicy: Local
