@@ -46,12 +46,28 @@ L'interface n'est pas exposée sur Internet. Elle s'ouvre depuis le poste local 
 tunnel SSH :
 
 ```bash
-ssh -L 8443:127.0.0.1:8080 <utilisateur>@<serveur> \
+ssh -t -L 8443:127.0.0.1:8080 <utilisateur>@<serveur> \
   kubectl --kubeconfig .kube/config port-forward -n argocd svc/argocd-server 8080:443
 ```
 
 puis https://localhost:8443. Le certificat est autosigné : l'avertissement du navigateur est
 attendu, le tunnel SSH assurant déjà le chiffrement.
+
+L'option `-t` attache un terminal à la commande distante : quand la connexion SSH se coupe,
+`kubectl port-forward` reçoit le signal et s'arrête. Sans elle, il continue de tourner sur le
+serveur et occupe le port 8080, ce qui fait échouer le tunnel suivant (`address already in use`).
+Pour retrouver et arrêter un tel processus, sur le serveur :
+
+```bash
+sudo ss -ltnp 'sport = :8080'   # affiche le pid du processus qui occupe le port
+kill <pid>
+```
+
+`pgrep port-forward` ne le trouve pas : le kubectl de k3s est le binaire k3s lancé sous un autre
+nom et la ligne de commande visible ne contient pas `port-forward`.
+
+Dans le navigateur, l'adresse est celle du port local du tunnel : https://localhost:8443. Le port
+8080 affiché par `kubectl port-forward` est celui du serveur.
 
 Le port local 8443 évite un conflit fréquent : 8080 est souvent déjà pris sur le poste (pile
 Docker Compose locale, serveur de développement). Dans ce cas, `ssh` n'ouvre pas le tunnel et le

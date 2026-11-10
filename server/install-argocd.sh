@@ -117,7 +117,7 @@ cat <<'EOF'
 
 Terminé. Accès à l'interface, depuis le poste local :
 
-  ssh -L 8443:127.0.0.1:8080 <utilisateur>@<serveur> \
+  ssh -t -L 8443:127.0.0.1:8080 <utilisateur>@<serveur> \
     kubectl --kubeconfig .kube/config port-forward -n argocd svc/argocd-server 8080:443
 
 puis https://localhost:8443 (certificat autosigné : avertissement attendu).
