@@ -1,0 +1,62 @@
+# Accès public au staging, par Traefik.
+#
+# Deux Ingress pour un même domaine : avec Traefik, une Ingress qui porte un
+# certificat ne répond qu'en HTTPS. Une seconde Ingress, sur le port 80, est donc
+# nécessaire pour rediriger HTTP vers HTTPS.
+#
+# Les middlewares sont désignés par <namespace>-<nom>@kubernetescrd : le namespace fait
+# partie du nom, d'où ce fichier propre à chaque environnement.
+
+# HTTPS. L'annotation cert-manager suffit : cert-manager obtient le certificat auprès
+# de Let's Encrypt, le range dans le Secret butterfly-tls et le renouvelle.
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: butterfly
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    traefik.ingress.kubernetes.io/router.tls: "true"
+    traefik.ingress.kubernetes.io/router.middlewares: butterfly-staging-security-headers@kubernetescrd
+spec:
+  ingressClassName: traefik
+  tls:
+    - hosts:
+        - staging.butterfly.cheridanh.fr
+      secretName: butterfly-tls
+  rules:
+    - host: staging.butterfly.cheridanh.fr
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: frontend
+                port:
+                  name: http
+---
+# HTTP : redirection vers HTTPS. Le service désigné n'est jamais atteint, la
+# redirection répond avant lui.
+# Le défi HTTP-01 de Let's Encrypt n'est pas redirigé : cert-manager crée pour lui une
+# Ingress temporaire au chemin plus précis, que Traefik fait passer en priorité.
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: butterfly-http
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: web
+    traefik.ingress.kubernetes.io/router.middlewares: butterfly-staging-redirect-https@kubernetescrd
+spec:
+  ingressClassName: traefik
+  rules:
+    - host: staging.butterfly.cheridanh.fr
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: frontend
+                port:
+                  name: http

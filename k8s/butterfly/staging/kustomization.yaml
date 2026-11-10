@@ -1,0 +1,35 @@
+# Environnement de staging : https://staging.butterfly.cheridanh.fr
+#
+# Reprend la base et y ajoute ce qui est propre au staging : namespace, domaine,
+# version des images, Mailpit à la place d'un vrai relais SMTP, secrets.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+# Toutes les ressources vont dans ce namespace, créé par Argo CD.
+namespace: butterfly-staging
+
+resources:
+  - ../base
+  - ingress.yaml
+  - mailpit.yaml
+  # Secrets chiffrés, produits par ../seal-secrets.sh (voir ../README.md).
+  - secrets/mysql-credentials.sealed.yaml
+  - secrets/backend-secrets.sealed.yaml
+  - secrets/swagger-htpasswd.sealed.yaml
+  - secrets/ghcr-pull.sealed.yaml
+
+# Valeurs propres au staging, ajoutées à celles de ../base/backend.env ou à leur place.
+configMapGenerator:
+  - name: backend-config
+    behavior: merge
+    envs:
+      - backend.env
+
+# Version déployée : l'étiquette sha-<commit> publiée par la CI de chaque dépôt.
+# Une étiquette sha désigne une image précise et immuable, à la différence de main.
+# Déployer une nouvelle version revient à modifier ces deux lignes.
+images:
+  - name: ghcr.io/dalton0x0/butterfly
+    newTag: sha-0000000
+  - name: ghcr.io/dalton0x0/butterfly-front
+    newTag: sha-0000000
