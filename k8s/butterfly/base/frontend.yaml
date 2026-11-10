@@ -1,0 +1,91 @@
+# Interface Vue servie par nginx, qui réachemine aussi /api vers le backend.
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend
+  labels:
+    app.kubernetes.io/name: frontend
+spec:
+  selector:
+    app.kubernetes.io/name: frontend
+  ports:
+    - name: http
+      port: 8080
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+  labels:
+    app.kubernetes.io/name: frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: frontend
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: frontend
+    spec:
+      enableServiceLinks: false
+      automountServiceAccountToken: false
+      imagePullSecrets:
+        - name: ghcr-pull
+      securityContext:
+        # Utilisateur nginx de l'image non privilégiée (UID 101).
+        runAsNonRoot: true
+        runAsUser: 101
+        runAsGroup: 101
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: frontend
+          image: ghcr.io/dalton0x0/butterfly-front
+          ports:
+            - name: http
+              containerPort: 8080
+          env:
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            # Nom complet du Service backend : le résolveur de nginx ne complète pas
+            # les noms courts. $(POD_NAMESPACE) est remplacé par Kubernetes, ce qui
+            # garde ce fichier identique dans tous les namespaces.
+            - name: BACKEND_HOST
+              value: backend.$(POD_NAMESPACE).svc.cluster.local
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+            periodSeconds: 20
+            timeoutSeconds: 3
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+            periodSeconds: 10
+            timeoutSeconds: 3
+          resources:
+            requests:
+              cpu: 20m
+              memory: 32Mi
+            limits:
+              memory: 128Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: [ ALL ]
+          volumeMounts:
+            # Comptes autorisés à consulter Swagger, fichier au format htpasswd.
+            # subPath : seul ce fichier est déposé, le reste de /etc/nginx reste celui
+            # de l'image.
+            - name: swagger-htpasswd
+              mountPath: /etc/nginx/swagger.htpasswd
+              subPath: swagger.htpasswd
+              readOnly: true
+      volumes:
+        - name: swagger-htpasswd
+          secret:
+            secretName: swagger-htpasswd

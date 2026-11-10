@@ -1,0 +1,118 @@
+# Isolation réseau du namespace.
+#
+# Tout trafic entrant est refusé par défaut, puis chaque flux attendu est autorisé
+# explicitement. Un composant compromis ne peut donc joindre que ce que son rôle exige :
+# depuis l'interface, la base de données reste injoignable.
+#
+# Seul le trafic entrant est filtré. Le trafic sortant reste libre : DNS, relais SMTP
+# externe, etc.
+#
+# Les contrôles de santé (probes) viennent du nœud lui-même : le contrôleur réseau de
+# k3s les laisse toujours passer.
+
+# 1. Refus par défaut de tout trafic entrant, pour tous les pods du namespace.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny-ingress
+spec:
+  podSelector: {}
+  policyTypes: [ Ingress ]
+---
+# 2. Traefik vers l'interface : le seul point d'entrée depuis Internet.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: frontend-from-traefik
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: frontend
+  policyTypes: [ Ingress ]
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+          podSelector:
+            matchLabels:
+              app.kubernetes.io/name: traefik
+      ports:
+        - port: 8080
+---
+# 3. Traefik vers le pod temporaire de cert-manager qui répond au défi de
+#    Let's Encrypt (validation HTTP-01), créé dans ce namespace à chaque émission ou
+#    renouvellement de certificat.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: acme-solver-from-traefik
+spec:
+  podSelector:
+    matchLabels:
+      acme.cert-manager.io/http01-solver: "true"
+  policyTypes: [ Ingress ]
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+          podSelector:
+            matchLabels:
+              app.kubernetes.io/name: traefik
+      ports:
+        - port: 8089
+---
+# 4. Interface vers le backend (réacheminement de /api par nginx).
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: backend-from-frontend
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: backend
+  policyTypes: [ Ingress ]
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: frontend
+      ports:
+        - port: 8080
+---
+# 5. Backend vers MySQL.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: mysql-from-backend
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: mysql
+  policyTypes: [ Ingress ]
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: backend
+      ports:
+        - port: 3306
+---
+# 6. Backend vers Redis.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: redis-from-backend
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: redis
+  policyTypes: [ Ingress ]
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: backend
+      ports:
+        - port: 6379

@@ -11,14 +11,14 @@ Docker Compose, à la racine du dépôt, reste l'outil du développement local.
 ```text
 k8s/
   apps/                         Applications Argo CD, une par composant (« app of apps »)
+  butterfly/                    L'application : base commune et un dossier par environnement
   infrastructure/
     cert-issuers/               Émetteurs Let's Encrypt (test et production)
     traefik/                    Réglages du Traefik fourni par k3s (IP réelle des clients)
   sealed-secrets-cert.pem       Certificat public de Sealed Secrets pour chiffrer hors ligne
 ```
 
-Le dossier s'enrichira de Butterfly, avec une base commune et une variante par environnement
-(staging, prod).
+La mise en service et l'exploitation de Butterfly sont décrites dans `butterfly/README.md`.
 
 ## Démarrage d'un cluster
 

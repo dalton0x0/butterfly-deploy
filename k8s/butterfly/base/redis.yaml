@@ -1,0 +1,75 @@
+# Cache Redis.
+#
+# Cache seulement : rien n'est écrit sur le disque, et un redémarrage repart d'un cache
+# vide. Le backend fonctionne aussi sans lui (il lit alors la base).
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis
+  labels:
+    app.kubernetes.io/name: redis
+spec:
+  selector:
+    app.kubernetes.io/name: redis
+  ports:
+    - name: redis
+      port: 6379
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis
+  labels:
+    app.kubernetes.io/name: redis
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: redis
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: redis
+    spec:
+      enableServiceLinks: false
+      automountServiceAccountToken: false
+      securityContext:
+        # Utilisateur redis de l'image Alpine (UID 999, groupe 1000).
+        runAsNonRoot: true
+        runAsUser: 999
+        runAsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: redis
+          image: redis:8.2-alpine
+          # Mêmes options que dans docker-compose.yml. maxmemory reste sous la limite du
+          # conteneur : Redis retire ses clés avant que le noyau ne le tue.
+          args: [ "redis-server", "--save", "", "--appendonly", "no",
+                  "--maxmemory", "64mb", "--maxmemory-policy", "allkeys-lru" ]
+          ports:
+            - name: redis
+              containerPort: 6379
+          livenessProbe:
+            exec:
+              command: [ "redis-cli", "ping" ]
+            periodSeconds: 20
+            timeoutSeconds: 3
+          readinessProbe:
+            exec:
+              command: [ "redis-cli", "ping" ]
+            periodSeconds: 10
+            timeoutSeconds: 3
+          resources:
+            requests:
+              cpu: 20m
+              memory: 32Mi
+            limits:
+              memory: 128Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            # Aucune écriture hors de la mémoire : le système de fichiers peut rester
+            # en lecture seule.
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: [ ALL ]
