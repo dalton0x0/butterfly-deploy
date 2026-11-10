@@ -30,6 +30,6 @@ configMapGenerator:
 # Déployer une nouvelle version revient à modifier ces deux lignes.
 images:
   - name: ghcr.io/dalton0x0/butterfly
-    newTag: sha-0000000
+    newTag: sha-8a80b11
   - name: ghcr.io/dalton0x0/butterfly-front
-    newTag: sha-0000000
+    newTag: sha-9da6eea
