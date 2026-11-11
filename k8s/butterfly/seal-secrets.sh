@@ -61,10 +61,11 @@ ask_secret() {
     printf '%s' "$value"
 }
 
-# Saisie visible, avec valeur par défaut.
+# Saisie visible avec valeur par défaut. -e : les flèches déplacent le curseur au lieu
+# d'insérer leur code dans la valeur.
 ask() {
     local value
-    read -r -p "$1 [$2] : " value
+    read -e -r -p "$1 [$2] : " value
     printf '%s' "${value:-$2}"
 }
 
@@ -164,10 +165,10 @@ seal_backup_credentials() {
     printf 'Mot de passe du dépôt : sans lui, les sauvegardes sont illisibles, même pour\n' >&2
     printf 'leur propriétaire. Le ranger dans le gestionnaire de mots de passe.\n' >&2
     local repository password region key_id key_secret
-    read -r -p "Dépôt restic : " repository
+    read -e -r -p "Dépôt restic : " repository
     [[ "$repository" == s3:https://* ]] || fail "le dépôt doit commencer par s3:https://."
     password="$(ask_secret "Mot de passe du dépôt restic")"
-    read -r -p "Région du stockage (exemples : fr-par, eu-central-003) : " region
+    read -e -r -p "Région du stockage (exemples : fr-par, eu-central-003) : " region
     [[ -n "$region" ]] || fail "valeur vide pour la région."
     key_id="$(ask_secret "Identifiant de la clé d'accès S3")"
     key_secret="$(ask_secret "Clé secrète S3")"
@@ -186,7 +187,7 @@ seal_backup_heartbeat() {
     printf "Adresse de signalement du contrôle Healthchecks.io de cet environnement,\n" >&2
     printf 'au format https://hc-ping.com/<identifiant>.\n' >&2
     local url
-    read -r -p "Adresse de signalement : " url
+    read -e -r -p "Adresse de signalement : " url
     [[ "$url" == https://* ]] || fail "l'adresse doit commencer par https://."
     {
         secret_header backup-heartbeat Opaque
