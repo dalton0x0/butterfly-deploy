@@ -150,8 +150,21 @@ keys, droit d'écriture coché). La clé privée correspondante est le secret Ac
 `DEPLOY_REPO_SSH_KEY` du backend ou du frontend. Pour révoquer l'accès d'un dépôt, supprimer sa
 clé ici.
 
-**Production ou retour à une version précédente du staging :** modifier les étiquettes
-`newTag` de l'environnement, commiter et pousser. Argo CD remplace les pods. Le backend s'arrête avant que le nouveau ne démarre (stratégie `Recreate`) : l'API est indisponible pendant environ une minute.
+**Production : par pull request.** Sur un tag de version (`v3.5.0`), le job `prepare-prod` de la
+CI pousse dans ce dépôt une branche `prod/<dépôt>-<version>` qui inscrit la version dans
+`prod/kustomization.yaml`. Le résumé de l'exécution sur GitHub donne le lien vers la pull
+request. La fusionner déploie la version.
+
+Avant de fusionner :
+
+- si le backend et le frontend changent tous les deux et que l'un exige la nouvelle version de
+  l'autre, fusionner d'abord celui dont l'autre dépend ;
+- si la version contient une migration Flyway, lancer d'abord une sauvegarde à la demande : une
+  migration ne s'annule pas en revenant à l'image précédente.
+
+**Retour arrière en production comme en staging :** remettre l'étiquette précédente dans le
+`kustomization.yaml` de l'environnement, commiter et pousser. Argo CD remplace les pods. Le backend s'arrête
+avant que le nouveau ne démarre (stratégie `Recreate`) : l'API est indisponible pendant environ une minute.
 
 ### Modifier un secret
 
