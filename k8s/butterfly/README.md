@@ -19,6 +19,10 @@ butterfly/
     mailpit.yaml        Capture des e-mails
     backend.env         Adresses publiques et messagerie
     secrets/            Secrets chiffrés (SealedSecrets)
+  prod/                 https://butterfly.cheridanh.fr
+    ingress.yaml        Domaine et certificat
+    backend.env         Adresses publiques, relais SMTP Brevo, Swagger désactivé
+    secrets/            Secrets chiffrés (SealedSecrets)
   seal-secrets.sh       Production des secrets chiffrés
 ```
 
