@@ -1,0 +1,34 @@
+# Environnement de production : https://butterfly.cheridanh.fr
+#
+# Reprend la base et y ajoute ce qui est propre à la production : namespace, domaine,
+# version des images, relais SMTP Brevo, Swagger désactivé, secrets.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: butterfly-prod
+
+resources:
+  - ../base
+  - ingress.yaml
+  # Secrets chiffrés, produits par ../seal-secrets.sh prod (voir ../README.md).
+  - secrets/mysql-credentials.sealed.yaml
+  - secrets/backend-secrets.sealed.yaml
+  - secrets/swagger-htpasswd.sealed.yaml
+  - secrets/ghcr-pull.sealed.yaml
+  - secrets/backup-credentials.sealed.yaml
+
+configMapGenerator:
+  - name: backend-config
+    behavior: merge
+    envs:
+      - backend.env
+
+# Version déployée : une version publiée, produite par un tag vX.Y.Z dans chaque dépôt.
+# Contrairement au staging, aucune mise à jour automatique : la production change par
+# décision, en modifiant ces deux lignes. Revenir en arrière se fait de la même façon,
+# avec la version précédente.
+images:
+  - name: ghcr.io/dalton0x0/butterfly
+    newTag: "3.4.0"
+  - name: ghcr.io/dalton0x0/butterfly-front
+    newTag: "3.4.0"
