@@ -35,6 +35,6 @@ configMapGenerator:
 # s'appuie sur cet ordre et échoue sinon.
 images:
   - name: ghcr.io/dalton0x0/butterfly
-    newTag: sha-ba2f85f
+    newTag: sha-a320e25
   - name: ghcr.io/dalton0x0/butterfly-front
     newTag: sha-d62bf51
