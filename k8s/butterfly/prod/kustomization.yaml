@@ -16,6 +16,7 @@ resources:
   - secrets/swagger-htpasswd.sealed.yaml
   - secrets/ghcr-pull.sealed.yaml
   - secrets/backup-credentials.sealed.yaml
+  - secrets/backup-heartbeat.sealed.yaml
 
 configMapGenerator:
   - name: backend-config

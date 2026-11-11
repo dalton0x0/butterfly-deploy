@@ -21,6 +21,7 @@
 #   swagger-htpasswd   comptes autorisés à consulter Swagger
 #   ghcr-pull          jeton de lecture des images privées de GHCR
 #   backup-credentials dépôt restic et accès au stockage S3 des sauvegardes
+#   backup-heartbeat   adresse de signalement Healthchecks.io des sauvegardes
 #
 # Les valeurs saisies se conservent dans un gestionnaire de mots de passe : un secret
 # chiffré ne se relit pas.
@@ -180,6 +181,19 @@ seal_backup_credentials() {
     } | seal backup-credentials
 }
 
+seal_backup_heartbeat() {
+    printf '\n--- backup-heartbeat\n' >&2
+    printf "Adresse de signalement du contrôle Healthchecks.io de cet environnement,\n" >&2
+    printf 'au format https://hc-ping.com/<identifiant>.\n' >&2
+    local url
+    read -r -p "Adresse de signalement : " url
+    [[ "$url" == https://* ]] || fail "l'adresse doit commencer par https://."
+    {
+        secret_header backup-heartbeat Opaque
+        printf '  HEALTHCHECK_URL: %s\n' "$(b64 "$url")"
+    } | seal backup-heartbeat
+}
+
 case "$ONLY" in
     "")
         seal_mysql_credentials
@@ -187,11 +201,13 @@ case "$ONLY" in
         seal_swagger_htpasswd
         seal_ghcr_pull
         seal_backup_credentials
+        seal_backup_heartbeat
         ;;
     mysql-credentials) seal_mysql_credentials ;;
     backend-secrets) seal_backend_secrets ;;
     swagger-htpasswd) seal_swagger_htpasswd ;;
     ghcr-pull) seal_ghcr_pull ;;
     backup-credentials) seal_backup_credentials ;;
+    backup-heartbeat) seal_backup_heartbeat ;;
     *) fail "secret inconnu : $ONLY." ;;
 esac
