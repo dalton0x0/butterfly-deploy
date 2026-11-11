@@ -263,15 +263,33 @@ Fichiers téléversés :
 
 ```bash
 tar -C ~/restauration/app/uploads -c . \
-  | kubectl -n butterfly-staging exec -i deployment/backend -- tar -x -C /app/uploads
+  | kubectl -n butterfly-staging exec -i deployment/backend -- tar -x --no-overwrite-dir -C /app/uploads
 ```
 
-Puis redémarrer le backend, pour vider ses caches, et supprimer la copie locale :
+`--no-overwrite-dir` laisse intacts les dossiers déjà présents. Sans cette option, tar tente de
+rétablir les droits et la date du dossier racine du volume qui appartient à root et échoue
+(`Cannot utime: Operation not permitted`).
+
+Puis vider le cache Redis : il garde des données lues avant la restauration, que le backend
+continuerait sinon de servir. Redémarrer le backend ne suffit pas, le cache est dans Redis et
+non dans le backend.
 
 ```bash
-kubectl -n butterfly-staging rollout restart deployment backend
-rm -rf ~/restauration
+kubectl -n butterfly-staging exec deployment/redis -- redis-cli FLUSHALL
 ```
+
+Les sessions ouvertes après la sauvegarde ne sont plus reconnues : se reconnecter.
+
+Enfin, supprimer la copie locale et les accès chargés dans la session :
+
+```bash
+rm -rf ~/restauration
+unset RESTIC_REPOSITORY RESTIC_PASSWORD AWS_DEFAULT_REGION AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY
+```
+
+Les fichiers téléversés après la sauvegarde restent sur le volume : la restauration ajoute et
+remplace des fichiers, elle n'en supprime aucun. Sans lien dans la base restaurée, ils ne
+sont plus affichés.
 
 Le mot de passe root de MySQL n'est pas à saisir : `sh -c` le lit dans les variables du
 conteneur, où Kubernetes l'a placé depuis le secret `mysql-credentials`.
