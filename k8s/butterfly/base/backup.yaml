@@ -115,20 +115,46 @@ spec:
               env:
                 - name: RESTIC_CACHE_DIR
                   value: /tmp/restic-cache
+                # Adresse de signalement Healthchecks.io (voir ../README.md, Supervision).
+                # Facultative : sans le secret backup-heartbeat, la sauvegarde tourne sans
+                # rien signaler.
+                - name: HEALTHCHECK_URL
+                  valueFrom:
+                    secretKeyRef:
+                      name: backup-heartbeat
+                      key: HEALTHCHECK_URL
+                      optional: true
               # --host fixe : sans lui, restic prendrait le nom du pod, différent à
               # chaque exécution. La rétention, qui raisonne par machine, ne
               # supprimerait alors jamais rien.
               # Rétention : 7 sauvegardes quotidiennes, 4 hebdomadaires, 6 mensuelles.
+              #
+              # Healthchecks.io reçoit le début (/start), puis la réussite ou l'échec
+              # (/fail) de la sauvegarde. Sans signal de réussite dans le délai prévu, il
+              # envoie une alerte : il détecte ainsi un échec, mais aussi une sauvegarde qui
+              # ne s'est jamais lancée. Un signal qui n'aboutit pas ne fait pas échouer la
+              # sauvegarde.
               command:
                 - sh
                 - -c
                 - |
                   set -eu
+                  signal() {
+                    [ -z "${HEALTHCHECK_URL:-}" ] \
+                      || wget -q -T 10 -O /dev/null "${HEALTHCHECK_URL}$1" \
+                      || echo "Signal Healthchecks$1 non transmis."
+                  }
+                  signal /start
+                  trap 'signal /fail' EXIT
+
                   # Premier passage : création du dépôt chiffré.
                   restic cat config > /dev/null 2>&1 || restic init
                   restic backup --host butterfly --tag nightly /backup /app/uploads
                   restic forget --host butterfly --keep-daily 7 --keep-weekly 4 --keep-monthly 6 --prune
                   restic snapshots --host butterfly --latest 3
+
+                  trap - EXIT
+                  signal ""
               resources:
                 requests:
                   cpu: 100m

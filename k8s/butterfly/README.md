@@ -12,7 +12,7 @@ butterfly/
     frontend.yaml       nginx : interface Vue et réacheminement de /api
     middlewares.yaml    Traefik : redirection HTTPS et en-tête HSTS
     network-policies.yaml
-    backup.yaml         Sauvegarde nocturne vers un stockage S3 (restic)
+    backup.yaml         Sauvegarde nocturne vers un stockage S3 (restic), signalée à Healthchecks.io
     backend.env         Configuration non sensible du backend
   staging/              https://staging.butterfly.cheridanh.fr
     ingress.yaml        Domaine et certificat
@@ -297,3 +297,64 @@ sont plus affichés.
 
 Le mot de passe root de MySQL n'est pas à saisir : `sh -c` le lit dans les variables du
 conteneur, où Kubernetes l'a placé depuis le secret `mysql-credentials`.
+
+## Supervision
+
+La surveillance tourne hors du serveur : un outil installé dessus tomberait avec lui et ne
+pourrait pas prévenir de sa propre panne. Deux services externes s'en chargent et envoient les
+alertes par e-mail.
+
+| Quoi | Service | Comment |
+|---|---|---|
+| Le site répond | UptimeRobot | Appel de l'API toutes les 5 minutes |
+| Les sauvegardes réussissent | Healthchecks.io | Signal envoyé par le CronJob `backup` |
+| Le serveur va bien | Healthchecks.io | Signal envoyé par `server/healthcheck.sh` |
+
+Le certificat n'a pas de contrôle propre : cert-manager le renouvelle et un certificat expiré
+ferait aussitôt échouer le contrôle du site.
+
+### Disponibilité du site (UptimeRobot)
+
+Un moniteur HTTP(S) par environnement, intervalle de 5 minutes, sur :
+
+```text
+https://butterfly.cheridanh.fr/api/v1/auth/registration
+```
+
+Cette adresse publique traverse toute la chaîne : Traefik, nginx, backend, puis MySQL, que
+l'état de l'inscription oblige à lire. La page d'accueil, servie par nginx seul, répondrait
+encore avec le backend ou la base en panne. L'adresse n'est pas soumise à la limitation de débit.
+
+### Sauvegardes (Healthchecks.io)
+
+Un contrôle par environnement, de type Cron :
+
+- planning `30 3 * * *`, fuseau `Europe/Paris`, comme le CronJob ;
+- délai de grâce d'une heure.
+
+Le CronJob signale son début, puis sa réussite ou son échec. Sans signal de réussite dans le
+délai, Healthchecks.io envoie une alerte : il détecte un échec, mais aussi une sauvegarde qui ne
+s'est pas lancée. Healthchecks.io affiche aussi la durée de chaque sauvegarde.
+
+L'adresse de signalement du contrôle se chiffre comme les autres secrets, puis s'ajoute à la
+liste `resources` du `kustomization.yaml` de l'environnement
+(`secrets/backup-heartbeat.sealed.yaml`) :
+
+```bash
+k8s/butterfly/seal-secrets.sh prod backup-heartbeat
+```
+
+Ce secret est facultatif : sans lui, la sauvegarde tourne normalement sans rien signaler.
+
+### Serveur (Healthchecks.io)
+
+`server/healthcheck.sh` vérifie chaque jour que k3s tourne, qu'aucun redémarrage n'est en attente
+et qu'aucun disque n'est rempli à plus de 85 %. Il signale la réussite ou l'échec avec la liste
+des problèmes. L'installation est décrite en tête du script.
+
+Contrôle de type Cron : planning `17 9 * * *`, fuseau `Europe/Paris` (celui du serveur, réglé par
+`harden.sh`), délai de grâce d'une heure. Une alerte arrive aussi si le serveur est éteint ou injoignable
+puisque le signal cesse.
+
+Une alerte « redémarrage en attente » se traite par `sudo reboot` à un moment calme : le site est
+coupé quelques minutes.
