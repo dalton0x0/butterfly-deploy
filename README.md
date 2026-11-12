@@ -17,6 +17,7 @@ applicatif : le backend et le frontend vivent dans leurs propres dépôts et y p
 - [Données persistantes](#données-persistantes)
 - [SonarQube](#sonarqube)
 - [Test de charge](#test-de-charge)
+- [Kubernetes (staging et production)](#kubernetes-staging-et-production)
 - [Pré-production](#pré-production)
 - [Contenus de démonstration](#contenus-de-démonstration)
 - [Commandes utiles](#commandes-utiles)
@@ -48,6 +49,7 @@ connaître.
 
 | Version de ce dépôt | Backend | Frontend |
 |---------------------|---------|----------|
+| 1.9.0               | 3.4.0   | 3.4.0    |
 | 1.8.0               | 3.3.0   | 3.3.0    |
 | 1.7.0               | 3.2.0   | 3.2.0    |
 | 1.6.0               | 3.1.0   | 3.1.0    |
@@ -233,7 +235,27 @@ Pour vérifier le cache des images, la seconde demande d'une même image doit re
 curl -sI http://localhost/api/media/images/<chemin> | grep X-Cache-Status
 ```
 
+## Kubernetes (staging et production)
+
+Le dossier `k8s/` décrit l'hébergement en ligne : un cluster k3s sur un seul serveur, piloté par
+Argo CD à partir de ce dépôt. Deux environnements y tournent, chacun dans son namespace :
+
+- **staging** (`staging.butterfly.cheridanh.fr`) : mis à jour automatiquement par la CI du backend
+  et du frontend après chaque poussée sur `main` ;
+- **production** (`butterfly.cheridanh.fr`) : mise à jour par la fusion d'une pull request que la
+  CI prépare sur chaque tag de version.
+
+Secrets chiffrés (Sealed Secrets), certificats Let's Encrypt (cert-manager), sauvegardes
+nocturnes chiffrées hors du serveur (restic) et supervision externe complètent l'ensemble. Le
+dossier `server/` contient les scripts de préparation du serveur.
+
+Démarrage d'un cluster : [k8s/README.md](k8s/README.md). Mise en service, exploitation,
+sauvegardes et supervision de l'application : [k8s/butterfly/README.md](k8s/butterfly/README.md).
+
 ## Pré-production
+
+Sur le serveur de Butterfly, cette pré-production Docker Compose est remplacée par Kubernetes
+(section précédente). Elle reste documentée pour un serveur sans Kubernetes.
 
 `docker-compose.preprod.yml` complète la pile pour un serveur exposé à Internet : Caddy termine le
 HTTPS avec un certificat Let's Encrypt obtenu et renouvelé automatiquement, et devient le seul
@@ -345,6 +367,6 @@ contenu de la version.
 
 ## Historique des versions
 
-Version courante : **v1.8.0**.
+Version courante : **v1.9.0**.
 
 L'historique complet des versions avec le détail de chaque livraison est dans [CHANGELOG.md](CHANGELOG.md).

@@ -11,6 +11,36 @@ commits qu'elle apporte. La toute première version renvoie vers son tag n'ayant
 
 ---
 
+## [v1.9.0](https://github.com/dalton0x0/butterfly-deploy/compare/v1.8.0...v1.9.0) - 2026-11-12
+
+Accompagne le backend v3.4.0 et le frontend v3.4.0, premières versions publiées sous forme
+d'images dans GHCR. Butterfly est désormais hébergé sur Kubernetes : un cluster k3s sur un seul
+serveur, piloté par Argo CD à partir du dossier `k8s/` de ce dépôt. Docker Compose reste l'outil du
+développement local.
+
+Le dossier `server/` prépare le serveur : durcissement du système (`harden.sh`), configuration de
+k3s avec chiffrement des Secrets, installation d'Argo CD et de son accès au dépôt
+(`install-argocd.sh`). Argo CD installe tout le reste : cert-manager et ses émetteurs Let's
+Encrypt, le contrôleur Sealed Secrets et un réglage de Traefik qui conserve l'adresse réelle des
+clients.
+
+`k8s/butterfly/` décrit l'application avec Kustomize : une base commune et un dossier par
+environnement. La base fait tourner chaque conteneur sans root ni élévation de privilèges et
+n'autorise que les flux réseau nécessaires. Le staging (`staging.butterfly.cheridanh.fr`) capture
+les e-mails dans Mailpit et se met à jour seul après chaque poussée sur `main` du backend ou du
+frontend. La production (`butterfly.cheridanh.fr`) envoie par Brevo, désactive Swagger et change
+de version par la fusion d'une pull request que la CI prépare à chaque tag. Les secrets sont
+chiffrés sur le poste par `seal-secrets.sh` et versionnés sans risque.
+
+Chaque nuit, la base et les fichiers téléversés de chaque environnement sont sauvegardés hors du
+serveur avec restic, chiffrés dans un stockage objet S3. La restauration a été éprouvée sur le
+staging et sa procédure corrigée en conséquence. Healthchecks.io est prévenu de chaque
+sauvegarde et reçoit chaque jour l'état du serveur (`server/healthcheck.sh` : k3s, redémarrage en
+attente, espace disque). Sur ce serveur, la pré-production Docker Compose est remplacée par
+Kubernetes. Elle reste documentée pour un serveur sans Kubernetes.
+
+---
+
 ## [v1.8.0](https://github.com/dalton0x0/butterfly-deploy/compare/v1.7.0...v1.8.0) - 2026-11-09
 
 Accompagne le backend v3.3.0 et le frontend v3.3.0 : rôle gestionnaire, blocs informatifs et
