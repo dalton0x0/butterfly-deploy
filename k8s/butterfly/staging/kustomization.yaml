@@ -38,4 +38,4 @@ images:
   - name: ghcr.io/dalton0x0/butterfly
     newTag: sha-a3dfdba
   - name: ghcr.io/dalton0x0/butterfly-front
-    newTag: sha-4e45c1d
+    newTag: sha-f84a662
