@@ -15,6 +15,9 @@
 #   k8s/butterfly/seal-secrets.sh staging                    tous les secrets
 #   k8s/butterfly/seal-secrets.sh staging backend-secrets    un seul secret
 #
+# Environnements : staging, prod et demo. La démo n'a pas de sauvegarde : ses secrets de
+# sauvegarde ne sont pas demandés.
+#
 # Secrets disponibles :
 #   mysql-credentials  mots de passe MySQL (root et compte de l'application)
 #   backend-secrets    clé JWT, compte administrateur, identifiants SMTP (prod)
@@ -37,8 +40,8 @@ ENVIRONMENT="${1:-}"
 ONLY="${2:-}"
 
 case "$ENVIRONMENT" in
-    staging | prod) ;;
-    *) fail "usage : $0 staging|prod [nom-du-secret]" ;;
+    staging | prod | demo) ;;
+    *) fail "usage : $0 staging|prod|demo [nom-du-secret]" ;;
 esac
 
 NAMESPACE="butterfly-$ENVIRONMENT"
@@ -51,6 +54,9 @@ mkdir -p "$OUT_DIR"
 # Encodage base64 sur une seule ligne. base64 de GNU coupe les lignes longues, pas
 # celui de macOS : tr harmonise les deux.
 b64() { printf '%s' "$1" | base64 | tr -d '\n'; }
+
+# Environnements qui envoient de vrais e-mails par Brevo.
+uses_real_smtp() { [[ "$ENVIRONMENT" == prod || "$ENVIRONMENT" == demo ]]; }
 
 # Saisie masquée d'une valeur obligatoire.
 ask_secret() {
@@ -113,9 +119,9 @@ seal_backend_secrets() {
     [[ ${#jwt} -ge 32 ]] || fail "la clé JWT doit faire au moins 32 caractères."
     email="$(ask "E-mail du compte administrateur" "admin@butterfly.local")"
     password="$(ask_secret "Mot de passe du compte administrateur")"
-    # En prod, le relais SMTP réel exige une authentification. Le staging utilise
-    # Mailpit, qui n'en demande pas.
-    if [[ "$ENVIRONMENT" == prod ]]; then
+    # En prod et en démo, le relais SMTP réel exige une authentification. Le staging
+    # utilise Mailpit, qui n'en demande pas.
+    if uses_real_smtp; then
         mail_user="$(ask_secret "Identifiant SMTP Brevo")"
         mail_password="$(ask_secret "Clé SMTP Brevo")"
     fi
@@ -124,7 +130,7 @@ seal_backend_secrets() {
         printf '  JWT_SECRET: %s\n' "$(b64 "$jwt")"
         printf '  ADMIN_EMAIL: %s\n' "$(b64 "$email")"
         printf '  ADMIN_PASSWORD: %s\n' "$(b64 "$password")"
-        if [[ "$ENVIRONMENT" == prod ]]; then
+        if uses_real_smtp; then
             printf '  MAIL_USERNAME: %s\n' "$(b64 "$mail_user")"
             printf '  MAIL_PASSWORD: %s\n' "$(b64 "$mail_password")"
         fi
@@ -201,8 +207,10 @@ case "$ONLY" in
         seal_backend_secrets
         seal_swagger_htpasswd
         seal_ghcr_pull
-        seal_backup_credentials
-        seal_backup_heartbeat
+        if [[ "$ENVIRONMENT" != demo ]]; then
+            seal_backup_credentials
+            seal_backup_heartbeat
+        fi
         ;;
     mysql-credentials) seal_mysql_credentials ;;
     backend-secrets) seal_backend_secrets ;;
