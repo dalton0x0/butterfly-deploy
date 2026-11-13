@@ -30,6 +30,6 @@ configMapGenerator:
 # avec la version précédente.
 images:
   - name: ghcr.io/dalton0x0/butterfly
-    newTag: "3.4.0"
+    newTag: "3.5.0"
   - name: ghcr.io/dalton0x0/butterfly-front
     newTag: "3.4.0"
