@@ -1,0 +1,63 @@
+# Environnement de démonstration : https://demo.butterfly.cheridanh.fr
+#
+# Une instance à montrer, que l'on remet à zéro après usage (scripts/reset-demo-k8s.sh).
+# Reprend la base avec trois différences :
+#   - pas de sauvegarde : les données sont jetables par nature ;
+#   - de vrais e-mails par Brevo, comme en production : les comptes de démonstration sont
+#     créés par l'administrateur et reçoivent leur lien d'activation ;
+#   - une réservation mémoire plus basse pour le backend : la démo ne reçoit que quelques
+#     visiteurs à la fois.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: butterfly-demo
+
+resources:
+  - ../base
+  - ingress.yaml
+  # Secrets chiffrés, produits par ../seal-secrets.sh demo (voir ../README.md).
+  - secrets/mysql-credentials.sealed.yaml
+  - secrets/backend-secrets.sealed.yaml
+  - secrets/swagger-htpasswd.sealed.yaml
+  - secrets/ghcr-pull.sealed.yaml
+
+patches:
+  # Pas de sauvegarde : la tâche et l'accès réseau qu'elle ouvre vers MySQL sont retirés.
+  - patch: |-
+      $patch: delete
+      apiVersion: batch/v1
+      kind: CronJob
+      metadata:
+        name: backup
+  - patch: |-
+      $patch: delete
+      apiVersion: networking.k8s.io/v1
+      kind: NetworkPolicy
+      metadata:
+        name: mysql-from-backup
+  # La limite reste celle de la base : la JVM dimensionne sa mémoire sur la limite, pas
+  # sur la réservation. Seule la place réservée sur le serveur baisse.
+  - target:
+      kind: Deployment
+      name: backend
+    patch: |-
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/requests/memory
+        value: 512Mi
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/requests/cpu
+        value: 100m
+
+configMapGenerator:
+  - name: backend-config
+    behavior: merge
+    envs:
+      - backend.env
+
+# Version déployée : une version publiée, comme en production. La démo montre ce qui est
+# livré, pas ce qui est en cours sur main.
+images:
+  - name: ghcr.io/dalton0x0/butterfly
+    newTag: "3.4.0"
+  - name: ghcr.io/dalton0x0/butterfly-front
+    newTag: "3.4.0"
