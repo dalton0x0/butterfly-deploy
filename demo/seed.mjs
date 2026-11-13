@@ -8,6 +8,10 @@
 //   node --env-file=.env demo/seed.mjs
 //
 // Le script peut être relancé : un compte ou un bloc qui existe déjà est conservé tel quel.
+//
+// DEMO_SKIP_ACCOUNTS=true ne charge que les contenus, sans comptes ni assignations. C'est le
+// mode de la démo en ligne : les comptes y sont créés à la main par l'administrateur, et
+// leurs invitations partent par un vrai relais SMTP, sans Mailpit à lire.
 
 import {readdir, readFile} from 'node:fs/promises'
 import path from 'node:path'
@@ -27,6 +31,9 @@ const MAILPIT_URL = process.env.DEMO_MAILPIT_URL ?? `http://localhost:${process.
 // 10 caractères minimum avec majuscule, minuscule, chiffre et caractère spécial.
 // Pas de # : node --env-file le prendrait pour le début d'un commentaire.
 const DEMO_PASSWORD = process.env.DEMO_PASSWORD ?? 'Butterfly-Demo2026'
+
+// Contenus seuls : aucun compte créé, aucun bloc assigné.
+const SKIP_ACCOUNTS = process.env.DEMO_SKIP_ACCOUNTS === 'true'
 
 // Libellés affichés dans le récapitulatif de fin.
 const ROLE_LABELS = {MANAGER: 'Gestionnaire', TEACHER: 'Formateur', USER: 'Apprenant'}
@@ -402,8 +409,10 @@ async function main() {
     await login()
 
     const users = []
-    for (const demoUser of DEMO_USERS) {
-        users.push(await ensureUser(demoUser))
+    if (!SKIP_ACCOUNTS) {
+        for (const demoUser of DEMO_USERS) {
+            users.push(await ensureUser(demoUser))
+        }
     }
 
     const existingBlocks = await fetchAllPages('/blocks')
@@ -420,6 +429,11 @@ async function main() {
         if (!block.informational) {
             demoBlockIds.push(blockIdsByName.get(block.name))
         }
+    }
+
+    if (SKIP_ACCOUNTS) {
+        console.log('\nContenus prêts. Aucun compte créé (DEMO_SKIP_ACCOUNTS=true) : créez-les depuis l\'interface.')
+        return
     }
 
     await assignBlocks(users, demoBlockIds)

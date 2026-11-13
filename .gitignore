@@ -1,5 +1,7 @@
-# Variables d'environnement : le fichier .env contient les secrets, seul l'exemple est versionné.
+# Variables d'environnement : les fichiers .env contiennent les secrets, seul l'exemple est
+# versionné. .env.* couvre aussi demo/.env.democqui porte le mot de passe de l'admin de la démo.
 .env
+.env.*
 !.env.example
 
 # Journaux
