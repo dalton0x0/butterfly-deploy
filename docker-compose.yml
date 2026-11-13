@@ -217,6 +217,15 @@ services:
       TOKEN_ACCOUNT_ACTIVATION_TTL: ${TOKEN_ACCOUNT_ACTIVATION_TTL:-72h}
       # Plafond des tentatives d'authentification par adresse IP (voir .env.example).
       RATE_LIMIT_IP_CAPACITY: ${RATE_LIMIT_IP_CAPACITY:-20}
+      # En-tête de la documentation Swagger. Vides : le bloc de présentation reste vide.
+      # OPEN_API_VERSION n'est pas transmise : la version suit alors celle du pom.xml.
+      OPEN_API_TITLE: ${OPEN_API_TITLE:-}
+      OPEN_API_DESCRIPTION: ${OPEN_API_DESCRIPTION:-}
+      OPEN_API_CONTACT_NAME: ${OPEN_API_CONTACT_NAME:-}
+      OPEN_API_CONTACT_EMAIL: ${OPEN_API_CONTACT_EMAIL:-}
+      OPEN_API_CONTACT_URL: ${OPEN_API_CONTACT_URL:-}
+      OPEN_API_LICENSE_NAME: ${OPEN_API_LICENSE_NAME:-}
+      OPEN_API_LICENSE_URL: ${OPEN_API_LICENSE_URL:-}
     volumes:
       # Volumes nommés : les fichiers téléversés et les journaux survivent à la
       # reconstruction de l'image, contrairement à tout ce qui reste dans le conteneur.
