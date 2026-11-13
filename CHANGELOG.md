@@ -11,6 +11,32 @@ commits qu'elle apporte. La toute première version renvoie vers son tag n'ayant
 
 ---
 
+## [v1.10.0](https://github.com/dalton0x0/butterfly-deploy/compare/v1.9.0...v1.10.0) - 2026-11-13
+
+Accompagne le backend v3.5.0 et le frontend v3.5.0. Troisième environnement Kubernetes : la
+démonstration (`demo.butterfly.cheridanh.fr`, namespace `butterfly-demo`), une instance à montrer
+puis à remettre à zéro. Elle déploie la même version que la production, mise à jour par la même
+pull request. Elle n'a pas de sauvegarde : deux patchs Kustomize retirent la tâche et l'accès
+réseau qu'elle ouvre vers MySQL. Ses e-mails partent par Brevo pour que les personnes invitées
+reçoivent leur lien d'activation et la mémoire réservée au backend baisse à 512 Mi, sa limite
+restant à 1 Gi. `seal-secrets.sh` accepte l'environnement `demo` et ne lui demande pas les
+secrets de sauvegarde.
+
+`scripts/reset-demo-k8s.sh`, lancé sur le serveur, vide la base, les fichiers téléversés et le
+cache puis redémarre le backend : Flyway recrée le schéma et l'administrateur de la démo est
+recréé. Les volumes sont vidés et non supprimés pour ne pas lutter contre Argo CD qui relance
+aussitôt les pods arrêtés. Le namespace est écrit en dur : le script ne peut pas viser le staging
+ni la production. Le chargement des contenus prend un mode `DEMO_SKIP_ACCOUNTS=true` : les blocs
+seuls, sans comptes ni assignations, chargés par l'API publique depuis le poste.
+
+L'en-tête de Swagger (`OPEN_API_*`) restait vide sous Docker Compose et sous Kubernetes : ces
+variables n'étaient transmises au conteneur ni par `docker-compose.yml` ni par `backend.env`. Elles
+le sont désormais sans guillemets dans `backend.env` où Kustomize les garderait dans la valeur.
+Le `.gitignore` couvre aussi `.env.*` dont `demo/.env.demo` qui porte le mot de passe de
+l'administrateur de la démo.
+
+---
+
 ## [v1.9.0](https://github.com/dalton0x0/butterfly-deploy/compare/v1.8.0...v1.9.0) - 2026-11-12
 
 Accompagne le backend v3.4.0 et le frontend v3.4.0, premières versions publiées sous forme
