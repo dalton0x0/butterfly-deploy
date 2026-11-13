@@ -1,0 +1,26 @@
+# Butterfly, environnement de démonstration : https://demo.butterfly.cheridanh.fr
+#
+# Manifestes dans k8s/butterfly/demo (base commune et réglages de la démonstration).
+#
+# Les secrets chiffrés de k8s/butterfly/demo/secrets doivent exister avant l'ajout de
+# ce fichier : sans eux, la construction des manifestes échoue et rien n'est déployé.
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: butterfly-demo
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: git@github.com:dalton0x0/butterfly-deploy.git
+    targetRevision: main
+    path: k8s/butterfly/demo
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: butterfly-demo
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
