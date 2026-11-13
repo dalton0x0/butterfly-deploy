@@ -23,6 +23,10 @@ butterfly/
     ingress.yaml        Domaine et certificat
     backend.env         Adresses publiques, relais SMTP Brevo, Swagger désactivé
     secrets/            Secrets chiffrés (SealedSecrets)
+  demo/                 https://demo.butterfly.cheridanh.fr
+    ingress.yaml        Domaine et certificat
+    backend.env         Adresses publiques, relais SMTP Brevo, Swagger désactivé
+    secrets/            Secrets chiffrés (SealedSecrets), sans ceux des sauvegardes
   seal-secrets.sh       Production des secrets chiffrés
 ```
 
@@ -193,6 +197,52 @@ ssh -t -L 8025:127.0.0.1:8025 <utilisateur>@<serveur> \
 ```
 
 puis http://localhost:8025.
+
+### Démonstration en ligne
+
+L'environnement `demo` sert à montrer Butterfly puis se remet à zéro. Il diffère de la
+production sur trois points : pas de sauvegarde, une réservation mémoire plus basse pour le
+backend et des comptes créés à la main. Les e-mails passent par Brevo comme en production :
+une personne invitée reçoit son lien d'activation.
+
+**Mise en service** comme pour un autre environnement (section précédente) :
+
+1. Enregistrement DNS `A` de `demo.butterfly.cheridanh.fr` vers le serveur.
+2. Secrets : `k8s/butterfly/seal-secrets.sh demo`. Les secrets de sauvegarde ne sont pas
+   demandés. Le compte administrateur saisi ici est celui de la démo : le ranger à part.
+3. Version : les deux `newTag` de `demo/kustomization.yaml` suivent ceux de la production.
+   À chaque nouvelle version, les mettre à jour dans la même pull request.
+4. Commiter les secrets chiffrés et `k8s/apps/butterfly-demo.yaml` puis pousser sur `main`.
+
+**Préparer une démonstration.** Charger les contenus depuis le poste par l'API publique.
+Créer d'abord `demo/.env.demo`, ignoré par Git :
+
+```bash
+DEMO_API_URL=https://demo.butterfly.cheridanh.fr/api
+ADMIN_EMAIL=<e-mail de l'administrateur de la démo>
+ADMIN_PASSWORD="<mot de passe de l'administrateur de la démo>"
+DEMO_SKIP_ACCOUNTS=true
+```
+
+```bash
+node --env-file=demo/.env.demo demo/seed.mjs
+```
+
+`DEMO_SKIP_ACCOUNTS=true` ne charge que les blocs. Se connecter ensuite en administrateur pour
+créer les comptes des personnes invitées puis leur assigner les blocs depuis l'écran
+« Membres » de chaque bloc.
+
+**Remettre à zéro** sur le serveur depuis une copie de ce dépôt :
+
+```bash
+scripts/reset-demo-k8s.sh
+```
+
+Le script vide la base, les fichiers téléversés et le cache puis redémarre le backend : Flyway
+recrée le schéma et l'administrateur de la démo est recréé. Tous les comptes créés pendant la
+démonstration cessent de fonctionner. Le namespace `butterfly-demo` est écrit en dur dans le
+script qui ne peut donc pas toucher au staging ni à la production. Relancer ensuite le
+chargement des contenus depuis le poste.
 
 ### Journaux
 
