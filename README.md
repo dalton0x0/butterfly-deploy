@@ -17,7 +17,7 @@ applicatif : le backend et le frontend vivent dans leurs propres dépôts et y p
 - [Données persistantes](#données-persistantes)
 - [SonarQube](#sonarqube)
 - [Test de charge](#test-de-charge)
-- [Kubernetes (staging et production)](#kubernetes-staging-et-production)
+- [Kubernetes (staging, production et démonstration)](#kubernetes-staging-production-et-démonstration)
 - [Pré-production](#pré-production)
 - [Contenus de démonstration](#contenus-de-démonstration)
 - [Commandes utiles](#commandes-utiles)
@@ -235,15 +235,17 @@ Pour vérifier le cache des images, la seconde demande d'une même image doit re
 curl -sI http://localhost/api/media/images/<chemin> | grep X-Cache-Status
 ```
 
-## Kubernetes (staging et production)
+## Kubernetes (staging, production et démonstration)
 
 Le dossier `k8s/` décrit l'hébergement en ligne : un cluster k3s sur un seul serveur, piloté par
-Argo CD à partir de ce dépôt. Deux environnements y tournent, chacun dans son namespace :
+Argo CD à partir de ce dépôt. Trois environnements y tournent, chacun dans son namespace :
 
 - **staging** (`staging.butterfly.cheridanh.fr`) : mis à jour automatiquement par la CI du backend
   et du frontend après chaque poussée sur `main` ;
 - **production** (`butterfly.cheridanh.fr`) : mise à jour par la fusion d'une pull request que la
-  CI prépare sur chaque tag de version.
+  CI prépare sur chaque tag de version ;
+- **démonstration** (`demo.butterfly.cheridanh.fr`) : même version que la production, sans
+  sauvegarde, remise à zéro après usage par `scripts/reset-demo-k8s.sh`.
 
 Secrets chiffrés (Sealed Secrets), certificats Let's Encrypt (cert-manager), sauvegardes
 nocturnes chiffrées hors du serveur (restic) et supervision externe complètent l'ensemble. Le
