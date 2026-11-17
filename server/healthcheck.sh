@@ -24,6 +24,16 @@
 #
 # L'adresse de signalement est lisible par root seulement : quiconque la connaît peut
 # envoyer de faux signaux.
+#
+# Réagir à une alerte « redémarrage en attente » : le site fonctionne, mais un noyau ou une
+# bibliothèque mise à jour ne sera utilisé qu'après redémarrage. L'alerte revient chaque
+# jour tant que le serveur n'a pas redémarré. « Ping Now » dans Healthchecks.io la masque
+# jusqu'au lendemain sans rien corriger. À une heure creuse :
+#
+#   sudo reboot                          # k3s relance les pods, coupure d'une à deux minutes
+#   ls /var/run/reboot-required          # après reconnexion : le fichier ne doit plus exister
+#   kubectl get pods -A                  # tous les pods Running
+#   sudo /usr/local/sbin/butterfly-healthcheck   # signal de réussite immédiat
 
 set -euo pipefail
 
