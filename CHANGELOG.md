@@ -11,6 +11,24 @@ commits qu'elle apporte. La toute première version renvoie vers son tag n'ayant
 
 ---
 
+## [v1.12.0](https://github.com/dalton0x0/butterfly-deploy/compare/v1.11.0...v1.12.0) - 2026-11-20
+
+Tous les réglages du backend sont visibles au même endroit pour Kubernetes comme pour Docker
+Compose. `k8s/butterfly/base/backend.env` et `.env.example` deviennent des catalogues rangés par
+thème. Une valeur par défaut y figure en commentaire sans être imposée et un secret y est
+signalé sans valeur dans le catalogue Kubernetes. Les valeurs appliquées ne changent pas. Chaque
+environnement Kubernetes ne garde que ses surcharges.
+
+`docker-compose.yml` transmet au backend tous les réglages qu'il ne transmettait pas. Ils sont écrits
+sans valeur : Compose reprend celle du `.env` et ne transmet rien quand la ligne y reste
+commentée. Le backend garde alors sa valeur par défaut sans qu'elle soit recopiée dans le fichier
+compose. Auparavant, décommenter par exemple `LEARNING_QUIZ_PASS_THRESHOLD` dans le `.env` restait
+sans effet.
+
+`scripts/check-backend-env.sh` vérifie, en local et dans la CI, que les deux catalogues et le
+service backend de `docker-compose.yml` reprennent toutes les variables du backend et qu'aucun
+fichier ne règle un nom inconnu.
+
 ## [v1.11.0](https://github.com/dalton0x0/butterfly-deploy/compare/v1.10.0...v1.11.0) - 2026-11-20
 
 Accompagne le backend v3.7.0 et le frontend v3.7.0. `.env.example` présente `ADMIN_EMAIL` comme
