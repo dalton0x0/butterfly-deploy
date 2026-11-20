@@ -13,7 +13,7 @@ butterfly/
     middlewares.yaml    Traefik : redirection HTTPS et en-tête HSTS
     network-policies.yaml
     backup.yaml         Sauvegarde nocturne vers un stockage S3 (restic), signalée à Healthchecks.io
-    backend.env         Configuration non sensible du backend
+    backend.env         Catalogue de tous les réglages du backend
   staging/              https://staging.butterfly.cheridanh.fr
     ingress.yaml        Domaine et certificat
     mailpit.yaml        Capture des e-mails
@@ -169,6 +169,34 @@ Avant de fusionner :
 **Retour arrière en production comme en staging :** remettre l'étiquette précédente dans le
 `kustomization.yaml` de l'environnement, commiter et pousser. Argo CD remplace les pods. Le backend s'arrête
 avant que le nouveau ne démarre (stratégie `Recreate`) : l'API est indisponible pendant environ une minute.
+
+### Modifier un réglage du backend
+
+`base/backend.env` liste tous les réglages du backend, rangés par thème. Une ligne commentée
+(`#LEARNING_QUIZ_PASS_THRESHOLD=0.7`) montre la valeur par défaut du code sans l'imposer. Une
+ligne `# secret NOM` signale une valeur fournie par un SealedSecret.
+
+- Pour tous les environnements, décommenter la ligne dans `base/backend.env`.
+- Pour un seul, copier la ligne sans le `#` dans le `backend.env` de cet environnement.
+
+Commiter et pousser puis synchroniser la production dans Argo CD. Le nom du ConfigMap change
+avec son contenu : le backend redémarre de lui-même avec la nouvelle valeur.
+
+Pour voir les valeurs reçues par un environnement :
+
+```bash
+kubectl kustomize k8s/butterfly/prod | grep -A80 'name: backend-config'
+```
+
+Après l'ajout d'une variable dans le backend, `scripts/check-backend-env.sh` signale qu'elle
+manque au catalogue. Il signale aussi un nom inconnu dans un `backend.env`, par exemple une
+faute de frappe qui laisserait la valeur par défaut sans rien dire :
+
+```bash
+scripts/check-backend-env.sh ../butterfly
+```
+
+La CI lance la même vérification à chaque pull request.
 
 ### Modifier un secret
 
