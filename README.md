@@ -149,8 +149,10 @@ appel, là où l'attente donnerait une connexion refusée sans aucune indication
 ## Configuration
 
 Toutes les valeurs proviennent du fichier `.env`, jamais du `docker-compose.yml` versionné. Le
-fichier `.env.example` documente chaque variable. Les obligatoires sont les mots de passe de la
-base, la clé `JWT_SECRET` et le compte administrateur.
+fichier `.env.example` documente chaque variable, y compris tous les réglages du backend. Une
+ligne commentée montre la valeur par défaut sans l'imposer : il suffit de la décommenter dans le
+`.env` pour la changer. Les obligatoires sont les mots de passe de la base, la clé `JWT_SECRET`
+et le compte administrateur.
 
 Trois points méritent une attention particulière :
 
@@ -163,7 +165,11 @@ Trois points méritent une attention particulière :
 - Une variable du `.env` n'atteint un conteneur que si elle est listée dans le bloc
   `environment` du service concerné. Compose lit le `.env` pour remplacer les `${...}` de ce
   fichier, il ne transmet rien de lui-même. Ajouter un réglage au `.env.example` sans l'ajouter
-  au `docker-compose.yml` donne une variable qui semble configurable et qui ne fait rien.
+  au `docker-compose.yml` donne une variable qui semble configurable et qui ne fait rien. Les
+  réglages facultatifs du backend y sont écrits sans valeur (`LEARNING_MAX_GRADE:`) : Compose
+  reprend celle du `.env`, ou ne transmet rien et le backend garde sa valeur par défaut.
+  `scripts/check-backend-env.sh ../butterfly` signale tout oubli, et la CI le lance à chaque
+  pull request.
 
 La messagerie vise Mailpit par défaut mais chaque variable `MAIL_*` est surchargeable depuis le
 `.env` : décommenter le bloc Brevo de `.env.example` suffit à basculer sur un envoi réel, sans
@@ -370,6 +376,6 @@ contenu de la version.
 
 ## Historique des versions
 
-Version courante : **v1.11.0**.
+Version courante : **v1.12.0**.
 
 L'historique complet des versions avec le détail de chaque livraison est dans [CHANGELOG.md](CHANGELOG.md).
