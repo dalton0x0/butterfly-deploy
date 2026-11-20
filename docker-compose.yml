@@ -217,8 +217,61 @@ services:
       TOKEN_ACCOUNT_ACTIVATION_TTL: ${TOKEN_ACCOUNT_ACTIVATION_TTL:-72h}
       # Plafond des tentatives d'authentification par adresse IP (voir .env.example).
       RATE_LIMIT_IP_CAPACITY: ${RATE_LIMIT_IP_CAPACITY:-20}
+
+      # Autres réglages du backend, tous facultatifs (catalogue complet dans .env.example).
+      # Un nom sans valeur reprend celle du .env. Absent ou commenté dans le .env, il n'est
+      # pas transmis du tout et le backend garde sa valeur par défaut. Écrire ici une valeur
+      # par défaut la doublerait avec celle du code, et l'une finirait par contredire l'autre.
+      HIKARI_MAX_POOL_SIZE:
+      HIKARI_MIN_IDLE:
+      TOKEN_EMAIL_VERIFICATION_TTL:
+      TOKEN_PASSWORD_RESET_TTL:
+      TOKEN_EMAIL_VERIFICATION_GRACE:
+      TOKEN_CLEANUP_CRON:
+      ACCOUNT_CLEANUP_ENABLED:
+      ACCOUNT_CLEANUP_RETENTION:
+      ACCOUNT_CLEANUP_BATCH_SIZE:
+      RATE_LIMIT_ENABLED:
+      RATE_LIMIT_IP_REFILL:
+      RATE_LIMIT_EMAIL_CAPACITY:
+      RATE_LIMIT_EMAIL_REFILL:
+      RATE_LIMIT_RETENTION:
+      RATE_LIMIT_CLEANUP_INTERVAL:
+      LEARNING_QUIZ_PASS_THRESHOLD:
+      LEARNING_MAX_GRADE:
+      LEARNING_COURSE_COMPLETED_PERCENT:
+      LEARNING_DEFAULT_QUESTION_TIME_SECONDS:
+      LEARNING_QUIZ_ANSWER_TOLERANCE_SECONDS:
+      LEARNING_OVERVIEW_RECENT_LIMIT:
+      DASHBOARD_RECENT_BADGES_LIMIT:
+      MAIL_CONNECTION_TIMEOUT:
+      MAIL_TIMEOUT:
+      MAIL_WRITE_TIMEOUT:
+      MAIL_VERIFICATION_PATH:
+      MAIL_PASSWORD_RESET_PATH:
+      MAIL_ACCOUNT_ACTIVATION_PATH:
+      THYMELEAF_CACHE:
+      NOTIFICATIONS_DISPATCH_INTERVAL:
+      NOTIFICATIONS_MAX_ATTEMPTS:
+      NOTIFICATIONS_SENT_RETENTION:
+      REDIS_TIMEOUT:
+      REDIS_CONNECT_TIMEOUT:
+      CACHE_PRINCIPAL_TTL:
+      CACHE_SESSION_STATUS_TTL:
+      STORAGE_MAX_FILE_SIZE_BYTES:
+      MEDIA_MAX_IMAGE_SIZE_BYTES:
+      MEDIA_MAX_VIDEO_SIZE_BYTES:
+      UPLOAD_MAX_FILE_SIZE:
+      UPLOAD_MAX_REQUEST_SIZE:
+      MEDIA_PENDING_UPLOAD_RETENTION:
+      MEDIA_CLEANUP_CRON:
+      LOG_MAX_FILE_SIZE:
+      LOG_MAX_HISTORY:
+      LOG_TOTAL_SIZE_CAP:
+      # Absente du .env, la version affichée dans Swagger suit celle du pom.xml.
+      OPEN_API_VERSION:
+
       # En-tête de la documentation Swagger. Vides : le bloc de présentation reste vide.
-      # OPEN_API_VERSION n'est pas transmise : la version suit alors celle du pom.xml.
       OPEN_API_TITLE: ${OPEN_API_TITLE:-}
       OPEN_API_DESCRIPTION: ${OPEN_API_DESCRIPTION:-}
       OPEN_API_CONTACT_NAME: ${OPEN_API_CONTACT_NAME:-}
