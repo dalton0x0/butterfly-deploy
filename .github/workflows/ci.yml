@@ -51,12 +51,22 @@ jobs:
         uses: actions/checkout@v7
 
       # Les noms des variables sont lus dans les fichiers de configuration du backend à
-      # jour sur sa branche main.
+      # jour sur sa branche main. Le dépôt backend est privé : le jeton de ce workflow ne
+      # donne accès qu'à butterfly-deploy. Une clé de déploiement en lecture seule posée
+      # sur le dépôt backend uniquement ouvre l'accès. Seul le dossier des fichiers de
+      # configuration est récupéré.
       - name: Récupération du backend
         uses: actions/checkout@v7
         with:
           repository: dalton0x0/butterfly
+          # Branche écrite en dur : sans elle, l'action demande la branche par défaut à
+          # l'API GitHub avec le jeton du workflow qui ne voit pas ce dépôt privé (404).
+          # La clé SSH ne sert qu'à Git, pas à l'API.
+          ref: main
+          ssh-key: ${{ secrets.BACKEND_REPO_SSH_KEY }}
           path: backend-src
+          sparse-checkout: src/main/resources
+          persist-credentials: false
 
       - name: Vérification du catalogue
         run: scripts/check-backend-env.sh backend-src
