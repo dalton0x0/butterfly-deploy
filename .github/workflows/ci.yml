@@ -1,8 +1,9 @@
-# Vérification du fichier compose à chaque poussée et à chaque pull request.
+# Vérifications à chaque poussée et à chaque pull request.
 #
 # Ce dépôt ne contient aucun code applicatif : il n'y a donc ni test ni
-# construction. La seule erreur qu'on peut attraper automatiquement ici est une
-# faute de syntaxe ou une référence cassée dans le docker-compose.yml.
+# construction. Les erreurs qu'on peut attraper automatiquement ici sont une
+# faute de syntaxe ou une référence cassée dans le docker-compose.yml et un
+# catalogue des réglages du backend incomplet ou contenant un nom inconnu.
 #
 # La commande config résout les variables, valide la structure et n'exécute rien.
 
@@ -40,3 +41,22 @@ jobs:
         run: |
           BACKEND_PATH=. FRONTEND_PATH=. DOMAIN=preprod.example.test ACME_EMAIL=ci@example.test \
             docker compose --env-file .env.example -f docker-compose.yml -f docker-compose.preprod.yml config --quiet
+
+  backend-env:
+    name: Catalogue des réglages du backend
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Récupération des sources
+        uses: actions/checkout@v7
+
+      # Les noms des variables sont lus dans les fichiers de configuration du backend à
+      # jour sur sa branche main.
+      - name: Récupération du backend
+        uses: actions/checkout@v7
+        with:
+          repository: dalton0x0/butterfly
+          path: backend-src
+
+      - name: Vérification du catalogue
+        run: scripts/check-backend-env.sh backend-src
