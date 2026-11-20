@@ -376,6 +376,6 @@ contenu de la version.
 
 ## Historique des versions
 
-Version courante : **v1.12.0**.
+Version courante : **v1.12.1**.
 
 L'historique complet des versions avec le détail de chaque livraison est dans [CHANGELOG.md](CHANGELOG.md).

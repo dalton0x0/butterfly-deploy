@@ -11,6 +11,13 @@ commits qu'elle apporte. La toute première version renvoie vers son tag n'ayant
 
 ---
 
+## [v1.12.1](https://github.com/dalton0x0/butterfly-deploy/compare/v1.12.0...v1.12.1) - 2026-11-20
+
+La sauvegarde nocturne attend que MySQL réponde avant l'export, jusqu'à 2 minutes. Après un
+redémarrage du serveur, MySQL pouvait encore démarrer à 3 h 30 : la première tentative échouait
+avec l'erreur 2003 et laissait un pod en `Init:Error`, la seconde réussissait. Une base toujours
+injoignable au bout de 2 minutes fait échouer la tentative comme avant.
+
 ## [v1.12.0](https://github.com/dalton0x0/butterfly-deploy/compare/v1.11.0...v1.12.0) - 2026-11-20
 
 Tous les réglages du backend sont visibles au même endroit pour Kubernetes comme pour Docker
