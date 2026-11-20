@@ -215,13 +215,11 @@ une personne invitée reçoit son lien d'activation.
 4. Commiter les secrets chiffrés et `k8s/apps/butterfly-demo.yaml` puis pousser sur `main`.
 
 **Préparer une démonstration.** Charger les contenus depuis le poste par l'API publique.
-Créer d'abord `demo/.env.demo`, ignoré par Git :
+Créer d'abord `demo/.env.demo` ignoré par Git à partir de l'exemple puis y saisir le
+compte administrateur de la démo :
 
 ```bash
-DEMO_API_URL=https://demo.butterfly.cheridanh.fr/api
-ADMIN_EMAIL=<e-mail de l'administrateur de la démo>
-ADMIN_PASSWORD="<mot de passe de l'administrateur de la démo>"
-DEMO_SKIP_ACCOUNTS=true
+cp demo/.env.demo.example demo/.env.demo
 ```
 
 ```bash
