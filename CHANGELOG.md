@@ -11,6 +11,14 @@ commits qu'elle apporte. La toute première version renvoie vers son tag n'ayant
 
 ---
 
+## [v1.11.0](https://github.com/dalton0x0/butterfly-deploy/compare/v1.10.0...v1.11.0) - 2026-11-20
+
+Accompagne le backend v3.7.0 et le frontend v3.7.0. `.env.example` présente `ADMIN_EMAIL` comme
+le compte propriétaire de la plateforme : chez un client, l'adresse de son responsable qui pourra
+transférer la propriété. `demo/.env.demo.example` documente les variables du chargement de la
+démo en ligne et `k8s/butterfly/README.md` le copie au lieu de recopier son contenu. Le
+`.gitignore` versionne les fichiers `.env.*.example` tout en ignorant toujours les vrais `.env`.
+
 ## [v1.10.0](https://github.com/dalton0x0/butterfly-deploy/compare/v1.9.0...v1.10.0) - 2026-11-13
 
 Accompagne le backend v3.5.0 et le frontend v3.5.0. Troisième environnement Kubernetes : la
