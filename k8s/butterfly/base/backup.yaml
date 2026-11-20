@@ -75,6 +75,11 @@ spec:
               # Pas de compression : restic compresse lui-même, et un fichier compressé
               # change entièrement d'une nuit à l'autre, ce qui empêcherait la
               # déduplication.
+              # Attente de MySQL avant l'export : après un redémarrage du serveur, MySQL
+              # peut encore démarrer à l'heure de la sauvegarde. Sans cette attente, la
+              # première tentative échoue (erreur 2003) et laisse un pod en Init:Error. Au
+              # bout de 2 minutes sans réponse, l'export est tenté quand même : son erreur
+              # fait échouer la tentative et reste signalée comme avant.
               command:
                 - bash
                 - -c
@@ -82,6 +87,13 @@ spec:
                   set -euo pipefail
                   trap 'rm -f /tmp/my.cnf' EXIT
                   printf '[client]\nuser=%s\npassword=%s\n' "$DB_USERNAME" "$DB_PASSWORD" > /tmp/my.cnf
+                  for attempt in $(seq 1 24); do
+                    if mysqladmin --defaults-extra-file=/tmp/my.cnf -h mysql ping --silent 2>/dev/null; then
+                      break
+                    fi
+                    echo "MySQL ne répond pas encore (essai $attempt/24), nouvel essai dans 5 s"
+                    sleep 5
+                  done
                   mysqldump --defaults-extra-file=/tmp/my.cnf -h mysql \
                     --single-transaction --no-tablespaces --set-gtid-purged=OFF \
                     --result-file=/backup/butterfly.sql "$DB_NAME"
