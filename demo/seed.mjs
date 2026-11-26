@@ -12,10 +12,14 @@
 // DEMO_SKIP_ACCOUNTS=true ne charge que les contenus, sans comptes ni assignations. C'est le
 // mode de la démo en ligne : les comptes y sont créés à la main par l'administrateur, et
 // leurs invitations partent par un vrai relais SMTP, sans Mailpit à lire.
+//
+// DEMO_ACTIVITY=true ajoute des apprenants et rejoue leur activité : cours terminés,
+// exercices rendus et corrigés, quiz réussis ou retentés (voir activity.mjs).
 
-import {readdir, readFile} from 'node:fs/promises'
+import {access, readdir, readFile} from 'node:fs/promises'
 import path from 'node:path'
 import {fileURLToPath} from 'node:url'
+import {ACTIVITY_LEARNERS, runActivity} from './activity.mjs'
 
 const CONTENT_DIR = path.join(path.dirname(fileURLToPath(import.meta.url)), 'content')
 
@@ -34,6 +38,17 @@ const DEMO_PASSWORD = process.env.DEMO_PASSWORD ?? 'Butterfly-Demo2026'
 
 // Contenus seuls : aucun compte créé, aucun bloc assigné.
 const SKIP_ACCOUNTS = process.env.DEMO_SKIP_ACCOUNTS === 'true'
+
+// Comptes avec activité : progression, rendus, corrections, quiz et badges.
+const WITH_ACTIVITY = process.env.DEMO_ACTIVITY === 'true'
+
+// Couverture d'un bloc : premier fichier trouvé dans son dossier, dans cet ordre.
+const COVER_FILES = [['cover.png', 'image/png'], ['cover.jpg', 'image/jpeg'], ['cover.webp', 'image/webp']]
+
+// Réponse 429 (quota de la limitation de débit) : nouvelles tentatives espacées. Le quota
+// par adresse IP se régénère en quelques minutes.
+const RATE_LIMIT_RETRIES = 6
+const RATE_LIMIT_DELAY_MS = 20000
 
 // Libellés affichés dans le récapitulatif de fin.
 const ROLE_LABELS = {MANAGER: 'Gestionnaire', TEACHER: 'Formateur', USER: 'Apprenant'}
@@ -71,24 +86,46 @@ class ApiError extends Error {
 
 /**
  * Appelle l'API et renvoie le champ data de l'enveloppe ApiResponse.
+ *
+ * @param options.token jeton d'accès d'un autre compte que l'administrateur
  */
-async function api(method, route, body) {
-    const headers = {'Content-Type': 'application/json'}
-    if (accessToken) {
-        headers.Authorization = `Bearer ${accessToken}`
-    }
-
-    const response = await fetch(API_URL + route, {
+async function api(method, route, body, options = {}) {
+    return send(API_URL + route, {
         method,
-        headers,
+        headers: {'Content-Type': 'application/json'},
         body: body === undefined ? undefined : JSON.stringify(body)
-    })
-    const payload = await response.json().catch(() => null)
+    }, 'token' in options ? options.token : accessToken, `${method} ${route}`)
+}
 
-    if (!response.ok) {
-        throw new ApiError(response.status, payload, `${method} ${route}`)
+/**
+ * Envoie un formulaire multipart (fichiers). La route est relative à API_URL, sauf avec
+ * options.root pour une route hors version comme /api/media.
+ */
+async function apiMultipart(route, form, options = {}) {
+    // Pas d'en-tête Content-Type : fetch le pose lui-même avec la délimitation des parties.
+    return send((options.root ?? API_URL) + route, {method: 'POST', headers: {}, body: form},
+        'token' in options ? options.token : accessToken, `POST ${route}`)
+}
+
+async function send(url, init, token, label) {
+    if (token) {
+        init.headers.Authorization = `Bearer ${token}`
     }
-    return payload?.data
+
+    for (let attempt = 0; ; attempt++) {
+        const response = await fetch(url, init)
+        const payload = await response.json().catch(() => null)
+
+        if (response.status === 429 && attempt < RATE_LIMIT_RETRIES) {
+            console.log(`  Limite de débit atteinte (${label}), nouvel essai dans ${RATE_LIMIT_DELAY_MS / 1000} s...`)
+            await new Promise((resolve) => setTimeout(resolve, RATE_LIMIT_DELAY_MS))
+            continue
+        }
+        if (!response.ok) {
+            throw new ApiError(response.status, payload, label)
+        }
+        return payload?.data
+    }
 }
 
 /**
@@ -131,6 +168,14 @@ async function login() {
     console.log(`Connecté en tant que ${auth.email}`)
 }
 
+/**
+ * Ouvre la session d'un compte de démonstration et renvoie son jeton d'accès.
+ */
+async function loginAs(email, password) {
+    const auth = await api('POST', '/auth/login', {email, password}, {token: null})
+    return auth.accessToken
+}
+
 // ---------------------------------------------------------------------------
 // Comptes de démonstration
 // ---------------------------------------------------------------------------
@@ -159,13 +204,16 @@ async function ensureUser(demoUser) {
         console.log(`Compte existant conservé : ${user.email}`)
     }
 
+    // Un compte invité dont l'invitation n'a pas pu être lue n'a pas de mot de passe : il
+    // ne peut pas se connecter, l'activité de démonstration l'ignore.
+    let usable = true
     if (user.pendingActivation) {
-        await activateAccount(user, created)
+        usable = await activateAccount(user, created)
     } else if (!user.emailVerified) {
         // Compte créé par une version antérieure, qui avait déjà un mot de passe.
-        await verifyEmail(user.email, created)
+        usable = await verifyEmail(user.email, created)
     }
-    return user
+    return {...user, usable}
 }
 
 /**
@@ -184,7 +232,7 @@ async function activateAccount(user, justCreated) {
     if (!token) {
         console.warn(`  Compte non activé pour ${user.email} : aucune invitation trouvée dans Mailpit (${MAILPIT_URL}).`)
         console.warn('  Relancez le script une fois Mailpit joignable.')
-        return
+        return false
     }
 
     await api('POST', '/auth/activate-account', {
@@ -193,6 +241,7 @@ async function activateAccount(user, justCreated) {
         confirmPassword: DEMO_PASSWORD
     })
     console.log(`  Compte activé : ${user.email}`)
+    return true
 }
 
 /**
@@ -210,12 +259,13 @@ async function verifyEmail(email, justCreated) {
     const token = await waitForToken(email, VERIFICATION_SUBJECT, requestedAt)
     if (!token) {
         console.warn(`  Adresse non confirmée pour ${email} : aucun message trouvé dans Mailpit (${MAILPIT_URL}).`)
-        console.warn('  Le compte reste utilisable pendant le délai de grâce. Relancez le script une fois Mailpit joignable.')
-        return
+        console.warn('  Le compte ne peut pas se connecter tant que son adresse n\'est pas confirmée. Relancez le script une fois Mailpit joignable.')
+        return false
     }
 
     await api('POST', '/auth/verify-email', {token})
     console.log(`  Adresse confirmée : ${email}`)
+    return true
 }
 
 /**
@@ -294,9 +344,26 @@ async function loadBlockDefinitions() {
                 module.quiz.questions = (await readJson(path.join(directory, module.quiz.file))).questions
             }
         }
+        block.cover = await readCover(directory)
         blocks.push(block)
     }
     return blocks
+}
+
+/**
+ * Lit l'image de couverture du bloc, facultative.
+ */
+async function readCover(directory) {
+    for (const [name, type] of COVER_FILES) {
+        const file = path.join(directory, name)
+        try {
+            await access(file)
+        } catch {
+            continue
+        }
+        return {name, type, bytes: await readFile(file)}
+    }
+    return null
 }
 
 async function readJson(file) {
@@ -317,6 +384,7 @@ async function createBlock(block, blockIdsByName) {
     const created = await api('POST', '/blocks', {
         name: block.name,
         description: block.description,
+        cover: block.cover ? await uploadCover(block.cover) : null,
         informational
     })
     console.log(`Bloc créé : ${block.name}`)
@@ -333,14 +401,27 @@ async function createBlock(block, blockIdsByName) {
     }
 
     let previousModuleId = null
+    const exerciseIds = []
     for (const module of block.modules) {
-        const moduleId = await createModule(module, created.id)
+        const {moduleId, moduleExerciseIds} = await createModule(module, created.id)
         if (previousModuleId !== null && !informational) {
             await api('PUT', `/modules/${moduleId}/prerequisites`, {prerequisiteIds: [previousModuleId]})
         }
         previousModuleId = moduleId
+        exerciseIds.push(...moduleExerciseIds)
     }
-    return created.id
+    return {blockId: created.id, exerciseIds}
+}
+
+/**
+ * Envoie l'image de couverture comme le fait l'interface, puis renvoie son adresse.
+ * La route des médias n'est pas versionnée : /api/media et non /api/v1/media.
+ */
+async function uploadCover(cover) {
+    const form = new FormData()
+    form.append('file', new Blob([cover.bytes], {type: cover.type}), cover.name)
+    const uploaded = await apiMultipart('/media/images?usage=COVER', form, {root: API_ROOT.replace(/\/$/, '')})
+    return uploaded.url
 }
 
 async function createModule(module, blockId) {
@@ -352,6 +433,7 @@ async function createModule(module, blockId) {
 
     // Cours et exercices partagent la même suite de positions : le backend place chaque
     // nouvel élément en fin de module, l'ordre de création fixe donc l'ordre du parcours.
+    const moduleExerciseIds = []
     for (const item of module.content) {
         if (item.type === 'course') {
             await api('POST', '/courses', {
@@ -361,7 +443,8 @@ async function createModule(module, blockId) {
                 moduleId: created.id
             })
         } else {
-            await api('POST', '/exercises', {name: item.name, content: item.content, moduleId: created.id})
+            const exercise = await api('POST', '/exercises', {name: item.name, content: item.content, moduleId: created.id})
+            moduleExerciseIds.push(exercise.id)
         }
     }
 
@@ -369,7 +452,7 @@ async function createModule(module, blockId) {
         await createQuiz(module.quiz, created.id)
     }
     console.log(`  Module créé : ${module.name}`)
-    return created.id
+    return {moduleId: created.id, moduleExerciseIds}
 }
 
 async function createQuiz(quiz, moduleId) {
@@ -399,18 +482,39 @@ async function assignBlocks(users, blockIds) {
     }
 }
 
+/**
+ * Désigne le formateur de démonstration comme correcteur des exercices créés : il les
+ * retrouve dans « Mes exercices » et reçoit les notifications de rendu. Possible seulement
+ * une fois les blocs assignés, le backend n'acceptant que des formateurs du bloc.
+ */
+async function assignCorrectors(users, exerciseIds) {
+    const teacher = users.find((user) => user.role === 'TEACHER')
+    if (!teacher || exerciseIds.length === 0) {
+        return
+    }
+    for (const exerciseId of exerciseIds) {
+        await api('PUT', `/exercises/${exerciseId}/correctors`, {userIds: [teacher.id]})
+    }
+    console.log(`Correcteur des ${exerciseIds.length} exercices créés : ${teacher.email}`)
+}
+
 // ---------------------------------------------------------------------------
 // Point d'entrée
 // ---------------------------------------------------------------------------
 
 async function main() {
+    if (WITH_ACTIVITY && SKIP_ACCOUNTS) {
+        throw new Error('DEMO_ACTIVITY=true demande des comptes : il est incompatible avec DEMO_SKIP_ACCOUNTS=true.')
+    }
+
     const blocks = await loadBlockDefinitions()
     console.log(`API : ${API_URL}`)
     await login()
 
+    const demoUsers = WITH_ACTIVITY ? [...DEMO_USERS, ...ACTIVITY_LEARNERS] : DEMO_USERS
     const users = []
     if (!SKIP_ACCOUNTS) {
-        for (const demoUser of DEMO_USERS) {
+        for (const demoUser of demoUsers) {
             users.push(await ensureUser(demoUser))
         }
     }
@@ -419,11 +523,14 @@ async function main() {
     const blockIdsByName = new Map(existingBlocks.map((block) => [block.name, block.id]))
 
     const demoBlockIds = []
+    const createdExerciseIds = []
     for (const block of blocks) {
         if (blockIdsByName.has(block.name)) {
             console.log(`Bloc existant conservé : ${block.name}`)
         } else {
-            blockIdsByName.set(block.name, await createBlock(block, blockIdsByName))
+            const {blockId, exerciseIds} = await createBlock(block, blockIdsByName)
+            blockIdsByName.set(block.name, blockId)
+            createdExerciseIds.push(...exerciseIds)
         }
         // Un bloc informatif est déjà visible par tous : il ne s'assigne pas.
         if (!block.informational) {
@@ -437,11 +544,31 @@ async function main() {
     }
 
     await assignBlocks(users, demoBlockIds)
+    await assignCorrectors(users, createdExerciseIds)
+
+    if (WITH_ACTIVITY) {
+        await playActivity(users, blockIdsByName)
+    }
 
     console.log('\nDémonstration prête. Comptes disponibles, mot de passe commun : ' + DEMO_PASSWORD)
-    for (const user of DEMO_USERS) {
+    for (const user of demoUsers) {
         console.log(`  ${ROLE_LABELS[user.role]} : ${user.email}`)
     }
+}
+
+/**
+ * Rejoue l'activité des apprenants, si tous les comptes peuvent se connecter.
+ */
+async function playActivity(users, blockIdsByName) {
+    const unusable = users.filter((user) => !user.usable)
+    if (unusable.length > 0) {
+        console.warn(`\nActivité ignorée : ${unusable.map((user) => user.email).join(', ')} `
+            + 'ne peut pas se connecter (invitation non lue dans Mailpit).')
+        return
+    }
+
+    console.log('\nActivité de démonstration...')
+    await runActivity({api, apiMultipart, loginAs, users, blockIdsByName, password: DEMO_PASSWORD})
 }
 
 main().catch((error) => {

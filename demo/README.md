@@ -7,6 +7,7 @@ apprenants.
 ## Sommaire
 
 - [Ce qui est créé](#ce-qui-est-créé)
+- [Activité de démonstration](#activité-de-démonstration)
 - [Lancement](#lancement)
 - [Fonctionnement](#fonctionnement)
 - [Relancer le script](#relancer-le-script)
@@ -25,7 +26,9 @@ défaut :
 | Apprenant    | Lucas Bernard  | `lucas.bernard@butterfly.local`  |
 | Apprenant    | Emma Petit     | `emma.petit@butterfly.local`     |
 
-Six blocs pédagogiques, assignés au formateur et aux deux apprenants. La gestionnaire voit déjà tous
+Six blocs pédagogiques, chacun avec son image de couverture assignés au formateur et aux deux
+apprenants. Le formateur est désigné correcteur de tous les exercices : il les retrouve dans
+« Mes exercices » et reçoit les notifications de rendu. La gestionnaire voit déjà tous
 les blocs : le backend refuse de lui en assigner. S'y ajoute le bloc informatif « Livret d'accueil »
 (règlement intérieur, informations pratiques), visible par tous les comptes sans assignation.
 
@@ -45,6 +48,33 @@ un module a pour prérequis le module qui le précède et se termine par un quiz
 en faut 7 pour le réussir avec le seuil par défaut de 70 %. Les blocs Spring Boot et Laravel
 restent verrouillés tant que leurs blocs prérequis ne sont pas terminés, ce qui suppose que le
 formateur ait validé les exercices : c'est ce qui permet de montrer le déverrouillage progressif.
+
+## Activité de démonstration
+
+Avec `DEMO_ACTIVITY=true`, le script ajoute quatre apprenants, les rattache à la « Promotion de
+démonstration » et rejoue leur parcours par l'API, comme le feraient de vrais utilisateurs. Le
+formateur corrige les rendus avec sa propre session.
+
+| Apprenant      | Parcours                                                                          |
+|----------------|-----------------------------------------------------------------------------------|
+| Lucas Bernard  | Git, SQL et Java terminés, Spring Boot déverrouillé avec un rendu en attente      |
+| Emma Petit     | Git (un quiz raté puis réussi), PHP (un rendu refusé puis validé), SQL en cours avec un rendu à reprendre |
+| Hugo Martin    | Premier module de Git (quiz retenté), second module avec un rendu en attente      |
+| Léa Dubois     | Git terminé, Java commencé (deux cours lus)                                        |
+| Nathan Roux    | Deux cours de Git lus                                                              |
+| Chloé Fournier | Inscrite, pas encore commencé                                                      |
+
+L'expérience, les badges, la complétion des modules et le déverrouillage des blocs sont calculés
+par le backend, comme en usage réel. Résultat : une file de correction avec des rendus en attente,
+des tableaux de bord remplis pour chaque rôle et des parcours à des stades différents.
+
+Toute l'activité est datée du moment du chargement : l'API n'accepte pas de date passée. Les
+séries de jours consécutifs démarrent donc à un jour, et les badges liés à l'heure (connexion
+tardive par exemple) dépendent de l'heure du chargement.
+
+Les apprenants doivent pouvoir se connecter : ce mode demande Mailpit pour lire les invitations,
+comme le mode avec comptes. Il est incompatible avec `DEMO_SKIP_ACCOUNTS=true`. Un apprenant qui a
+déjà une progression est ignoré à la relance : rien n'est rendu deux fois.
 
 ## Lancement
 
@@ -70,6 +100,7 @@ Variables facultatives :
 | `DEMO_PASSWORD`    | `Butterfly-Demo2026`                     | Mot de passe des comptes créés        |
 | `DEMO_API_URL`     | `http://localhost:${FRONTEND_PORT}/api`  | Racine de l'API visée sans version, par exemple un backend lancé hors conteneur (`http://localhost:8080/api`). Le script ajoute lui-même `/v1` |
 | `DEMO_MAILPIT_URL` | `http://localhost:${MAILPIT_UI_PORT}`    | Interface de Mailpit                  |
+| `DEMO_ACTIVITY`    | `false`                                  | `true` : comptes avec activité, voir [Activité de démonstration](#activité-de-démonstration) |
 | `DEMO_SKIP_ACCOUNTS` | `false`                                | `true` : contenus seuls, sans comptes ni assignations. Mode de la démo en ligne où les comptes sont créés à la main et reçoivent un vrai e-mail ([k8s/butterfly/README.md](../k8s/butterfly/README.md#démonstration-en-ligne)) |
 
 ## Fonctionnement
@@ -111,6 +142,10 @@ l'interface avant de relancer.
 
 ## Ajouter un bloc
 
+L'image de couverture d'un bloc est le fichier `cover.png`, `cover.jpg` ou `cover.webp` de son
+dossier, facultatif. Elle est envoyée comme depuis l'interface (5 Mo maximum).
+
+
 Chaque bloc est un dossier de `content`. Les dossiers sont traités dans l'ordre de leur préfixe
 numérique : un bloc doit venir après ses prérequis puisqu'il les désigne par leur nom.
 
@@ -118,6 +153,7 @@ numérique : un bloc doit venir après ses prérequis puisqu'il les désigne par
 content/
   03-java/
     block.json            nom, description, prérequis, modules et ordre du contenu
+    cover.png             image de couverture, facultative
     01-bases/
       01-premier-programme.md
       03-exercice-moyenne.md
@@ -138,4 +174,6 @@ content/
 
 - Un bloc existant n'est jamais mis à jour : modifier un contenu déjà chargé passe par l'interface,
   ou par la suppression du bloc puis une relance.
-- Le script ne crée aucune progression : les apprenants démarrent avec un parcours vierge.
+- Sans `DEMO_ACTIVITY=true`, le script ne crée aucune progression : les apprenants démarrent
+  avec un parcours vierge.
+- La démo en ligne n'a pas de Mailpit : elle ne peut charger ni les comptes ni l'activité.

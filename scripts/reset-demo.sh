@@ -2,11 +2,17 @@
 #
 # Remise à zéro de la pile locale puis rechargement des contenus de démonstration.
 #
-# Usage : scripts/reset-demo.sh [--yes]
+# Usage : scripts/reset-demo.sh [--yes] [--contents-only | --with-activity]
 #
 # Supprime la base et les fichiers téléversés, redémarre la pile, puis lance
 # demo/seed.mjs. Au redémarrage, Flyway recrée le schéma et le backend recrée le
 # compte administrateur du .env : on repart de l'état d'une installation neuve.
+#
+# Trois états de départ :
+#   (sans option)      contenus et comptes de démonstration, parcours vierges,
+#   --contents-only    contenus seuls, aucun compte en dehors de l'administrateur,
+#   --with-activity    contenus, comptes et activité : progression, rendus corrigés ou en
+#                      attente, quiz réussis ou retentés, badges.
 #
 # Réservé au poste de développement. Le script refuse de tourner si le .env désigne
 # un vrai relais SMTP (MAIL_HOST autre que mailpit) : c'est le signe d'une
@@ -16,6 +22,19 @@
 # --yes saute la question de confirmation.
 
 set -euo pipefail
+
+confirm=true
+seed_mode=accounts
+for arg in "$@"; do
+    case "$arg" in
+        --yes) confirm=false ;;
+        --contents-only) seed_mode=contents ;;
+        --with-activity) seed_mode=activity ;;
+        *) echo "Option inconnue : $arg" >&2
+           echo "Usage : scripts/reset-demo.sh [--yes] [--contents-only | --with-activity]" >&2
+           exit 1 ;;
+    esac
+done
 
 # Le script peut être lancé depuis n'importe où : docker compose doit trouver
 # docker-compose.yml et le .env du dépôt.
@@ -34,7 +53,7 @@ fi
 # Nom du projet compose, préfixe du nom réel des volumes (dossier du dépôt par défaut).
 project="$(docker compose config | sed -n 's/^name: //p' | head -n 1)"
 
-if [[ "${1:-}" != "--yes" ]]; then
+if [[ "$confirm" == true ]]; then
     echo "La base et les fichiers téléversés du projet « $project » vont être supprimés."
     read -r -p "Continuer ? [o/N] " answer
     [[ "$answer" == "o" || "$answer" == "O" ]] || { echo "Abandon."; exit 0; }
@@ -56,4 +75,9 @@ echo "Redémarrage de la pile (attente des contrôles de santé)..."
 docker compose up -d --wait
 
 echo "Chargement des contenus de démonstration..."
-node --env-file=.env demo/seed.mjs
+# Une variable déjà présente dans l'environnement l'emporte sur celle du .env.
+case "$seed_mode" in
+    contents) DEMO_SKIP_ACCOUNTS=true node --env-file=.env demo/seed.mjs ;;
+    activity) DEMO_ACTIVITY=true node --env-file=.env demo/seed.mjs ;;
+    *) node --env-file=.env demo/seed.mjs ;;
+esac
