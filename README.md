@@ -297,6 +297,17 @@ scripts/reset-demo.sh
 Le script supprime la base et les fichiers téléversés, redémarre la pile puis recharge la démo.
 Il refuse de tourner si le `.env` désigne un vrai relais SMTP, signe d'une pré-production.
 
+Deux options changent l'état de départ :
+
+```bash
+scripts/reset-demo.sh --contents-only   # contenus seuls, aucun compte en dehors de l'administrateur
+scripts/reset-demo.sh --with-activity   # contenus, comptes et activité des apprenants
+```
+
+Avec `--with-activity`, six apprenants ont déjà un parcours : cours terminés, exercices corrigés
+ou en attente, quiz réussis ou retentés, badges. C'est l'état à montrer quand l'application doit
+paraître utilisée.
+
 ## Commandes utiles
 
 ```bash
@@ -376,6 +387,6 @@ contenu de la version.
 
 ## Historique des versions
 
-Version courante : **v1.13.0**.
+Version courante : **v1.14.0**.
 
 L'historique complet des versions avec le détail de chaque livraison est dans [CHANGELOG.md](CHANGELOG.md).
