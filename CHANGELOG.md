@@ -11,6 +11,14 @@ commits qu'elle apporte. La toute première version renvoie vers son tag n'ayant
 
 ---
 
+## [v1.13.0](https://github.com/dalton0x0/butterfly-deploy/compare/v1.12.1...v1.13.0) - 2026-11-25
+
+Réglages du backend v3.8.0. Le quota de connexion par compte visé (`RATE_LIMIT_LOGIN_CAPACITY`,
+`RATE_LIMIT_LOGIN_REFILL`) rejoint les catalogues `base/backend.env` et `.env.example` et le service
+backend de `docker-compose.yml`. La description du délai de grâce suit la nouvelle règle : une
+inscription publique doit confirmer son adresse avant la première connexion, le délai ne concerne
+plus que le changement d'adresse.
+
 ## [v1.12.1](https://github.com/dalton0x0/butterfly-deploy/compare/v1.12.0...v1.12.1) - 2026-11-20
 
 La sauvegarde nocturne attend que MySQL réponde avant l'export, jusqu'à 2 minutes. Après un
