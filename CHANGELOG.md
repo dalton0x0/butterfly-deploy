@@ -11,6 +11,18 @@ commits qu'elle apporte. La toute première version renvoie vers son tag n'ayant
 
 ---
 
+## [v1.14.0](https://github.com/dalton0x0/butterfly-deploy/compare/v1.13.0...v1.14.0) - 2026-11-26
+
+Démo avec activité. `DEMO_ACTIVITY=true` (ou `scripts/reset-demo.sh --with-activity`) ajoute quatre
+apprenants, une promotion et rejoue par l'API le parcours de six apprenants : cours terminés,
+exercices rendus, corrigés par le formateur ou en attente, rendus refusés puis repris, quiz
+réussis ou ratés puis retentés. Expérience, badges et déverrouillage des blocs sont calculés par le
+backend. `scripts/reset-demo.sh --contents-only` recharge les contenus sans comptes.
+
+Les blocs de démonstration reçoivent une image de couverture (`cover.png` du dossier du bloc) et
+le formateur de démonstration devient correcteur de leurs exercices. Le script réessaie un appel
+refusé par la limitation de débit (429) au lieu de s'arrêter.
+
 ## [v1.13.0](https://github.com/dalton0x0/butterfly-deploy/compare/v1.12.1...v1.13.0) - 2026-11-25
 
 Réglages du backend v3.8.0. Le quota de connexion par compte visé (`RATE_LIMIT_LOGIN_CAPACITY`,
